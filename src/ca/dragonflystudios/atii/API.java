@@ -3,14 +3,13 @@ package ca.dragonflystudios.atii;
 public interface API {
 
     // This section is the "data model" interface.
-    public abstract static class Navigation {
-    }
+    // These are used to programatically "play" a playable.
+    // They could be used to implement? record? compose? perform? a replayable?
 
-    public abstract static class Stopover extends Navigation {
-    }
-
-    public abstract static class Hop extends Navigation {
-    }
+    public interface Activity { } // manages frames ... starting, ending ... real time ...
+    public interface Navigation extends Activity { }
+    public interface Stopover extends Navigation { }
+    public interface Hop extends Navigation { }
 
     public interface Navigable {
         public void navigateTo(Stopover stopover);
@@ -18,24 +17,19 @@ public interface API {
         public void navigateBy(Hop hop);
     }
 
-    public abstract static class Indication { }
+    public interface Indication extends Activity { }
     public interface Indicatable {
         public void indicate(Indication indication);
     }
 
-    public abstract static class Enunciation { }
+    public interface Enunciation extends Activity { }
     public interface Enunciable {
-        public void enunciate();
+        public void enunciate(Enunciation enunciation);
     }
 
-    public interface Playable extends Navigable, Indicatable, Enunciable {
-    }
+    public interface Playable extends Navigable, Indicatable, Enunciable { }
 
-    // Need a set of ... UI event interfaces ...
-
-    public interface NavigationObserver {
-    }
-
+    // These are used to replay a Replayable
     public interface Replayable {
         public void start();
 
@@ -57,6 +51,16 @@ public interface API {
 
         public void toFinish();
     }
+
+    // Need a set of ... real time UI event monitoring interfaces ...
+
+    public interface Monitorable { }
+    public interface ActivityMonitor {
+        public void onActivityStart(Monitorable observable, Activity activity);
+        public void onActivityUpdate(Monitorable observable, Activity activity);
+        public void onActivityFinish(Monitorable observable, Activity activity);
+    }
+
 
     public interface Touchable {
         public void onTap();
