@@ -8,8 +8,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
-public class GestureDetectionView extends View implements
-        GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,
+public class GestureDetectionView extends View implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,
         ScaleGestureDetector.OnScaleGestureListener {
 
     private GestureDetector mGestureDetector;
@@ -33,8 +32,7 @@ public class GestureDetectionView extends View implements
         init(context);
     }
 
-    public GestureDetectionView(Context context, AttributeSet attrs,
-            int defStyle) {
+    public GestureDetectionView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context);
     }
@@ -46,20 +44,16 @@ public class GestureDetectionView extends View implements
     @Override
     public boolean onDown(MotionEvent arg0) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onDown -- (" + arg0.getX() + ", "
-                    + arg0.getY() + ")");
+            Log.d(getClass().getName(), "onDown -- (" + arg0.getX() + ", " + arg0.getY() + ")");
 
         return true;
     }
 
     @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-            float velocityY) {
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onFling -- " + "e1: (" + e1.getX()
-                    + ", " + e1.getY() + ")\t\t" + "e2: (" + e2.getX() + ", "
-                    + e2.getY() + ")\t\t" + "velocity: <" + velocityX + ", "
-                    + velocityY + ">");
+            Log.d(getClass().getName(), "onFling -- " + "e1: (" + e1.getX() + ", " + e1.getY() + ")\t\t" + "e2: (" + e2.getX()
+                    + ", " + e2.getY() + ")\t\t" + "velocity: <" + velocityX + ", " + velocityY + ">");
 
         return true;
     }
@@ -67,18 +61,14 @@ public class GestureDetectionView extends View implements
     @Override
     public void onLongPress(MotionEvent e) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onLongPress -- (" + e.getX() + ", "
-                    + e.getY() + ")");
+            Log.d(getClass().getName(), "onLongPress -- (" + e.getX() + ", " + e.getY() + ")");
     }
 
     @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-            float distanceY) {
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onScroll -- " + "e1: (" + e1.getX()
-                    + ", " + e1.getY() + ")\t\t" + "e2: (" + e2.getX() + ", "
-                    + e2.getY() + ")\t\t" + "distance: <" + distanceX + ", "
-                    + distanceY + ">");
+            Log.d(getClass().getName(), "onScroll -- " + "e1: (" + e1.getX() + ", " + e1.getY() + ")\t\t" + "e2: (" + e2.getX()
+                    + ", " + e2.getY() + ")\t\t" + "distance: <" + distanceX + ", " + distanceY + ">");
 
         return true;
     }
@@ -86,15 +76,13 @@ public class GestureDetectionView extends View implements
     @Override
     public void onShowPress(MotionEvent e) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onShowPress -- (" + e.getX() + ", "
-                    + e.getY() + ")");
+            Log.d(getClass().getName(), "onShowPress -- (" + e.getX() + ", " + e.getY() + ")");
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onSingleTapUp -- (" + e.getX() + ", "
-                    + e.getY() + ")");
+            Log.d(getClass().getName(), "onSingleTapUp -- (" + e.getX() + ", " + e.getY() + ")");
 
         return false;
     }
@@ -105,8 +93,7 @@ public class GestureDetectionView extends View implements
     @Override
     public boolean onDoubleTap(MotionEvent e) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(),
-                    "onDouleTap -- (" + e.getX() + ", " + e.getY() + ")");
+            Log.d(getClass().getName(), "onDouleTap -- (" + e.getX() + ", " + e.getY() + ")");
 
         return true;
     }
@@ -114,8 +101,7 @@ public class GestureDetectionView extends View implements
     @Override
     public boolean onDoubleTapEvent(MotionEvent e) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onDoubleTapEvent -- (" + e.getX()
-                    + ", " + e.getY() + ")");
+            Log.d(getClass().getName(), "onDoubleTapEvent -- (" + e.getX() + ", " + e.getY() + ")");
 
         return true;
     }
@@ -123,8 +109,7 @@ public class GestureDetectionView extends View implements
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onSingleTapConfirmed -- (" + e.getX()
-                    + ", " + e.getY() + ")");
+            Log.d(getClass().getName(), "onSingleTapConfirmed -- (" + e.getX() + ", " + e.getY() + ")");
 
         return true;
     }
@@ -136,8 +121,7 @@ public class GestureDetectionView extends View implements
     @Override
     public boolean onScaleBegin(ScaleGestureDetector detector) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onScaleBegin -- " + "focus: ("
-                    + detector.getFocusX() + ", " + detector.getFocusY() + ")"
+            Log.d(getClass().getName(), "onScaleBegin -- " + "focus: (" + detector.getFocusX() + ", " + detector.getFocusY() + ")"
                     + "scale: " + detector.getScaleFactor());
 
         mScaling = true;
@@ -147,8 +131,7 @@ public class GestureDetectionView extends View implements
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onScaleBegin -- " + "focus: ("
-                    + detector.getFocusX() + ", " + detector.getFocusY() + ")"
+            Log.d(getClass().getName(), "onScaleBegin -- " + "focus: (" + detector.getFocusX() + ", " + detector.getFocusY() + ")"
                     + "scale: " + detector.getScaleFactor());
 
         return true;
@@ -157,8 +140,7 @@ public class GestureDetectionView extends View implements
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
         if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onScaleBegin -- " + "focus: ("
-                    + detector.getFocusX() + ", " + detector.getFocusY() + ")"
+            Log.d(getClass().getName(), "onScaleBegin -- " + "focus: (" + detector.getFocusX() + ", " + detector.getFocusY() + ")"
                     + "scale: " + detector.getScaleFactor());
 
         mScaling = false;

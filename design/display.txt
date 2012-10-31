@@ -1,0 +1,73 @@
+
+WorldDrawer // graphics engine ...
+{
+    ViewportSize
+    Scaling
+    WorldWindow
+
+    // updates triggered by user
+    //
+    // - Viewport size change (device rotation)
+    //   => Window size change
+    // - Scaling change (pinch zoom)
+    //   => Window size and position change
+    // - Panning change (scroll, fling, double tap)
+    //   => Window position change
+    //
+    // - All requires new rendering requests
+    //   => Render request ... simulated by onDraw call for now ...
+
+    // Tiling should happen here.
+}
+
+Viewport
+{
+    // specified in screen/view coordinates
+
+    // most important is width and height
+
+    // device rotation would be a viewport change
+}
+
+WorldWindow
+{
+    // specified in world coordinates
+
+    // determined from
+    // - scaling ..., specified in 
+    // - size ..., specified in world coordinates
+    // - origin ..., specified in world coordinates
+}
+
+World
+{
+    // implements an interface that renders content of a window into bitmap ...
+
+    // paging should happen here?
+}
+
+ViewTile
+{
+    // this is a matter of Viewport
+}
+
+DocumentLayout
+{
+    // single page; continuous; scrolls ...
+}
+
+DocumentLayouter
+{
+    // this is a matter of document
+
+    // single page vs. continuous vs. scrolls is a matter of how the "world"
+    // is to be constructed from document content
+
+    // Page mode change is a world change ...
+}
+
+Document
+{
+    // serves content ...
+}
+
