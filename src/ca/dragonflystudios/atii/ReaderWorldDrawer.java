@@ -1,6 +1,7 @@
 package ca.dragonflystudios.atii;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import ca.dragonflystudios.atii.ReaderWorldView.ViewportSizeChangeListener;
 import ca.dragonflystudios.atii.ReaderWorldView.WorldDrawingDelegate;
@@ -15,10 +16,12 @@ public class ReaderWorldDrawer implements ViewportSizeChangeListener, WorldDrawi
         public float getLimitMaxX(RectF worldWindow);
 
         public float getLimitMaxY(RectF worldWindow);
+
+        public RectF getWorldRect();
     }
 
     public interface DrawableWorld {
-        public void draw(Canvas canvas, RectF worldWindow);
+        public void draw(Canvas canvas, RectF worldWindow, Paint paint);
     }
 
     public ReaderWorldDrawer(DrawableWorld dw, WorldWindowDelegate wd, ReaderWorldView rwv) {
@@ -27,16 +30,19 @@ public class ReaderWorldDrawer implements ViewportSizeChangeListener, WorldDrawi
         mViewport.top = 0f;
 
         mDrawableWorld = dw;
-        mWorldWindow = new RectF();
         mWorldWindowDelegate = wd;
+        mWorldWindow = wd.getWorldRect();
 
         mReaderWorldView = rwv;
         mReaderWorldView.setWorldDrawingDelegate(this);
         mReaderWorldView.setViewportSizeChnageListener(this);
+
+        mWorldToViewScale = -1f;
+        mPaint = new Paint();
     }
 
-    public static final float MIN_SCALE_FACTOR = 0.1f;
-    public static final float MAX_SCALE_FACTOR = 0.5f;
+    public static final float MIN_SCALE_FACTOR = 10f;
+    public static final float MAX_SCALE_FACTOR = 500f;
 
     private RectF mViewport;
 
@@ -47,14 +53,22 @@ public class ReaderWorldDrawer implements ViewportSizeChangeListener, WorldDrawi
     private ReaderWorldView mReaderWorldView;
 
     private float mWorldToViewScale;
+    private Paint mPaint;
 
     // ViewportSizeChangeListener implementation
     @Override
     public void onViewportSizeChanged(float newWidth, float newHeight) {
+        if (mWorldToViewScale <= 0) {
+            mWorldToViewScale = newWidth / (mWorldWindow.right - mWorldWindow.left); // fit width
+            mWorldToViewScale = Math.max(MIN_SCALE_FACTOR, Math.min(mWorldToViewScale, MAX_SCALE_FACTOR));
+        }
+
         mViewport.right = newWidth;
         mViewport.bottom = newHeight;
         mWorldWindow.right = mWorldWindow.left + newWidth / mWorldToViewScale;
         mWorldWindow.bottom = mWorldWindow.top + newHeight / mWorldToViewScale;
+
+        mPaint.setStrokeWidth(1/mWorldToViewScale);
 
         mReaderWorldView.invalidate();
     }
@@ -62,13 +76,14 @@ public class ReaderWorldDrawer implements ViewportSizeChangeListener, WorldDrawi
     // WorldWindowChangeRequestListener implementation
     @Override
     public void onPanning(float deltaX, float deltaY) {
-        mWorldWindow.offset(deltaX / mWorldToViewScale, deltaY / mWorldToViewScale);
+        mWorldWindow.offset(-deltaX / mWorldToViewScale, -deltaY / mWorldToViewScale);
+        /*
         mWorldWindow.offsetTo(
                 Math.max(mWorldWindowDelegate.getLimitMinX(mWorldWindow),
                         Math.min(mWorldWindow.left, mWorldWindowDelegate.getLimitMaxX(mWorldWindow))),
                 Math.max(mWorldWindowDelegate.getLimitMinY(mWorldWindow),
                         Math.min(mWorldWindow.top, mWorldWindowDelegate.getLimitMaxY(mWorldWindow))));
-
+        */
         mReaderWorldView.invalidate();
     }
 
@@ -82,22 +97,28 @@ public class ReaderWorldDrawer implements ViewportSizeChangeListener, WorldDrawi
         float previousScaleFactor = mWorldToViewScale;
         mWorldToViewScale *= scaleBy;
         mWorldToViewScale = Math.max(MIN_SCALE_FACTOR, Math.min(mWorldToViewScale, MAX_SCALE_FACTOR));
+        mPaint.setStrokeWidth(1/mWorldToViewScale);
 
         // "zooming in", i.e. scaleBy > 1.0, means a smaller world WorldWindow
         final float scaling = previousScaleFactor / mWorldToViewScale;
-        mWorldWindow.offset(WorldWindowFocusX - WorldWindowFocusX * scaling, WorldWindowFocusY - WorldWindowFocusY * scaling);
-        mWorldWindow.right = mWorldWindow.left + (mWorldWindow.right - mWorldWindow.left) * scaling;
-        mWorldWindow.bottom = mWorldWindow.top + (mWorldWindow.bottom - mWorldWindow.top) * scaling;
-
+        mWorldWindow.offset(-WorldWindowFocusX, -WorldWindowFocusY);
+        mWorldWindow.set(mWorldWindow.left * scaling, mWorldWindow.top * scaling, mWorldWindow.right * scaling, mWorldWindow.bottom * scaling);
+        mWorldWindow.offset(WorldWindowFocusX * scaling, WorldWindowFocusY * scaling);
+        /*
+        mWorldWindow.offsetTo(
+                Math.max(mWorldWindowDelegate.getLimitMinX(mWorldWindow),
+                        Math.min(mWorldWindow.left, mWorldWindowDelegate.getLimitMaxX(mWorldWindow))),
+                Math.max(mWorldWindowDelegate.getLimitMinY(mWorldWindow),
+                        Math.min(mWorldWindow.top, mWorldWindowDelegate.getLimitMaxY(mWorldWindow))));
+        */
         mReaderWorldView.invalidate();
     }
 
     @Override
     public void draw(Canvas canvas) {
         canvas.save();
-        canvas.translate(mWorldWindow.left * mWorldToViewScale, mWorldWindow.top * mWorldToViewScale);
         canvas.scale(mWorldToViewScale, mWorldToViewScale);
-        mDrawableWorld.draw(canvas, mWorldWindow);
+        mDrawableWorld.draw(canvas, mWorldWindow, mPaint);
         canvas.restore();
     }
 }

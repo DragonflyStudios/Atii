@@ -9,61 +9,86 @@ import ca.dragonflystudios.atii.ReaderWorldDrawer.WorldWindowDelegate;
 
 public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
 
-    // the "world" is made of 256 horizontal and 256 vertical grid lines of shades of, respectively, blue and green 
-    private static final float WORLD_LEFT = 0f;
-    private static final float WORLD_RIGHT = 8.5f;
-    private static final float WORLD_TOP = 0f;
-    private static final float WORLD_BOTTOM = 11f;
+    // the "world" is made of GRID_COUNT horizontal and GRID_COUNT vertical grid
+    // lines of shades of, respectively, blue and green
+    private static final float GRID_COUNT = 64;
 
-    private static final float WORLD_MARGIN = 1f;
+    private static final float CONTENT_LEFT = 0f;
+    private static final float CONTENT_RIGHT = 8.5f;
+    private static final float CONTENT_TOP = 0f;
+    private static final float CONTENT_BOTTOM = 11f;
 
-    private static final float X_INC = WORLD_RIGHT / 255;
-    private static final float Y_INC = WORLD_BOTTOM / 255;
+    private static final float CONTENT_MARGIN = 1f;
 
-    public ReaderWorld()
-    {
-        mPaint = new Paint();
-    }
-    
-    private Paint mPaint;
+    private static final float X_INC = (CONTENT_RIGHT - CONTENT_LEFT) / GRID_COUNT;
+    private static final float Y_INC = (CONTENT_BOTTOM - CONTENT_TOP) / GRID_COUNT;
+
+    private static final float GRID_LINE_WIDTH = 2f;
 
     // WorldWindowDelegate implementation
     @Override
     public float getLimitMinX(RectF worldWindow) {
-        return WORLD_LEFT - WORLD_MARGIN;
+        return CONTENT_LEFT - CONTENT_MARGIN;
     }
 
     // WorldWindowDelegate implementation
     @Override
     public float getLimitMinY(RectF worldWindow) {
-        return WORLD_TOP - WORLD_MARGIN;
+        return CONTENT_TOP - CONTENT_MARGIN;
     }
 
     // WorldWindowDelegate implementation
     @Override
     public float getLimitMaxX(RectF worldWindow) {
-        return WORLD_RIGHT - (worldWindow.right - worldWindow.left) + WORLD_MARGIN;
+        return CONTENT_RIGHT - (worldWindow.right - worldWindow.left) + 2 * CONTENT_MARGIN;
     }
 
     // WorldWindowDelegate implementation
     @Override
     public float getLimitMaxY(RectF worldWindow) {
-        return WORLD_BOTTOM - (worldWindow.bottom - worldWindow.top) + WORLD_MARGIN;
+        return CONTENT_BOTTOM - (worldWindow.bottom - worldWindow.top) + 2 * CONTENT_MARGIN;
+    }
+
+    // WorldWindowDelegate implementation
+    @Override
+    public RectF getWorldRect() {
+        return new RectF(CONTENT_LEFT - CONTENT_MARGIN, CONTENT_TOP - CONTENT_MARGIN, CONTENT_RIGHT + CONTENT_MARGIN,
+                CONTENT_BOTTOM + CONTENT_MARGIN);
     }
 
     // DrawableWorld implementation
     @Override
-    public void draw(Canvas canvas, RectF worldWindow) {
-        int shadeX = (int)((worldWindow.left - WORLD_LEFT) / X_INC);
-        for (float lineX = worldWindow.left; lineX <= worldWindow.right; lineX += X_INC, shadeX++) {
-            mPaint.setColor(Color.argb(255, shadeX, shadeX, 255));
-            canvas.drawLine(lineX, worldWindow.top, lineX, worldWindow.bottom, mPaint);
+    public void draw(Canvas canvas, RectF worldWindow, Paint paint) {
+
+        // TODO: smarter clipping is necessary
+
+        final float strokeWidth = paint.getStrokeWidth();
+        paint.setStrokeWidth(strokeWidth * GRID_LINE_WIDTH);
+        paint.setColor(Color.BLACK);
+        canvas.drawRect(worldWindow, paint);
+
+        int shade = 0;
+        for (float lineX = CONTENT_LEFT; lineX <= CONTENT_RIGHT; lineX += X_INC, shade++) {
+            if (lineX < worldWindow.left)
+                continue;
+            if (lineX > worldWindow.right)
+                break;
+
+            paint.setColor(Color.argb(255, shade, shade, 255));
+            canvas.drawLine(lineX, CONTENT_TOP, lineX, CONTENT_BOTTOM, paint);
         }
 
-        int shadeY = (int)((worldWindow.left - WORLD_LEFT) / Y_INC);
-        for (float lineY = worldWindow.left; lineY <= worldWindow.right; lineY += Y_INC, shadeY++) {
-            mPaint.setColor(Color.argb(255, shadeY, 255, shadeY));
-            canvas.drawLine(worldWindow.left, lineY, worldWindow.right, lineY, mPaint);
+        shade = 0;
+        for (float lineY = CONTENT_TOP; lineY <= CONTENT_BOTTOM; lineY += Y_INC, shade++) {
+            if (lineY < worldWindow.top)
+                continue;
+            if (lineY > worldWindow.bottom)
+                break;
+
+            paint.setColor(Color.argb(255, shade, 255, shade));
+            canvas.drawLine(CONTENT_LEFT, lineY, CONTENT_RIGHT, lineY, paint);
         }
+
+        paint.setStrokeWidth(strokeWidth);
     }
 }

@@ -134,7 +134,7 @@ public class ReaderGestureView extends View implements GestureDetector.OnGesture
             Log.d(getClass().getName(), "onScaleBegin -- " + "focus: (" + detector.getFocusX() + ", " + detector.getFocusY() + ")"
                     + "scale: " + detector.getScaleFactor());
 
-        mListener.onScaling(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
+        mListener.onScaling(detector.getScaleFactor(), detector.getFocusX() - getLeft(), detector.getFocusY() - getTop());
         return true;
     }
 
