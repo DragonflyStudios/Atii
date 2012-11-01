@@ -1,41 +1,39 @@
 package ca.dragonflystudios.atii;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
-public class GestureDetectionView extends View implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,
+public class ReaderGestureView extends View implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,
         ScaleGestureDetector.OnScaleGestureListener {
 
-    private GestureDetector mGestureDetector;
-    private ScaleGestureDetector mScaleGestureDetector;
-    private boolean mScaling; // Whether the user is currently pinch zooming
+    public interface ReaderGestureListener {
+        // in view coordinates
+        public void onPanning(float deltaX, float deltaY);
 
-    private void init(Context context) {
+        // in view coordinates
+        public void onScaling(float scaling, float focusX, float focusY);
+    }
+
+    public ReaderGestureView(Context context, ReaderGestureListener listener) {
+        super(context);
         mGestureDetector = new GestureDetector(context, this);
         mGestureDetector.setIsLongpressEnabled(true);
         mGestureDetector.setOnDoubleTapListener(this);
         mScaleGestureDetector = new ScaleGestureDetector(context, this);
+
+        mListener = listener;
     }
 
-    public GestureDetectionView(Context context) {
-        super(context);
-        init(context);
-    }
+    private ReaderGestureListener mListener;
 
-    public GestureDetectionView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context);
-    }
+    private GestureDetector mGestureDetector;
+    private ScaleGestureDetector mScaleGestureDetector;
 
-    public GestureDetectionView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        init(context);
-    }
+    private boolean mScaling; // Whether the user is currently pinch zooming
 
     //
     // GestureDetector.OnGestureListener implementation
@@ -70,6 +68,8 @@ public class GestureDetectionView extends View implements GestureDetector.OnGest
             Log.d(getClass().getName(), "onScroll -- " + "e1: (" + e1.getX() + ", " + e1.getY() + ")\t\t" + "e2: (" + e2.getX()
                     + ", " + e2.getY() + ")\t\t" + "distance: <" + distanceX + ", " + distanceY + ">");
 
+        if (null != mListener)
+            mListener.onPanning(distanceX, distanceY);
         return true;
     }
 
@@ -134,6 +134,7 @@ public class GestureDetectionView extends View implements GestureDetector.OnGest
             Log.d(getClass().getName(), "onScaleBegin -- " + "focus: (" + detector.getFocusX() + ", " + detector.getFocusY() + ")"
                     + "scale: " + detector.getScaleFactor());
 
+        mListener.onScaling(detector.getScaleFactor(), detector.getFocusX(), detector.getFocusY());
         return true;
     }
 

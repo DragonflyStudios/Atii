@@ -4,11 +4,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import ca.dragonflystudios.atii.WorldDrawer.DrawableWorld;
-import ca.dragonflystudios.atii.WorldDrawer.WorldWindowDelegate;
+import ca.dragonflystudios.atii.ReaderWorldDrawer.DrawableWorld;
+import ca.dragonflystudios.atii.ReaderWorldDrawer.WorldWindowDelegate;
 
-public class World implements WorldWindowDelegate, DrawableWorld {
+public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
 
+    // the "world" is made of 256 horizontal and 256 vertical grid lines of shades of, respectively, blue and green 
     private static final float WORLD_LEFT = 0f;
     private static final float WORLD_RIGHT = 8.5f;
     private static final float WORLD_TOP = 0f;
@@ -19,7 +20,7 @@ public class World implements WorldWindowDelegate, DrawableWorld {
     private static final float X_INC = WORLD_RIGHT / 255;
     private static final float Y_INC = WORLD_BOTTOM / 255;
 
-    public World()
+    public ReaderWorld()
     {
         mPaint = new Paint();
     }
