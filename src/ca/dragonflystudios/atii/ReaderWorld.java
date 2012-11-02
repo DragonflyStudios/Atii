@@ -41,13 +41,13 @@ public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
     // WorldWindowDelegate implementation
     @Override
     public float getLimitMaxX(RectF worldWindow) {
-        return CONTENT_RIGHT - (worldWindow.right - worldWindow.left) + 2 * CONTENT_MARGIN;
+        return CONTENT_RIGHT - (worldWindow.right - worldWindow.left) + CONTENT_MARGIN;
     }
 
     // WorldWindowDelegate implementation
     @Override
     public float getLimitMaxY(RectF worldWindow) {
-        return CONTENT_BOTTOM - (worldWindow.bottom - worldWindow.top) + 2 * CONTENT_MARGIN;
+        return CONTENT_BOTTOM - (worldWindow.bottom - worldWindow.top) + CONTENT_MARGIN;
     }
 
     // WorldWindowDelegate implementation
