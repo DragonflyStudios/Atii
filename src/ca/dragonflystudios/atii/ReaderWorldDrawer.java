@@ -76,7 +76,7 @@ public class ReaderWorldDrawer implements ViewportSizeChangeListener, WorldDrawi
     // WorldWindowChangeRequestListener implementation
     @Override
     public void onPanning(float deltaX, float deltaY) {
-        mWorldWindow.offset(-deltaX / mWorldToViewScale, -deltaY / mWorldToViewScale);
+        mWorldWindow.offset(deltaX / mWorldToViewScale, deltaY / mWorldToViewScale);
         /*
         mWorldWindow.offsetTo(
                 Math.max(mWorldWindowDelegate.getLimitMinX(mWorldWindow),
@@ -103,7 +103,7 @@ public class ReaderWorldDrawer implements ViewportSizeChangeListener, WorldDrawi
         final float scaling = previousScaleFactor / mWorldToViewScale;
         mWorldWindow.offset(-WorldWindowFocusX, -WorldWindowFocusY);
         mWorldWindow.set(mWorldWindow.left * scaling, mWorldWindow.top * scaling, mWorldWindow.right * scaling, mWorldWindow.bottom * scaling);
-        mWorldWindow.offset(WorldWindowFocusX * scaling, WorldWindowFocusY * scaling);
+        mWorldWindow.offset(WorldWindowFocusX, WorldWindowFocusY);
         /*
         mWorldWindow.offsetTo(
                 Math.max(mWorldWindowDelegate.getLimitMinX(mWorldWindow),
@@ -118,6 +118,7 @@ public class ReaderWorldDrawer implements ViewportSizeChangeListener, WorldDrawi
     public void draw(Canvas canvas) {
         canvas.save();
         canvas.scale(mWorldToViewScale, mWorldToViewScale);
+        canvas.translate(-mWorldWindow.left, -mWorldWindow.top);
         mDrawableWorld.draw(canvas, mWorldWindow, mPaint);
         canvas.restore();
     }

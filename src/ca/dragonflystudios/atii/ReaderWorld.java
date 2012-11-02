@@ -11,7 +11,7 @@ public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
 
     // the "world" is made of GRID_COUNT horizontal and GRID_COUNT vertical grid
     // lines of shades of, respectively, blue and green
-    private static final float GRID_COUNT = 64;
+    private static final float GRID_COUNT = 64f;
 
     private static final float CONTENT_LEFT = 0f;
     private static final float CONTENT_RIGHT = 8.5f;
@@ -22,6 +22,7 @@ public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
 
     private static final float X_INC = (CONTENT_RIGHT - CONTENT_LEFT) / GRID_COUNT;
     private static final float Y_INC = (CONTENT_BOTTOM - CONTENT_TOP) / GRID_COUNT;
+    private static final float COLOR_INC = 255f / GRID_COUNT;
 
     private static final float GRID_LINE_WIDTH = 2f;
 
@@ -64,7 +65,7 @@ public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
 
         final float strokeWidth = paint.getStrokeWidth();
         paint.setStrokeWidth(strokeWidth * GRID_LINE_WIDTH);
-        paint.setColor(Color.BLACK);
+        paint.setColor(Color.GRAY);
         canvas.drawRect(worldWindow, paint);
 
         int shade = 0;
@@ -74,7 +75,8 @@ public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
             if (lineX > worldWindow.right)
                 break;
 
-            paint.setColor(Color.argb(255, shade, shade, 255));
+            int s = (int)(shade * COLOR_INC);
+            paint.setColor(Color.argb(255, 0, 0, s));
             canvas.drawLine(lineX, CONTENT_TOP, lineX, CONTENT_BOTTOM, paint);
         }
 
@@ -85,7 +87,8 @@ public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
             if (lineY > worldWindow.bottom)
                 break;
 
-            paint.setColor(Color.argb(255, shade, 255, shade));
+            int s = (int)(shade * COLOR_INC);
+            paint.setColor(Color.argb(255, 0, s, 0));
             canvas.drawLine(CONTENT_LEFT, lineY, CONTENT_RIGHT, lineY, paint);
         }
 
