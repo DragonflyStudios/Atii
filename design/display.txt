@@ -18,6 +18,28 @@ WorldDrawer // graphics engine ...
     //   => Render request ... simulated by onDraw call for now ...
 
     // Tiling should happen here.
+
+    // During Scaling ... 
+    // - Use closest scale
+
+    // During Panning ...
+    // - Use closest scale
+    // - If crosses into new ...
+    //   - Update new ... request new
+    // - If crosses half-way line
+    //   - ... request new for invisible ones (prerequest)
+    //     - ... triggered if distance to window edge is less than half of a tile's width or height
+
+    // When ScaleFactor is updated ... 
+    // - Figure out tiles ... request new tiles 
+
+    // Cacheing for neighborhood ...
+
+    // 4 tiles cover visible area with a bit of padding
+    // Maximum of 9 tiles needed at a time
+    // Up to 16 tiles cached (7 currently invisible ones in direction of travel)
+
+    // should have a tile state to track the state and host the tile Drawables ...
 }
 
 Viewport
@@ -41,9 +63,15 @@ WorldWindow
 
 World
 {
-    // implements an interface that renders content of a window into bitmap ...
+    // knows nothing about tiles ...
+    // only knows Drawable is requested for a rect
 
-    // paging should happen here?
+    // implements an interface that renders content of a window into bitmap ... into Drawables
+    // Drawables ... that indicates the rect of the world that is being drawn ...
+    // ... potentially override the draw() method to present things differently ...
+
+    //
+    
 }
 
 ViewTile
