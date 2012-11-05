@@ -2,52 +2,54 @@ package ca.dragonflystudios.atii;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.view.View;
+import ca.dragonflystudios.atii.ReaderGestureView.ReaderGestureListener;
 
-public class ReaderWorldView extends View {
+public class ReaderWorldView extends View implements ReaderGestureListener {
 
     public interface WorldDrawingDelegate {
         public void draw(Canvas canvas);
     }
 
-    public interface ViewportSizeChangeListener {
-        public void onViewportSizeChanged(float newWidth, float newHeight);
+    public Paint getPaint() {
+        return mPaint;
     }
 
-    WorldDrawingDelegate mWorldDrawingDelegate;
-    ViewportSizeChangeListener mViewportSizeChangeListener;
-
-    public ReaderWorldView(Context context) {
+    public ReaderWorldView(Context context, ReaderWorldPerspective rwp) {
         super(context);
-        mPreviousWidth = 0;
-        mPreviousHeight = 0;
+        mPaint = new Paint();
+        mReaderWorldPerspective = rwp;
     }
 
-    public void setWorldDrawingDelegate(WorldDrawingDelegate delegate) {
-        mWorldDrawingDelegate = delegate;
+    public void setWorldDrawingDelegate(WorldDrawingDelegate wdd) {
+        mWorldDrawingDelegate = wdd;
     }
-
-    public void setViewportSizeChnageListener(ViewportSizeChangeListener listener) {
-        mViewportSizeChangeListener = listener;
-    }
-
-    private int mPreviousWidth, mPreviousHeight;
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
 
-        if (changed) {
-            final int width = right - left + 1;
-            final int height = bottom - top + 1;
-
-            if (width != mPreviousWidth || height != mPreviousHeight) {
-                mViewportSizeChangeListener.onViewportSizeChanged(width, height);
-                mPreviousWidth = width;
-                mPreviousHeight = height;
-            }
+        if (changed && mReaderWorldPerspective.updateViewport(left, top, right, bottom)) {
+            mPaint.setStrokeWidth(1 / mReaderWorldPerspective.getWorldToViewScale());
+            invalidate();
         }
+    }
 
+    // WorldWindowChangeRequestListener implementation
+    @Override
+    public void onPanning(float deltaX, float deltaY) {
+        if (mReaderWorldPerspective.panWorldWindow(deltaX, deltaY))
+            invalidate();
+    }
+
+    // WorldWindowChangeRequestListener implementation
+    @Override
+    public void onScaling(float scaleBy, float focusX, float focusY) {
+        if (mReaderWorldPerspective.scaleWorldWindow(scaleBy, focusX, focusY)) {
+            mPaint.setStrokeWidth(1 / mReaderWorldPerspective.getWorldToViewScale());
+            invalidate();
+        }
     }
 
     @Override
@@ -56,4 +58,8 @@ public class ReaderWorldView extends View {
 
         // Draw other things
     }
+
+    private Paint mPaint;
+    private WorldDrawingDelegate mWorldDrawingDelegate;
+    private ReaderWorldPerspective mReaderWorldPerspective;
 }

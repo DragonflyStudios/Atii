@@ -28,7 +28,7 @@ WorldDrawer // graphics engine ...
     //   - Update new ... request new
     // - If crosses half-way line
     //   - ... request new for invisible ones (prerequest)
-    //     - ... triggered if distance to window edge is less than half of a tile's width or height
+    //     - ... triggered if distance to window edge is less than half of a tile's width or height and moving in that direction
 
     // When ScaleFactor is updated ... 
     // - Figure out tiles ... request new tiles 
@@ -40,6 +40,8 @@ WorldDrawer // graphics engine ...
     // Up to 16 tiles cached (7 currently invisible ones in direction of travel)
 
     // should have a tile state to track the state and host the tile Drawables ...
+
+    // could be implemented with "Perspectives"
 }
 
 Viewport
@@ -71,7 +73,6 @@ World
     // ... potentially override the draw() method to present things differently ...
 
     //
-    
 }
 
 ViewTile

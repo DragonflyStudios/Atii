@@ -18,9 +18,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         mWorld = new ReaderWorld();
-        mWorldView = new ReaderWorldView(this);
-        mWorldDrawer = new ReaderWorldDrawer(mWorld, mWorld, mWorldView);
-        mGestureView = new ReaderGestureView(this, mWorldDrawer);
+        ReaderWorldPerspective rwp = new ReaderWorldPerspective(mWorld);
+        mWorldView = new ReaderWorldView(this, rwp);
+        mWorldDrawer = new ReaderWorldDrawer(mWorld, mWorldView, rwp);
+        mWorldView.setWorldDrawingDelegate(mWorldDrawer);
+        mGestureView = new ReaderGestureView(this, mWorldView);
 
         RelativeLayout mainView = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.activity_main, null);
         mainView.addView(mWorldView);

@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import ca.dragonflystudios.atii.ReaderWorldDrawer.DrawableWorld;
-import ca.dragonflystudios.atii.ReaderWorldDrawer.WorldWindowDelegate;
+import ca.dragonflystudios.atii.ReaderWorldPerspective.WorldWindowDelegate;
 
 public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
 
