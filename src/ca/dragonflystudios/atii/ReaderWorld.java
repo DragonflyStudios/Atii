@@ -65,8 +65,6 @@ public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
 
         final float strokeWidth = paint.getStrokeWidth();
         paint.setStrokeWidth(strokeWidth * GRID_LINE_WIDTH);
-        paint.setColor(Color.GRAY);
-        canvas.drawRect(worldWindow, paint);
 
         int shade = 0;
         for (float lineX = CONTENT_LEFT; lineX <= CONTENT_RIGHT; lineX += X_INC, shade++) {

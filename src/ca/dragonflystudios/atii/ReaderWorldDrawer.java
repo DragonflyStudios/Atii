@@ -1,10 +1,19 @@
 package ca.dragonflystudios.atii;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import ca.dragonflystudios.atii.ReaderWorldPerspective.Tile;
 import ca.dragonflystudios.atii.ReaderWorldView.WorldDrawingDelegate;
 
+/*
+ * TODO:
+ *      [ ] Tiled drawing
+ *          1. Given WorldWindow and Viewport ... return a series of tile specs
+ *          2. Iterate through tile speces and draw them
+ *      [ ] Asynchronous preparation of tile images
+ */
 public class ReaderWorldDrawer implements WorldDrawingDelegate {
 
     public interface DrawableWorld {
@@ -20,9 +29,21 @@ public class ReaderWorldDrawer implements WorldDrawingDelegate {
     @Override // implements WorldDrawingDelegate
     public void draw(Canvas canvas) {
         canvas.save();
+
         canvas.scale(mReaderWorldPerspective.getWorldToViewScale(), mReaderWorldPerspective.getWorldToViewScale());
-        canvas.translate(-mReaderWorldPerspective.getWorldWindow().left, -mReaderWorldPerspective.getWorldWindow().top);
-        mDrawableWorld.draw(canvas, mReaderWorldPerspective.getWorldWindow(), mReaderWorldView.getPaint()); // call tiled drawer with mWorldWindow
+        RectF worldWindow = mReaderWorldPerspective.getWorldWindow();
+        canvas.translate(-worldWindow.left, -worldWindow.top);
+
+        Paint paint = mReaderWorldView.getPaint();
+
+        for (Tile worldTile : mReaderWorldPerspective.getCurrentWorldTiles()) {
+            int level = worldTile.columnIndex * 20 + worldTile.rowIndex * 90;
+            paint.setColor(Color.argb(255, level, level, level));
+            canvas.drawRect(worldTile.tileRect, paint);
+
+            mDrawableWorld.draw(canvas, worldTile.tileRect, paint);
+        }
+
         canvas.restore();
     }
 
