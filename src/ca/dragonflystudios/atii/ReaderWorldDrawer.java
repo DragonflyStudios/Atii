@@ -4,15 +4,31 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import ca.dragonflystudios.atii.ReaderWorldPerspective.Tile;
+import ca.dragonflystudios.atii.ReaderTiler.Tile;
 import ca.dragonflystudios.atii.ReaderWorldView.WorldDrawingDelegate;
 
 /*
- * TODO:
- *      [ ] Tiled drawing
+ * TODOs:
+ *      [x] Tiled drawing
  *          1. Given WorldWindow and Viewport ... return a series of tile specs
  *          2. Iterate through tile speces and draw them
- *      [ ] Asynchronous preparation of tile images
+ *      [x] test on very lengthy content ...
+ *      [x] Factor out the Tiling algorithm stuff
+ *      
+ *      [2] Asynchronous Tile management
+ *      - request; random wait; ready; call draw(Canvas) on UI thread
+ *      - TileState: pending; ready; in_use; ...
+ *      
+ *      [3] Predictive fetching (the 16 tiles), cancelling, and cacheing
+ *      
+ *      [4] Default drawable
+ *      - (how to do this?)
+ *      
+ *      [5] Bitmaps as drawables [precise rendering]
+ *      
+ *      [6] Blend images and drawings ...
+ *      - Two kinds of drawings: part of scene (sprite?) and part of screen.
+
  */
 public class ReaderWorldDrawer implements WorldDrawingDelegate {
 

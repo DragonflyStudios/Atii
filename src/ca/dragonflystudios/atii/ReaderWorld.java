@@ -16,7 +16,7 @@ public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
     private static final float CONTENT_LEFT = 0f;
     private static final float CONTENT_RIGHT = 8.5f;
     private static final float CONTENT_TOP = 0f;
-    private static final float CONTENT_BOTTOM = 11f;
+    private static final float CONTENT_BOTTOM = 22f;
 
     private static final float CONTENT_MARGIN = 1f;
 

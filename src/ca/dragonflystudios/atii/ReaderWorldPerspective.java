@@ -2,6 +2,7 @@ package ca.dragonflystudios.atii;
 
 import java.util.ArrayList;
 
+import ca.dragonflystudios.atii.ReaderTiler.Tile;
 import android.graphics.RectF;
 
 // TODO: part of the data model; should be persisted
@@ -25,23 +26,6 @@ public class ReaderWorldPerspective {
     public static final float MIN_SCALE_FACTOR = 10f;
     public static final float MAX_SCALE_FACTOR = 500f;
 
-    public static final float TILING_PADDING_X = 50f;
-    public static final float TILING_PADDING_Y = 50f;
-    public static final int MIN_TILE_COLUMNS = 2;
-    public static final int MIN_TILE_ROWS = 2;
-
-    public static class Tile {
-        public RectF tileRect;
-        public int columnIndex;
-        public int rowIndex;
-
-        public Tile(RectF rect, int c, int r) {
-            tileRect = rect;
-            columnIndex = c;
-            rowIndex = r;
-        }
-    }
-
     public interface WorldWindowDelegate {
         public float getLimitMinX(RectF worldWindow);
 
@@ -57,7 +41,11 @@ public class ReaderWorldPerspective {
     public ReaderWorldPerspective(WorldWindowDelegate wdd) {
         mInitialized = false;
         mWorldWindowDelegate = wdd;
-        mCurrentWorldTiles = new ArrayList<Tile>();
+        mReaderTiler = new ReaderTiler();
+    }
+
+    public ArrayList<Tile> getCurrentWorldTiles() {
+        return mReaderTiler.getCurrentWorldTiles();
     }
 
     public boolean updateViewport(float left, float top, float right, float bottom) {
@@ -81,7 +69,7 @@ public class ReaderWorldPerspective {
 
         mWorldWindow.right = mWorldWindow.left + (right - left + 1) / mWorldToViewScale;
         mWorldWindow.bottom = mWorldWindow.top + (bottom - top + 1) / mWorldToViewScale;
-        retile();
+        mReaderTiler.retile(mWorldWindowDelegate.getWorldRect(), mWorldWindow, mViewport, mWorldToViewScale);
 
         return true;
     }
@@ -99,7 +87,7 @@ public class ReaderWorldPerspective {
                         Math.min(mWorldWindow.top, mWorldWindowDelegate.getLimitMaxY(mWorldWindow))));
         boolean panned = (oldLeft != mWorldWindow.left || oldTop != mWorldWindow.top);
         if (panned)
-            updateCurrentTiles();
+            mReaderTiler.updateCurrentTiles(mWorldWindowDelegate.getWorldRect(), mWorldWindow);
 
         return panned;
     }
@@ -132,7 +120,7 @@ public class ReaderWorldPerspective {
         boolean scaled = (oldLeft != mWorldWindow.left || oldTop != mWorldWindow.top || oldRight != mWorldWindow.right || oldBottom != mWorldWindow.bottom);
 
         if (scaled)
-            retile();
+            mReaderTiler.retile(mWorldWindowDelegate.getWorldRect(), mWorldWindow, mViewport, mWorldToViewScale);
 
         return scaled;
     }
@@ -149,51 +137,10 @@ public class ReaderWorldPerspective {
         return mViewport;
     }
 
-    public ArrayList<Tile> getCurrentWorldTiles() {
-        return mCurrentWorldTiles;
-    }
-
-    private void updateTilingParams() {
-        mTileViewportWidth = (mViewport.width() + TILING_PADDING_X) / MIN_TILE_COLUMNS;
-        mTileViewportHeight = (mViewport.height() + TILING_PADDING_Y) / MIN_TILE_ROWS;
-        mTileWorldWidth = mTileViewportWidth / mWorldToViewScale;
-        mTileWorldHeight = mTileViewportHeight / mWorldToViewScale;
-    }
-
-    private void updateCurrentTiles() {
-        mCurrentWorldTiles.clear();
-        RectF worldRect = mWorldWindowDelegate.getWorldRect();
-        
-        mColumnStart = (int) ((mWorldWindow.left - worldRect.left)/ mTileWorldWidth); // floor
-        mRowStart = (int) ((mWorldWindow.top - worldRect.top) / mTileWorldHeight); // floor
-        mTileStartX = worldRect.left + mColumnStart * mTileWorldWidth;
-        mTileStartY = worldRect.top + mRowStart * mTileWorldHeight;
-        mColumnCount = Math.round((mWorldWindow.right - mTileStartX) / mTileWorldWidth + 0.5f); // ceiling
-        mRowCount = Math.round((mWorldWindow.bottom - mTileStartY) / mTileWorldHeight + 0.5f); // ceiling
-        float currentTileLeft = mTileStartX, currentTileTop = mTileStartY;
-        for (int i = 0; i < mRowCount; i++, currentTileLeft = mTileStartX, currentTileTop += mTileWorldHeight)
-            for (int j = 0; j < mColumnCount; j++, currentTileLeft += mTileWorldWidth) {
-                RectF rect = new RectF(currentTileLeft, currentTileTop, currentTileLeft + mTileWorldWidth, currentTileTop
-                        + mTileWorldHeight);
-                mCurrentWorldTiles.add(new Tile(rect, j, i));
-            }
-    }
-
-    private void retile() {
-        updateTilingParams();
-        updateCurrentTiles();
-    }
-
     private WorldWindowDelegate mWorldWindowDelegate;
     private RectF mViewport;
     private RectF mWorldWindow;
     private float mWorldToViewScale;
     private boolean mInitialized;
-
-    private ArrayList<Tile> mCurrentWorldTiles;
-    private float mTileViewportWidth, mTileViewportHeight;
-    private float mTileWorldWidth, mTileWorldHeight;
-    private int mColumnStart, mRowStart;
-    private float mTileStartX, mTileStartY;
-    private int mColumnCount, mRowCount;
+    private ReaderTiler mReaderTiler;
 }
