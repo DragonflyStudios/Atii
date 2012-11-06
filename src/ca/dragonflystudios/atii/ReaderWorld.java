@@ -73,7 +73,7 @@ public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
             if (lineX > worldWindow.right)
                 break;
 
-            int s = (int)(shade * COLOR_INC);
+            int s = (int) (shade * COLOR_INC);
             paint.setColor(Color.argb(255, 0, 0, s));
             canvas.drawLine(lineX, CONTENT_TOP, lineX, CONTENT_BOTTOM, paint);
         }
@@ -85,7 +85,7 @@ public class ReaderWorld implements WorldWindowDelegate, DrawableWorld {
             if (lineY > worldWindow.bottom)
                 break;
 
-            int s = (int)(shade * COLOR_INC);
+            int s = (int) (shade * COLOR_INC);
             paint.setColor(Color.argb(255, 0, s, 0));
             canvas.drawLine(CONTENT_LEFT, lineY, CONTENT_RIGHT, lineY, paint);
         }

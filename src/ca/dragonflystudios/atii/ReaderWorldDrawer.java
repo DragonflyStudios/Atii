@@ -42,7 +42,8 @@ public class ReaderWorldDrawer implements WorldDrawingDelegate {
         mReaderWorldPerspective = rwp;
     }
 
-    @Override // implements WorldDrawingDelegate
+    @Override
+    // implements WorldDrawingDelegate
     public void draw(Canvas canvas) {
         canvas.save();
 

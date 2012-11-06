@@ -38,6 +38,14 @@ public class ReaderWorldPerspective {
         public RectF getWorldRect();
     }
 
+    public interface TilingDelegate {
+        public ArrayList<Tile> getCurrentTiles();
+
+        public void retile(RectF worldRect, RectF worldWindow, RectF viewport, float worldToViewScale);
+
+        public void updateCurrentTiles(RectF worldRect, RectF worldWindow);
+    }
+
     public ReaderWorldPerspective(WorldWindowDelegate wdd) {
         mInitialized = false;
         mWorldWindowDelegate = wdd;
@@ -45,7 +53,7 @@ public class ReaderWorldPerspective {
     }
 
     public ArrayList<Tile> getCurrentWorldTiles() {
-        return mReaderTiler.getCurrentWorldTiles();
+        return mReaderTiler.getCurrentTiles();
     }
 
     public boolean updateViewport(float left, float top, float right, float bottom) {
@@ -142,5 +150,5 @@ public class ReaderWorldPerspective {
     private RectF mWorldWindow;
     private float mWorldToViewScale;
     private boolean mInitialized;
-    private ReaderTiler mReaderTiler;
+    private TilingDelegate mReaderTiler;
 }
