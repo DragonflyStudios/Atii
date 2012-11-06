@@ -54,8 +54,14 @@ public class ReaderWorldDrawer implements WorldDrawingDelegate {
         Paint paint = mReaderWorldView.getPaint();
 
         for (Tile worldTile : mReaderWorldPerspective.getCurrentWorldTiles()) {
-            int level = worldTile.columnIndex * 20 + worldTile.rowIndex * 90;
+            /*
+            float unit = 255f / (worldTile.totalColumns * worldTile.totalRows);
+            int level = 255 - (int)(unit * (worldTile.columnIndex + worldTile.rowIndex * worldTile.totalColumns));
             paint.setColor(Color.argb(255, level, level, level));
+            */
+            int levelR = 255 - (int)((255f * worldTile.rowIndex) / worldTile.totalRows);
+            int levelGB = 255 - (int)((255f * worldTile.columnIndex) / worldTile.totalColumns);
+            paint.setColor(Color.argb(255, levelR, levelGB, levelGB));
             canvas.drawRect(worldTile.tileRect, paint);
 
             mDrawableWorld.draw(canvas, worldTile.tileRect, paint);

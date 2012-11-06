@@ -17,6 +17,10 @@ public class ReaderTiler implements TilingDelegate {
         public int columnIndex;
         public int rowIndex;
 
+        // These two are for debugging, otherwise unnecessary
+        public int totalColumns;
+        public int totalRows;
+
         public Tile(RectF rect, int c, int r) {
             tileRect = rect;
             columnIndex = c;
@@ -37,26 +41,45 @@ public class ReaderTiler implements TilingDelegate {
     @Override
     // implements TilingDelegate
     public void updateCurrentTiles(RectF worldRect, RectF worldWindow) {
-        mCurrentTiles.clear();
+        int oldColumnStart = mColumnStart;
+        int oldRowStart = mRowStart;
+        int oldColumnCount = mColumnCount;
+        int oldRowCount = mRowCount;
 
         mColumnStart = (int) ((worldWindow.left - worldRect.left) / mTileWorldWidth); // floor
         mRowStart = (int) ((worldWindow.top - worldRect.top) / mTileWorldHeight); // floor
+
         mTileStartX = worldRect.left + mColumnStart * mTileWorldWidth;
         mTileStartY = worldRect.top + mRowStart * mTileWorldHeight;
         mColumnCount = Math.round((worldWindow.right - mTileStartX) / mTileWorldWidth + 0.5f); // ceiling
         mRowCount = Math.round((worldWindow.bottom - mTileStartY) / mTileWorldHeight + 0.5f); // ceiling
+
+        if (!mCurrentTiles.isEmpty() && mColumnStart == oldColumnStart && mRowStart == oldRowStart
+                && mColumnCount == oldColumnCount && mRowCount == oldRowCount)
+            return;
+
+        // These two are for debugging, otherwise unnecessary
+        int totalColumns = Math.round((worldRect.right - worldRect.left) / mTileWorldWidth + 0.5f); // ceiling
+        int totalRows = Math.round((worldRect.bottom - worldRect.top) / mTileWorldHeight + 0.5f); // ceiling
+
         float currentTileLeft = mTileStartX, currentTileTop = mTileStartY;
         for (int i = 0; i < mRowCount; i++, currentTileLeft = mTileStartX, currentTileTop += mTileWorldHeight)
             for (int j = 0; j < mColumnCount; j++, currentTileLeft += mTileWorldWidth) {
                 RectF rect = new RectF(currentTileLeft, currentTileTop, currentTileLeft + mTileWorldWidth, currentTileTop
                         + mTileWorldHeight);
-                mCurrentTiles.add(new Tile(rect, j, i));
+
+                Tile tile = new Tile(rect, mColumnStart + j, mRowStart + i);
+                // These two are for debugging, otherwise unnecessary
+                tile.totalColumns = totalColumns;
+                tile.totalRows = totalRows;
+                mCurrentTiles.add(tile);
             }
     }
 
     @Override
     // implements TilingDelegate
     public void retile(RectF worldRect, RectF worldWindow, RectF viewport, float worldToViewScale) {
+        mCurrentTiles.clear();
         updateTilingParams(viewport, worldToViewScale);
         updateCurrentTiles(worldRect, worldWindow);
     }
