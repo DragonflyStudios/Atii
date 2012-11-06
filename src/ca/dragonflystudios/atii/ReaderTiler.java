@@ -26,10 +26,15 @@ public class ReaderTiler implements TilingDelegate {
             columnIndex = c;
             rowIndex = r;
         }
+
+        public static boolean inRange(int x, int y, int columnStart, int rowStart, int columnCount, int rowCount) {
+            return (x >= columnStart && x < columnStart + columnCount && y >= rowStart && y < rowStart + rowCount);
+        }
     }
 
     public ReaderTiler() {
         mCurrentTiles = new ArrayList<Tile>();
+        mNewTiles = new ArrayList<Tile>();
     }
 
     @Override
@@ -62,9 +67,17 @@ public class ReaderTiler implements TilingDelegate {
         int totalColumns = Math.round((worldRect.right - worldRect.left) / mTileWorldWidth + 0.5f); // ceiling
         int totalRows = Math.round((worldRect.bottom - worldRect.top) / mTileWorldHeight + 0.5f); // ceiling
 
+        for (Tile tile : mCurrentTiles)
+            if (Tile.inRange(tile.columnIndex, tile.rowIndex, mColumnStart, mRowStart, mColumnCount, mRowCount))
+                mNewTiles.add(tile);
+
         float currentTileLeft = mTileStartX, currentTileTop = mTileStartY;
         for (int i = 0; i < mRowCount; i++, currentTileLeft = mTileStartX, currentTileTop += mTileWorldHeight)
             for (int j = 0; j < mColumnCount; j++, currentTileLeft += mTileWorldWidth) {
+                if (!mCurrentTiles.isEmpty()
+                        && Tile.inRange(mColumnStart + j, mRowStart + i, oldColumnStart, oldRowStart, oldColumnCount, oldRowCount))
+                    continue;
+
                 RectF rect = new RectF(currentTileLeft, currentTileTop, currentTileLeft + mTileWorldWidth, currentTileTop
                         + mTileWorldHeight);
 
@@ -72,8 +85,14 @@ public class ReaderTiler implements TilingDelegate {
                 // These two are for debugging, otherwise unnecessary
                 tile.totalColumns = totalColumns;
                 tile.totalRows = totalRows;
-                mCurrentTiles.add(tile);
+                mNewTiles.add(tile);
             }
+
+        // "double buffer"
+        mCurrentTiles.clear();
+        ArrayList<Tile> temp = mCurrentTiles;
+        mCurrentTiles = mNewTiles;
+        mNewTiles = temp;
     }
 
     @Override
@@ -92,6 +111,7 @@ public class ReaderTiler implements TilingDelegate {
     }
 
     private ArrayList<Tile> mCurrentTiles;
+    private ArrayList<Tile> mNewTiles;
     private float mTileViewportWidth, mTileViewportHeight;
     private float mTileWorldWidth, mTileWorldHeight;
     private int mColumnStart, mRowStart;
