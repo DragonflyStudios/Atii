@@ -15,15 +15,15 @@ import ca.dragonflystudios.atii.ReaderWorldView.WorldDrawingDelegate;
  *      [x] test on very lengthy content ...
  *      [x] Factor out the Tiling algorithm stuff
  *      
- *      [1.5] Which tiles need update ...
+ *      [x] Reuse old tiles
  *      
  *      [2] Asynchronous Tile management
- *      - request; random wait; ready; call draw(Canvas) on UI thread
  *      - TileState: pending & ready
+ *         [3] Default drawable
+ *         - used if pending: draw gray ... *
+ *      - request; random wait; ready; call draw(Canvas) on UI thread
+ *        - Note that the drawing here should be tile specific ... 
  *      
- *      [3] Default drawable
- *      - used if pending: draw gray ...
- *
  *      [4] Predictive fetching (the 16 tiles), cancelling, and cacheing
  *      
  *      [5] Bitmaps as drawables [precise rendering]
