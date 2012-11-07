@@ -2,8 +2,11 @@ package ca.dragonflystudios.atii;
 
 import java.util.ArrayList;
 
-import ca.dragonflystudios.atii.ReaderTiler.Tile;
 import android.graphics.RectF;
+import android.view.View;
+import ca.dragonflystudios.atii.ReaderGestureView.ReaderGestureListener;
+import ca.dragonflystudios.atii.ReaderPerspectiveTiler.OnTileReadyListener;
+import ca.dragonflystudios.atii.ReaderView.OnLayoutListener;
 
 // TODO: part of the data model; should be persisted
 
@@ -21,7 +24,7 @@ import android.graphics.RectF;
  *     (6.4) If Perspective is persisted, then update Viewport to the newly given one
  */
 
-public class ReaderWorldPerspective {
+public class ReaderPerspective implements ReaderGestureListener, OnLayoutListener, OnTileReadyListener {
 
     public static final float MIN_SCALE_FACTOR = 10f;
     public static final float MAX_SCALE_FACTOR = 500f;
@@ -39,20 +42,21 @@ public class ReaderWorldPerspective {
     }
 
     public interface TilingDelegate {
-        public ArrayList<Tile> getCurrentTiles();
+        public ArrayList<ReaderTile> getCurrentTiles();
 
         public void retile(RectF worldRect, RectF worldWindow, RectF viewport, float worldToViewScale);
 
-        public void updateCurrentTiles(RectF worldRect, RectF worldWindow);
+        public void updateCurrentTiles(RectF worldRect, RectF worldWindow, float worldToViewScale);
     }
 
-    public ReaderWorldPerspective(WorldWindowDelegate wdd) {
+    public ReaderPerspective(WorldWindowDelegate wdd, ReaderView rv) {
         mInitialized = false;
         mWorldWindowDelegate = wdd;
-        mReaderTiler = new ReaderTiler();
+        mReaderView = rv;
+        mReaderTiler = new ReaderPerspectiveTiler();
     }
 
-    public ArrayList<Tile> getCurrentWorldTiles() {
+    public ArrayList<ReaderTile> getCurrentWorldTiles() {
         return mReaderTiler.getCurrentTiles();
     }
 
@@ -95,7 +99,7 @@ public class ReaderWorldPerspective {
                         Math.min(mWorldWindow.top, mWorldWindowDelegate.getLimitMaxY(mWorldWindow))));
         boolean panned = (oldLeft != mWorldWindow.left || oldTop != mWorldWindow.top);
         if (panned)
-            mReaderTiler.updateCurrentTiles(mWorldWindowDelegate.getWorldRect(), mWorldWindow);
+            mReaderTiler.updateCurrentTiles(mWorldWindowDelegate.getWorldRect(), mWorldWindow, mWorldToViewScale);
 
         return panned;
     }
@@ -145,7 +149,39 @@ public class ReaderWorldPerspective {
         return mViewport;
     }
 
+
+    @Override
+    // ReaderGestureListener implementation
+    public void onPanning(float deltaX, float deltaY) {
+        if (panWorldWindow(deltaX, deltaY))
+            mReaderView.invalidate();
+    }
+
+    @Override
+    // ReaderGestureListener implementation
+    public void onScaling(float scaleBy, float focusX, float focusY) {
+        if (scaleWorldWindow(scaleBy, focusX, focusY)) {
+            mReaderView.invalidate();
+        }
+    }
+
+    @Override
+    // OnLayoutListener implementation
+    public void onLayout(View view, boolean changed, int left, int top, int right, int bottom) {
+        if (changed && updateViewport(left, top, right, bottom)) {
+            mReaderView.invalidate();
+        }
+    }
+
+    @Override
+    // OnTileReadyListener implementation
+    public void onTileReady(ReaderTile tile) {
+        mReaderView.postInvalidate();
+    }
+
     private WorldWindowDelegate mWorldWindowDelegate;
+    private ReaderView mReaderView;
+
     private RectF mViewport;
     private RectF mWorldWindow;
     private float mWorldToViewScale;
