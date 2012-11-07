@@ -6,6 +6,7 @@ import android.graphics.RectF;
 import android.view.View;
 import ca.dragonflystudios.atii.ReaderGestureView.ReaderGestureListener;
 import ca.dragonflystudios.atii.ReaderPerspectiveTiler.OnTileReadyListener;
+import ca.dragonflystudios.atii.ReaderPerspectiveTiler.TileDrawableSource;
 import ca.dragonflystudios.atii.ReaderView.OnLayoutListener;
 
 // TODO: part of the data model; should be persisted
@@ -49,11 +50,11 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
         public void updateCurrentTiles(RectF worldRect, RectF worldWindow, float worldToViewScale);
     }
 
-    public ReaderPerspective(WorldWindowDelegate wdd, ReaderView rv) {
+    public ReaderPerspective(WorldWindowDelegate wdd, TileDrawableSource tds, ReaderView rv) {
         mInitialized = false;
         mWorldWindowDelegate = wdd;
         mReaderView = rv;
-        mReaderTiler = new ReaderPerspectiveTiler();
+        mReaderTiler = new ReaderPerspectiveTiler(tds, this);
     }
 
     public ArrayList<ReaderTile> getCurrentWorldTiles() {
@@ -148,7 +149,6 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
     public RectF getViewport() {
         return mViewport;
     }
-
 
     @Override
     // ReaderGestureListener implementation

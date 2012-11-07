@@ -38,18 +38,20 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
         public void onTileReady(ReaderTile tile);
     }
 
+    public interface TileDrawableSource {
+        public void requestDrawableForTile(ReaderTile tile, TileDrawableCallback callback);
+    }
+
     public static final float TILING_PADDING_X = 50f;
     public static final float TILING_PADDING_Y = 50f;
     public static final int MIN_TILE_COLUMNS = 2;
     public static final int MIN_TILE_ROWS = 2;
 
-    public ReaderPerspectiveTiler() {
+    public ReaderPerspectiveTiler(TileDrawableSource tds, OnTileReadyListener listener) {
+        mTileDrawableSource = tds;
+        mOnTileReadyListener = listener;
         mCurrentTiles = new ArrayList<ReaderTile>();
         mNewTiles = new ArrayList<ReaderTile>();
-    }
-
-    public void setOnTileReadyListener(OnTileReadyListener l) {
-        mOnTileReadyListener = l;
     }
 
     @Override
@@ -85,12 +87,15 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
         for (ReaderTile tile : mCurrentTiles)
             if (ReaderTile.inRange(tile.columnIndex, tile.rowIndex, mColumnStart, mRowStart, mColumnCount, mRowCount))
                 mNewTiles.add(tile);
+            else
+                tile.setFree();
 
         float currentTileLeft = mTileStartX, currentTileTop = mTileStartY;
         for (int i = 0; i < mRowCount; i++, currentTileLeft = mTileStartX, currentTileTop += mTileWorldHeight)
             for (int j = 0; j < mColumnCount; j++, currentTileLeft += mTileWorldWidth) {
                 if (!mCurrentTiles.isEmpty()
-                        && ReaderTile.inRange(mColumnStart + j, mRowStart + i, oldColumnStart, oldRowStart, oldColumnCount, oldRowCount))
+                        && ReaderTile.inRange(mColumnStart + j, mRowStart + i, oldColumnStart, oldRowStart, oldColumnCount,
+                                oldRowCount))
                     continue;
 
                 RectF rect = new RectF(currentTileLeft, currentTileTop, currentTileLeft + mTileWorldWidth, currentTileTop
@@ -101,14 +106,19 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
                 tile.totalColumns = totalColumns;
                 tile.totalRows = totalRows;
                 mNewTiles.add(tile);
-                
+
             }
 
         // "double buffer"
         mCurrentTiles.clear();
-        ArrayList<ReaderTile> temp = mCurrentTiles;
+        ArrayList<ReaderTile> tmp = mCurrentTiles;
         mCurrentTiles = mNewTiles;
-        mNewTiles = temp;
+        mNewTiles = tmp;
+
+        for (ReaderTile tile : mCurrentTiles) {
+            if (tile.isNew())
+                mTileDrawableSource.requestDrawableForTile(tile, this);
+        }
     }
 
     @Override
@@ -125,7 +135,7 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
         if (mCurrentTiles.contains(tile))
             mOnTileReadyListener.onTileReady(tile);
     }
-    
+
     private void updateTilingParams(RectF viewport, float worldToViewScale) {
         mTileViewportWidth = (viewport.width() + TILING_PADDING_X) / MIN_TILE_COLUMNS;
         mTileViewportHeight = (viewport.height() + TILING_PADDING_Y) / MIN_TILE_ROWS;
@@ -133,7 +143,8 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
         mTileWorldHeight = mTileViewportHeight / worldToViewScale;
     }
 
-    private OnTileReadyListener mOnTileReadyListener; 
+    private OnTileReadyListener mOnTileReadyListener;
+    private TileDrawableSource mTileDrawableSource;
     private ArrayList<ReaderTile> mCurrentTiles;
     private ArrayList<ReaderTile> mNewTiles;
     private float mTileViewportWidth, mTileViewportHeight;

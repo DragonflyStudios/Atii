@@ -23,8 +23,8 @@ public class ReaderViewDrawer implements DrawingDelgate {
         canvas.translate(-worldWindow.left, -worldWindow.top);
 
         for (ReaderTile worldTile : mReaderWorldPerspective.getCurrentWorldTiles()) {
-            int levelR = 255 - (int)((255f * worldTile.rowIndex) / worldTile.totalRows);
-            int levelGB = 255 - (int)((255f * worldTile.columnIndex) / worldTile.totalColumns);
+            int levelR = 255 - (int) ((255f * worldTile.rowIndex) / worldTile.totalRows);
+            int levelGB = 255 - (int) ((255f * worldTile.columnIndex) / worldTile.totalColumns);
             mPaint.setColor(Color.argb(255, levelR, levelGB, levelGB));
             canvas.drawRect(worldTile.tileRect, mPaint);
 

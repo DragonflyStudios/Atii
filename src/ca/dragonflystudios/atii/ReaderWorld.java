@@ -6,8 +6,9 @@ import android.graphics.RectF;
 import android.os.Handler;
 import android.os.HandlerThread;
 import ca.dragonflystudios.atii.ReaderPerspective.WorldWindowDelegate;
+import ca.dragonflystudios.atii.ReaderPerspectiveTiler.TileDrawableSource;
 
-public class ReaderWorld implements WorldWindowDelegate {
+public class ReaderWorld implements WorldWindowDelegate, TileDrawableSource {
 
     // the "world" is made of GRID_COUNT horizontal and GRID_COUNT vertical grid
     // lines of shades of, respectively, blue and green
@@ -50,14 +51,14 @@ public class ReaderWorld implements WorldWindowDelegate {
         return CONTENT_RIGHT - (worldWindow.right - worldWindow.left) + CONTENT_MARGIN;
     }
 
-    // WorldWindowDelegate implementation
     @Override
+    // WorldWindowDelegate implementation
     public float getLimitMaxY(RectF worldWindow) {
         return CONTENT_BOTTOM - (worldWindow.bottom - worldWindow.top) + CONTENT_MARGIN;
     }
 
-    // WorldWindowDelegate implementation
     @Override
+    // WorldWindowDelegate implementation
     public RectF getWorldRect() {
         return new RectF(CONTENT_LEFT - CONTENT_MARGIN, CONTENT_TOP - CONTENT_MARGIN, CONTENT_RIGHT + CONTENT_MARGIN,
                 CONTENT_BOTTOM + CONTENT_MARGIN);
@@ -75,14 +76,17 @@ public class ReaderWorld implements WorldWindowDelegate {
         public void onTileDrawableReady(ReaderTile tile);
     }
 
+    @Override
+    // TileDrawableSource implementation
     public void requestDrawableForTile(final ReaderTile tile, final TileDrawableCallback callback) {
         if (tile.isReady())
             callback.onTileDrawableReady(tile);
-        else
+        else {
+            tile.setPending();
             mDrawingHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    long procTime = (long)(Math.random() * 5000);
+                    long procTime = (long)(Math.random() * 500);
                     try {
                         Thread.sleep(procTime);
                     } catch (InterruptedException e) {};
@@ -91,6 +95,7 @@ public class ReaderWorld implements WorldWindowDelegate {
                     callback.onTileDrawableReady(tile);
                 }
             });
+        }
     }
 
 }

@@ -15,7 +15,7 @@ public class MainActivity extends Activity {
         ReaderWorld world = new ReaderWorld();
         ReaderView readerView = new ReaderView(this);
 
-        ReaderPerspective readerPerspective = new ReaderPerspective(world, readerView);
+        ReaderPerspective readerPerspective = new ReaderPerspective(world, world, readerView);
         readerView.setOnLayoutListener(readerPerspective);
 
         ReaderViewDrawer viewDrawer = new ReaderViewDrawer(readerPerspective);
