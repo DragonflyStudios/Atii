@@ -20,11 +20,21 @@ import ca.dragonflystudios.atii.ReaderWorld.TileDrawableCallback;
  *          [x] Default drawable
  *          [x] used if pending: draw gray ... *
  *
- *      [2] Asynchronous Tile management
+ *      [x] Asynchronous Tile management
  *      - request; random wait; ready; call draw(Canvas) on UI thread
  *        - Note that the drawing here should be tile specific ... 
  *      
- *      [4] Predictive fetching (the 16 tiles), cancelling, and cacheing
+ *      [3] Zooming use existing data ... 
+ *      - Zoom-in use current tiles ...
+ *      - Zoom-out use a combination of fit-to-width image and current tiles
+ *      - Use the canvas' scale transformation
+ *      
+ *      [4] Predictive fetching (the 16 tiles)
+ *      - prefetch the extra 7
+ *          - extra 3 in 1st direction of travel
+ *          - extra 4 in 1nd direction of travel
+ *          - post requests to the end of queue (rather than the front)
+ *      - cancelling prefetching if direction changes
  *      
  *      [5] Bitmaps as drawables [precise rendering]
  *      
@@ -40,6 +50,7 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
 
     public interface TileDrawableSource {
         public void requestDrawableForTile(ReaderTile tile, TileDrawableCallback callback);
+        public void cancelPendingRequests();
     }
 
     public static final float TILING_PADDING_X = 50f;
@@ -125,6 +136,7 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
     // implements TilingDelegate
     public void retile(RectF worldRect, RectF worldWindow, RectF viewport, float worldToViewScale) {
         mCurrentTiles.clear();
+        mTileDrawableSource.cancelPendingRequests();
         updateTilingParams(viewport, worldToViewScale);
         updateCurrentTiles(worldRect, worldWindow, worldToViewScale);
     }

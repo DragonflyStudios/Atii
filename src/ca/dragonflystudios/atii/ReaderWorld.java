@@ -25,7 +25,7 @@ public class ReaderWorld implements WorldWindowDelegate, TileDrawableSource {
     public static final float Y_INC = (CONTENT_BOTTOM - CONTENT_TOP) / GRID_COUNT;
     public static final float COLOR_INC = 255f / GRID_COUNT;
 
-    public static final float GRID_LINE_WIDTH = 6f;
+    public static final float GRID_LINE_WIDTH = 5f;
 
     public ReaderWorld() {
         mDrawingHandlerThread = new HandlerThread("Async Tile Drawing Thread");
@@ -83,10 +83,10 @@ public class ReaderWorld implements WorldWindowDelegate, TileDrawableSource {
             callback.onTileDrawableReady(tile);
         else {
             tile.setPending();
-            mDrawingHandler.post(new Runnable() {
+            mDrawingHandler.postAtFrontOfQueue(new Runnable() {
                 @Override
                 public void run() {
-                    long procTime = (long)(Math.random() * 500);
+                    long procTime = (long)(Math.random() * 300);
                     try {
                         Thread.sleep(procTime);
                     } catch (InterruptedException e) {};
@@ -96,6 +96,12 @@ public class ReaderWorld implements WorldWindowDelegate, TileDrawableSource {
                 }
             });
         }
+    }
+    
+    @Override
+    // TileDrawableSource implementation
+    public void cancelPendingRequests() {
+        mDrawingHandler.removeCallbacks(null, null);
     }
 
 }
