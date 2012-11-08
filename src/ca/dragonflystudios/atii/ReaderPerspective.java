@@ -47,7 +47,7 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
 
         public void retile(RectF worldRect, RectF worldWindow, RectF viewport, float worldToViewScale);
 
-        public void updateCurrentTiles(RectF worldRect, RectF worldWindow, float worldToViewScale);
+        public void updateCurrentTiles(RectF worldRect, RectF worldWindow, float scale, int columnDirection, int rowDirection);
     }
 
     public ReaderPerspective(WorldWindowDelegate wdd, TileDrawableSource tds, ReaderView rv) {
@@ -100,9 +100,14 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
                         Math.min(mWorldWindow.top, mWorldWindowDelegate.getLimitMaxY(mWorldWindow))));
         boolean panned = (oldLeft != mWorldWindow.left || oldTop != mWorldWindow.top);
         if (panned)
-            mReaderTiler.updateCurrentTiles(mWorldWindowDelegate.getWorldRect(), mWorldWindow, mWorldToViewScale);
+            mReaderTiler.updateCurrentTiles(mWorldWindowDelegate.getWorldRect(), mWorldWindow, mWorldToViewScale, sign(deltaX),
+                    sign(deltaY));
 
         return panned;
+    }
+
+    private int sign(float f) {
+        return ((f > 0f) ? 1 : ((f < 0f) ? -1 : 0));
     }
 
     public boolean scaleWorldWindow(float scaleBy, float focusX, float focusY) {

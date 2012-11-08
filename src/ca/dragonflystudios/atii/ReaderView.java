@@ -2,6 +2,8 @@ package ca.dragonflystudios.atii;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.View;
 
 public class ReaderView extends View {
@@ -35,6 +37,7 @@ public class ReaderView extends View {
 
     @Override
     public void onDraw(Canvas canvas) {
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR); // Doesn't seem to help!
         mWorldDrawingDelegate.draw(canvas);
 
         // Draw other things
