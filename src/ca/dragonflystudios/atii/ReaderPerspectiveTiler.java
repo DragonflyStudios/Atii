@@ -42,24 +42,32 @@ import ca.dragonflystudios.atii.ReaderWorld.TileDrawableCallback;
  *      - Two kinds of drawings: part of scene (sprite?) and part of screen.
  */
 
-public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallback {
+public class ReaderPerspectiveTiler implements TilingDelegate,
+        TileDrawableCallback
+{
 
-    public interface OnTileReadyListener {
+    public interface OnTileReadyListener
+    {
         public void onTileReady(ReaderTile tile);
     }
 
-    public interface TileDrawableSource {
-        public void requestDrawableForTile(ReaderTile tile, TileDrawableCallback callback);
-
+    public interface TileDrawableSource
+    {
+        public void requestDrawableForTile(ReaderTile tile,
+                TileDrawableCallback callback);
+        public void requestPrefetchDrawableForTile(ReaderTile tile,
+                TileDrawableCallback callback);
         public void cancelPendingRequests();
     }
 
     public static final float TILING_PADDING_X = 50f;
     public static final float TILING_PADDING_Y = 50f;
-    public static final int MIN_TILE_COLUMNS = 2;
-    public static final int MIN_TILE_ROWS = 2;
+    public static final int   MIN_TILE_COLUMNS = 2;
+    public static final int   MIN_TILE_ROWS    = 2;
 
-    public ReaderPerspectiveTiler(TileDrawableSource tds, OnTileReadyListener listener) {
+    public ReaderPerspectiveTiler(TileDrawableSource tds,
+            OnTileReadyListener listener)
+    {
         mTileDrawableSource = tds;
         mOnTileReadyListener = listener;
         mCurrentTiles = new ArrayList<ReaderTile>();
@@ -69,13 +77,16 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
 
     @Override
     // implements TilingDelegate
-    public ArrayList<ReaderTile> getCurrentTiles() {
+    public ArrayList<ReaderTile> getCurrentTiles()
+    {
         return mCurrentTiles;
     }
 
     @Override
     // implements TilingDelegate
-    public void updateCurrentTiles(RectF worldRect, RectF worldWindow, float scale, int columnDirection, int rowDirection) {
+    public void updateCurrentTiles(RectF worldRect, RectF worldWindow,
+            float scale, int columnDirection, int rowDirection)
+    {
         int oldColumnStart = mColumnStart;
         int oldRowStart = mRowStart;
         int oldColumnCount = mColumnCount;
@@ -84,46 +95,99 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
         mColumnStart = (int) ((worldWindow.left - worldRect.left) / mTileWorldWidth); // floor
         mRowStart = (int) ((worldWindow.top - worldRect.top) / mTileWorldHeight); // floor
 
-        mTileStartX = worldRect.left + mColumnStart * mTileWorldWidth;
-        mTileStartY = worldRect.top + mRowStart * mTileWorldHeight;
-        mColumnCount = Math.round((worldWindow.right - mTileStartX) / mTileWorldWidth + 0.5f); // ceiling
-        mRowCount = Math.round((worldWindow.bottom - mTileStartY) / mTileWorldHeight + 0.5f); // ceiling
+        mColumnCount = Math.round((worldWindow.right - worldRect.left)
+                / mTileWorldWidth - mColumnStart + 0.5f); // ceiling
+        mRowCount = Math.round((worldWindow.bottom - worldRect.top)
+                / mTileWorldHeight - mRowStart + 0.5f); // ceiling
 
-        if (mCouldReuse && mColumnStart == oldColumnStart && mRowStart == oldRowStart && mColumnCount == oldColumnCount
+        if (mCouldReuse && mColumnStart == oldColumnStart
+                && mRowStart == oldRowStart && mColumnCount == oldColumnCount
                 && mRowCount == oldRowCount)
             return;
 
-        // These two are for debugging, otherwise unnecessary
-        int totalColumns = Math.round((worldRect.right - worldRect.left) / mTileWorldWidth + 0.5f); // ceiling
-        int totalRows = Math.round((worldRect.bottom - worldRect.top) / mTileWorldHeight + 0.5f); // ceiling
+        mTotalColumns = Math.round((worldRect.right - worldRect.left)
+                / mTileWorldWidth + 0.5f); // ceiling
+        mTotalRows = Math.round((worldRect.bottom - worldRect.top)
+                / mTileWorldHeight + 0.5f); // ceiling
 
         for (ReaderTile tile : mCurrentTiles)
-            if (ReaderTile.inRange(tile.columnIndex, tile.rowIndex, mColumnStart, mRowStart, mColumnCount, mRowCount))
+            if (ReaderTile.inRange(tile.columnIndex, tile.rowIndex,
+                    mColumnStart, mRowStart, mColumnCount, mRowCount))
                 mNewTiles.add(tile);
             else
                 tile.setFree();
 
-        float currentTileLeft = mTileStartX, currentTileTop = mTileStartY;
-        for (int i = 0; i < mRowCount; i++, currentTileLeft = mTileStartX, currentTileTop += mTileWorldHeight)
-            for (int j = 0; j < mColumnCount; j++, currentTileLeft += mTileWorldWidth) {
-                int tileColumn = mColumnStart + j, tileRow = mRowStart + i;
-                if (mCouldReuse
-                        && ReaderTile.inRange(tileColumn, tileRow, oldColumnStart, oldRowStart, oldColumnCount, oldRowCount))
+        int columnStartWithPrefetch = mColumnStart;
+        int rowStartWithPrefetch = mRowStart;
+        int columnCountWithPrefetch = mColumnCount;
+        int rowCountWithPrefetch = mRowCount;
+
+        if (mColumnCount <= MIN_TILE_COLUMNS) {
+            if (mColumnStart > 0) {
+                columnStartWithPrefetch--;
+                columnCountWithPrefetch++;
+            }
+            if (columnCountWithPrefetch < mTotalColumns)
+                columnCountWithPrefetch++;
+        } else if (-1 == columnDirection && mColumnStart > 0) {
+            columnStartWithPrefetch--;
+            columnCountWithPrefetch++;
+        } else if (1 == columnDirection
+                && columnCountWithPrefetch < mTotalColumns)
+            columnCountWithPrefetch++;
+
+        if (mRowCount <= MIN_TILE_ROWS) {
+            if (mRowStart > 0) {
+                rowStartWithPrefetch--;
+                rowCountWithPrefetch++;
+            }
+            if (rowCountWithPrefetch < mTotalRows)
+                rowCountWithPrefetch++;
+        } else if (-1 == rowDirection && mRowStart > 0) {
+            rowStartWithPrefetch--;
+            rowCountWithPrefetch++;
+        } else if (1 == rowDirection && rowCountWithPrefetch < mTotalRows)
+            rowCountWithPrefetch++;
+
+        float tileStartX = worldRect.left + columnStartWithPrefetch
+                * mTileWorldWidth;
+        float tileStartY = worldRect.top + rowStartWithPrefetch
+                * mTileWorldHeight;
+
+        float currentTileLeft = tileStartX, currentTileTop = tileStartY;
+        for (int i = 0; i < rowCountWithPrefetch; i++, currentTileLeft = tileStartX, currentTileTop += mTileWorldHeight)
+            for (int j = 0; j < columnCountWithPrefetch; j++, currentTileLeft += mTileWorldWidth) {
+                int tileColumn = columnStartWithPrefetch + j;
+                int tileRow = rowStartWithPrefetch + i;
+                ReaderTile tile;
+
+                boolean required = ReaderTile.inRange(tileColumn, tileRow,
+                        mColumnStart, mRowStart, mColumnCount, mRowCount);
+
+                if (required
+                        && mCouldReuse
+                        && ReaderTile.inRange(tileColumn, tileRow,
+                                oldColumnStart, oldRowStart, oldColumnCount,
+                                oldRowCount))
                     continue;
 
-                ReaderTile tile = retrieveFromPrefetched(scale, tileColumn, tileRow);
+                tile = retrieveFromPrefetched(scale, tileColumn, tileRow);
 
                 if (null == tile) {
-                    RectF rect = new RectF(currentTileLeft, currentTileTop, currentTileLeft + mTileWorldWidth, currentTileTop
-                            + mTileWorldHeight);
+                    RectF rect = new RectF(currentTileLeft, currentTileTop,
+                            currentTileLeft + mTileWorldWidth, currentTileTop
+                                    + mTileWorldHeight);
 
                     tile = new ReaderTile(scale, rect, tileColumn, tileRow);
                     // These two are for debugging, otherwise unnecessary
-                    tile.totalColumns = totalColumns;
-                    tile.totalRows = totalRows;
+                    tile.totalColumns = mTotalColumns;
+                    tile.totalRows = mTotalRows;
                 }
 
-                mNewTiles.add(tile);
+                if (required)
+                    mNewTiles.add(tile);
+                else
+                    mPrefetchedTiles.add(tile);
             }
 
         // "double buffer"
@@ -131,20 +195,22 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
         ArrayList<ReaderTile> tmp = mCurrentTiles;
         mCurrentTiles = mNewTiles;
         mNewTiles = tmp;
-
-        for (ReaderTile tile : mCurrentTiles) {
-            if (tile.isNew())
-                mTileDrawableSource.requestDrawableForTile(tile, this);
-        }
-
         mCouldReuse = true;
 
-        requestPrefetch(oldColumnStart, oldRowStart);
+        for (ReaderTile tile : mCurrentTiles)
+            if (tile.isNew())
+                mTileDrawableSource.requestDrawableForTile(tile, this);
+
+        for (ReaderTile tile : mPrefetchedTiles)
+            if (tile.isNew())
+                mTileDrawableSource.requestPrefetchDrawableForTile(tile, this);
     }
 
     @Override
     // implements TilingDelegate
-    public void retile(RectF worldRect, RectF worldWindow, RectF viewport, float worldToViewScale) {
+    public void retile(RectF worldRect, RectF worldWindow, RectF viewport,
+            float worldToViewScale)
+    {
         mCurrentTiles.clear();
         mPrefetchedTiles.clear();
         mTileDrawableSource.cancelPendingRequests();
@@ -154,24 +220,36 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
     }
 
     @Override
-    // implements TileDrawableCallback
-    public void onTileDrawableReady(ReaderTile tile) {
+    // TileDrawableCallback implementatino
+    public void onTileDrawableReady(ReaderTile tile)
+    {
         if (mCurrentTiles.contains(tile))
             mOnTileReadyListener.onTileReady(tile);
     }
 
-    private void updateTilingParams(RectF viewport, float worldToViewScale) {
+    @Override
+    // TileDrawableCallback implementatino
+    public void onPrefetchedTileDrawableReady(ReaderTile tile) {
+        // do nothing
+    }
+
+    private void updateTilingParams(RectF viewport, float worldToViewScale)
+    {
         // TODO: snap to pixel grids
-        mTileViewportWidth = (viewport.width() + TILING_PADDING_X) / MIN_TILE_COLUMNS;
-        mTileViewportHeight = (viewport.height() + TILING_PADDING_Y) / MIN_TILE_ROWS;
+        mTileViewportWidth = (viewport.width() + TILING_PADDING_X)
+                / MIN_TILE_COLUMNS;
+        mTileViewportHeight = (viewport.height() + TILING_PADDING_Y)
+                / MIN_TILE_ROWS;
         mTileWorldWidth = mTileViewportWidth / worldToViewScale;
         mTileWorldHeight = mTileViewportHeight / worldToViewScale;
     }
 
-    private ReaderTile retrieveFromPrefetched(float scale, int column, int row) {
+    private ReaderTile retrieveFromPrefetched(float scale, int column, int row)
+    {
         ReaderTile foundTile = null;
         for (ReaderTile tile : mPrefetchedTiles)
-            if (tile.worldToViewScale == scale && tile.columnIndex == column && tile.rowIndex == row) {
+            if (tile.worldToViewScale == scale && tile.columnIndex == column
+                    && tile.rowIndex == row) {
                 foundTile = tile;
                 break;
             }
@@ -181,36 +259,15 @@ public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallb
         return foundTile;
     }
 
-    private void requestPrefetch(int columnDirection, int rowDirection) {
-        int extraColumn;
-        
-        if (-1 == columnDirection)
-            extraColumn = mColumnStart - 1;
-        else if (1 == columnDirection)
-            extraColumn = mColumnStart + mColumnCount + 1;
-
-        if (0 != columnDirection);
-            // for (int )
-        // if columnDirection == -1; add column on left, using mColumnStart - 1;
-        // else if columnDirection == 1; add column on right, using mColumnStart + mColumnCount + 1;
-        // loop through rows
-        
-        // if rowDirection == -1; add row on top, using mRowStart - 1;
-        // else if rowDirection == 1; add row at bottom, using mRowStart + mRowCount + 1;
-        // loop through columns
-        
-        // add corner at 
-    }
-
-    private OnTileReadyListener mOnTileReadyListener;
-    private TileDrawableSource mTileDrawableSource;
-    private boolean mCouldReuse;
+    private OnTileReadyListener   mOnTileReadyListener;
+    private TileDrawableSource    mTileDrawableSource;
+    private boolean               mCouldReuse;
     private ArrayList<ReaderTile> mCurrentTiles;
     private ArrayList<ReaderTile> mNewTiles;
     private ArrayList<ReaderTile> mPrefetchedTiles;
-    private float mTileViewportWidth, mTileViewportHeight;
-    private float mTileWorldWidth, mTileWorldHeight;
-    private int mColumnStart, mRowStart;
-    private float mTileStartX, mTileStartY;
-    private int mColumnCount, mRowCount;
+    private float                 mTileViewportWidth, mTileViewportHeight;
+    private float                 mTileWorldWidth, mTileWorldHeight;
+    private int                   mColumnStart, mRowStart;
+    private int                   mColumnCount, mRowCount;
+    private int                   mTotalColumns, mTotalRows;
 }
