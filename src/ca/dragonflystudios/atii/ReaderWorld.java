@@ -2,6 +2,7 @@ package ca.dragonflystudios.atii;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -28,7 +29,7 @@ public class ReaderWorld implements WorldWindowDelegate, TileDrawableSource
                                                       / GRID_COUNT;
     public static final float COLOR_INC       = 255f / GRID_COUNT;
 
-    public static final float GRID_LINE_WIDTH = 5f;
+    public static final float GRID_LINE_WIDTH = 0.03f;
 
     public ReaderWorld()
     {
@@ -81,7 +82,7 @@ public class ReaderWorld implements WorldWindowDelegate, TileDrawableSource
 
     public interface ReaderWorldDrawable
     {
-        public void draw(Canvas canvas, Paint paint);
+        public void draw(Canvas canvas, Rect viewRect, Paint paint);
     }
 
     public interface TileDrawableCallback
@@ -116,13 +117,7 @@ public class ReaderWorld implements WorldWindowDelegate, TileDrawableSource
                 @Override
                 public void run()
                 {
-                    long procTime = (long) (Math.random() * 300);
-                    try {
-                        Thread.sleep(procTime);
-                    } catch (InterruptedException e) {
-                    }
-                    ;
-
+                    tile.render();
                     tile.setReady();
                     callback.onTileDrawableReady(tile);
                 }

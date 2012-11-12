@@ -2,6 +2,7 @@ package ca.dragonflystudios.atii;
 
 import java.util.ArrayList;
 
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.View;
 import ca.dragonflystudios.atii.ReaderGestureView.ReaderGestureListener;
@@ -153,6 +154,13 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
 
     public RectF getViewport() {
         return mViewport;
+    }
+
+    public Rect getViewRectForWorldRect(RectF worldRect) {
+        return new Rect((int)((worldRect.left - mWorldWindow.left) * mWorldToViewScale),
+                (int)((worldRect.top - mWorldWindow.top) * mWorldToViewScale),
+                (int)((worldRect.right - mWorldWindow.left) * mWorldToViewScale),
+                (int)((worldRect.bottom - mWorldWindow.top) * mWorldToViewScale));
     }
 
     @Override
