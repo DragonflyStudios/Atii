@@ -73,6 +73,7 @@ public class ReaderPerspectiveTiler implements TilingDelegate,
         mCurrentTiles = new ArrayList<ReaderTile>();
         mNewTiles = new ArrayList<ReaderTile>();
         mPrefetchedTiles = new ArrayList<ReaderTile>();
+        mNewPrefetchedTiles = new ArrayList<ReaderTile>();
     }
 
     @Override
@@ -161,10 +162,10 @@ public class ReaderPerspectiveTiler implements TilingDelegate,
                 int tileRow = rowStartWithPrefetch + i;
                 ReaderTile tile;
 
-                boolean required = ReaderTile.inRange(tileColumn, tileRow,
+                boolean currentlyVisible = ReaderTile.inRange(tileColumn, tileRow,
                         mColumnStart, mRowStart, mColumnCount, mRowCount);
 
-                if (required
+                if (currentlyVisible
                         && mCouldReuse
                         && ReaderTile.inRange(tileColumn, tileRow,
                                 oldColumnStart, oldRowStart, oldColumnCount,
@@ -184,10 +185,10 @@ public class ReaderPerspectiveTiler implements TilingDelegate,
                     tile.totalRows = mTotalRows;
                 }
 
-                if (required)
+                if (currentlyVisible)
                     mNewTiles.add(tile);
                 else
-                    mPrefetchedTiles.add(tile);
+                    mNewPrefetchedTiles.add(tile);
             }
 
         // "double buffer"
@@ -195,6 +196,10 @@ public class ReaderPerspectiveTiler implements TilingDelegate,
         ArrayList<ReaderTile> tmp = mCurrentTiles;
         mCurrentTiles = mNewTiles;
         mNewTiles = tmp;
+        mPrefetchedTiles.clear();
+        tmp = mPrefetchedTiles;
+        mPrefetchedTiles = mNewPrefetchedTiles;
+        mNewPrefetchedTiles = tmp;
         mCouldReuse = true;
 
         for (ReaderTile tile : mCurrentTiles)
@@ -211,9 +216,9 @@ public class ReaderPerspectiveTiler implements TilingDelegate,
     public void retile(RectF worldRect, RectF worldWindow, RectF viewport,
             float worldToViewScale)
     {
+        mTileDrawableSource.cancelPendingRequests();
         mCurrentTiles.clear();
         mPrefetchedTiles.clear();
-        mTileDrawableSource.cancelPendingRequests();
         mCouldReuse = false;
         updateTilingParams(viewport, worldToViewScale);
         updateCurrentTiles(worldRect, worldWindow, worldToViewScale, 0, 0);
@@ -265,6 +270,7 @@ public class ReaderPerspectiveTiler implements TilingDelegate,
     private ArrayList<ReaderTile> mCurrentTiles;
     private ArrayList<ReaderTile> mNewTiles;
     private ArrayList<ReaderTile> mPrefetchedTiles;
+    private ArrayList<ReaderTile> mNewPrefetchedTiles;
     private float                 mTileViewportWidth, mTileViewportHeight;
     private float                 mTileWorldWidth, mTileWorldHeight;
     private int                   mColumnStart, mRowStart;
