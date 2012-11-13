@@ -1,6 +1,6 @@
 
 
-- a series of photos ... named picture1, picture2, picture3 ...
+- a series of photos ... named photo1, photo2, photo3 ...
 
 - a series of Looks of photos ... named look1, look2, look3 ...
 -- each view is specified in terms of a Viewport-WorldWindow pair w.r.t. a picture
@@ -17,18 +17,38 @@
 [Future:] - a series of gestures ... 
 
 
+- Document File Structure [be ware of the fan calculus issues here: cut by book title, by author, by "performer"]
+-- Folder: "bookname.atii"
+---- File:
+------ "bookname.play" [there could be multiple of them]
+---- Folder: "videos"
+------ File: p1.png, p2.png ...
+---- Folder: "audios"
+------ File: a1.mp3, a2.mp3 ...
+
+- Sample "Story Description":
 // do the simple case ...
 <story>
     <clip>
         <look>
-            <picture></picture>
-            <viewport></viewport>
-            <worldwindow></worldwindow>
+            <photo>p2.png</photo>
+            <viewport>
+                <left>20</left>
+                <top>100</top>
+                <right>1020</right>
+                <bottom>700</bottom>
+            </viewport>
+            <window>
+                <left>0</left>
+                <top>0</top>
+                <right>2000</right>
+                <bottom>1200</bottom>
+            </window>
         </look>
         <listen>
-            <audio></audio>
-            <start></start>
-            <duration></duration>
+            <audio>a3.mp3</audio>
+            <start>0</start>
+            <duration>3000</duration>
         </listen>
     </clip>
     <clip>

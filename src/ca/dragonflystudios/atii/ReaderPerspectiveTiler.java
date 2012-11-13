@@ -47,7 +47,7 @@ import ca.dragonflystudios.atii.ReaderWorld.TileDrawableCallback;
  *          
  *      [ ] Snap tiles to pixel boundary
  *      
- *      [ ] Integrate MuPDF
+ *      [ ] Integrate MuPDF or camera image source
  */
 
 public class ReaderPerspectiveTiler implements TilingDelegate, TileDrawableCallback {
