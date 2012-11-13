@@ -1,0 +1,37 @@
+
+
+- a series of photos ... named picture1, picture2, picture3 ...
+
+- a series of Looks of photos ... named look1, look2, look3 ...
+-- each view is specified in terms of a Viewport-WorldWindow pair w.r.t. a picture
+--- WorldWindow coordinates are pixel coordinates of the pictures
+
+- a series of audios ... named audio1, audio2, audio3 ...
+
+- a series of listens of audios ... named listen1, listen2, listen3 ...
+-- each playback is specified in terms of a time-window w.r.t. an audio
+
+- an Atii Clip is a sequence of <Look, Listen> pairs ...
+-- NOTE: both the view and the playback could be "empty", but the pair may still take space and time ...
+
+[Future:] - a series of gestures ... 
+
+
+// do the simple case ...
+<story>
+    <clip>
+        <look>
+            <picture></picture>
+            <viewport></viewport>
+            <worldwindow></worldwindow>
+        </look>
+        <listen>
+            <audio></audio>
+            <start></start>
+            <duration></duration>
+        </listen>
+    </clip>
+    <clip>
+        ...
+    </clip>
+</story>
