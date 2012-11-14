@@ -15,26 +15,22 @@ import android.util.Xml;
 // modeled after: http://developer.android.com/training/basics/network-ops/xml.html
 public class Parser {
 
-    public Story parse(File file) throws XmlPullParserException, IOException {
+    public void parse(File storyFile, Story story) throws XmlPullParserException, IOException {
         InputStream in = null;
-        Story story = null;
 
         try {
-            in = new BufferedInputStream(new FileInputStream(file));
+            in = new BufferedInputStream(new FileInputStream(storyFile));
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
             parser.setInput(in, null);
             parser.nextTag();
 
             parser.require(XmlPullParser.START_TAG, Story.ns, "story");
-            story = new Story(file.getAbsolutePath());
             story.loadFromXml(parser);
         } finally {
             if (in != null)
                 in.close();
         }
-
-        return story;
     }
 
     public static void skip(XmlPullParser parser) throws XmlPullParserException, IOException {

@@ -5,12 +5,10 @@ import java.io.File;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.widget.RelativeLayout;
 import ca.dragonflystudios.android.storage.Storage;
-import ca.dragonflystudios.atii.story.Parser;
 import ca.dragonflystudios.atii.story.Story;
 
 public class MainActivity extends Activity {
@@ -22,7 +20,15 @@ public class MainActivity extends Activity {
         // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         // WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        ReaderWorld world = new ReaderWorld();
+        Story story;
+        if (Storage.isExternalStorageWriteable()) {
+            File atiiDir = new File(Environment.getExternalStorageDirectory(), "Atii");
+            File storyFolder = new File(atiiDir, "story1.atii");
+            File storyFile = new File(atiiDir, "story.xml");
+            story = new Story(storyFolder);
+        }
+
+        ReaderWorld world = new ReaderWorld(story);
         ReaderView readerView = new ReaderView(this);
 
         ReaderPerspective readerPerspective = new ReaderPerspective(world, world, readerView);
@@ -37,19 +43,6 @@ public class MainActivity extends Activity {
         mainView.addView(readerView);
         mainView.addView(gestureView);
         setContentView(mainView);
-
-        if (Storage.isExternalStorageWriteable()) {
-            Parser parser = new Parser();
-            File atiiDir = new File(Environment.getExternalStorageDirectory(), "Atii");
-            File storyFile = new File(atiiDir, "story1.xml");
-
-            try {
-                mStory = parser.parse(storyFile);
-                Log.d(getClass().getName(), mStory.toString());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override
@@ -57,6 +50,4 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
-    
-    Story mStory;
 }

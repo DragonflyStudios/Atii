@@ -30,4 +30,8 @@ public class Clip extends Entity {
             }
         }
     }
+
+    public Look getLook() {
+        return mLook;
+    }
 }

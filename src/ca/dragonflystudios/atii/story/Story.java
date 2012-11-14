@@ -1,5 +1,6 @@
 package ca.dragonflystudios.atii.story;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -7,12 +8,24 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 public class Story extends Entity {
-    public Story(String storyFilePath) {
-        mStoryFilePath = storyFilePath;
+    public Story(File storyFolder) {
+        mStoryFolderPath = storyFolder.getAbsolutePath();
+
+        File storyFile = new File(storyFolder, "story.xml");
+        Parser parser = new Parser();
+        try {
+            parser.parse(storyFile, this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public String getStoryFilePath() {
-        return mStoryFilePath;
+    public String getStoryFolderPath() {
+        return mStoryFolderPath;
+    }
+
+    public ArrayList<Clip> getClips() {
+        return mClips;
     }
 
     @Override
@@ -34,6 +47,6 @@ public class Story extends Entity {
         }
     }
 
-    private String mStoryFilePath;
+    private String mStoryFolderPath;
     private ArrayList<Clip> mClips;
 }
