@@ -15,12 +15,11 @@ import android.util.Xml;
 // modeled after: http://developer.android.com/training/basics/network-ops/xml.html
 public class Parser {
 
-    public Story parse(String storyFilePath) throws XmlPullParserException, IOException {
+    public Story parse(File file) throws XmlPullParserException, IOException {
         InputStream in = null;
         Story story = null;
 
         try {
-            File file = new File(storyFilePath);
             in = new BufferedInputStream(new FileInputStream(file));
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
@@ -28,7 +27,7 @@ public class Parser {
             parser.nextTag();
 
             parser.require(XmlPullParser.START_TAG, Story.ns, "story");
-            story = new Story(storyFilePath);
+            story = new Story(file.getAbsolutePath());
             story.loadFromXml(parser);
         } finally {
             if (in != null)
@@ -56,7 +55,7 @@ public class Parser {
     }
 
     public static Rect readRectFromXml(XmlPullParser parser) throws IOException, XmlPullParserException {
-        Long ll = null, lt = null, lr = null, lb = null;
+        int l = 0, t = 0, r = 0, b = 0;
         
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -64,26 +63,23 @@ public class Parser {
             }
             String name = parser.getName();
             if (name.equals("left")) {
-                ll = readLongFromXml(parser);
+                l = readIntFromXml(parser);
                 parser.require(XmlPullParser.END_TAG, Entity.ns, "left");
             } else if (name.equals("top")) {
-                lt = readLongFromXml(parser);
+                t = readIntFromXml(parser);
                 parser.require(XmlPullParser.END_TAG, Entity.ns, "top");
             } else if (name.equals("right")) {
-                lr = readLongFromXml(parser);
+                r = readIntFromXml(parser);
                 parser.require(XmlPullParser.END_TAG, Entity.ns, "right");
             } else if (name.equals("bottom")) {
-                lb = readLongFromXml(parser);
+                b = readIntFromXml(parser);
                 parser.require(XmlPullParser.END_TAG, Entity.ns, "bottom");
             } else {
                 skip(parser);
             }
         }
-        
-        if (null == ll || null == lt || null == lr || null == lb)
-            return null;
-                    
-        return new Rect(ll.intValue(), lt.intValue(), lr.intValue(), lb.intValue());
+
+        return new Rect(l, t, r, b);
     }
 
     public static String readTextFromXml(XmlPullParser parser) throws IOException, XmlPullParserException {
@@ -95,10 +91,19 @@ public class Parser {
         return result;
     }
 
-    public static Long readLongFromXml(XmlPullParser parser) throws IOException, XmlPullParserException {
-        Long l = null;
+    public static int readIntFromXml(XmlPullParser parser) throws IOException, XmlPullParserException {
+        int v = 0;
         if (parser.next() == XmlPullParser.TEXT) {
-            l = Long.getLong(parser.getText());
+            v = Integer.parseInt(parser.getText());
+            parser.nextTag();
+        }
+        return v;
+    }
+
+    public static long readLongFromXml(XmlPullParser parser) throws IOException, XmlPullParserException {
+        long l = 0;
+        if (parser.next() == XmlPullParser.TEXT) {
+            l = Long.parseLong(parser.getText());
             parser.nextTag();
         }
         return l;

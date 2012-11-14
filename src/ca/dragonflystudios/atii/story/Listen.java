@@ -38,7 +38,7 @@ public class Listen extends Entity {
             String name = parser.getName();
             if (name.equals("audio")) {
                 mAudioFileName = Parser.readTextFromXml(parser);
-                parser.require(XmlPullParser.END_TAG, ns, "photo");
+                parser.require(XmlPullParser.END_TAG, ns, "audio");
             } else if (name.equals("start")) {
                 mStart = Parser.readLongFromXml(parser);
                 parser.require(XmlPullParser.END_TAG, ns, "start");
