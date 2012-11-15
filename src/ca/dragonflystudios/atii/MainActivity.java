@@ -9,8 +9,12 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.widget.RelativeLayout;
 import ca.dragonflystudios.android.storage.Storage;
-import ca.dragonflystudios.atii.story.Story;
-import ca.dragonflystudios.atii.world.World;
+import ca.dragonflystudios.atii.control.ReaderPerspective;
+import ca.dragonflystudios.atii.model.story.Story;
+import ca.dragonflystudios.atii.model.world.World;
+import ca.dragonflystudios.atii.view.ReaderGestureView;
+import ca.dragonflystudios.atii.view.ReaderView;
+import ca.dragonflystudios.atii.view.ReaderViewDrawer;
 
 public class MainActivity extends Activity {
 
@@ -21,11 +25,10 @@ public class MainActivity extends Activity {
         // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         // WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        Story story;
+        Story story = null;
         if (Storage.isExternalStorageWriteable()) {
             File atiiDir = new File(Environment.getExternalStorageDirectory(), "Atii");
             File storyFolder = new File(atiiDir, "story1.atii");
-            File storyFile = new File(atiiDir, "story.xml");
             story = new Story(storyFolder);
         }
 

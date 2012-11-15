@@ -20,8 +20,9 @@
 - Document File Structure [be ware of the fan calculus issues here: cut by book title, by author, by "performer"]
 -- Folder: "bookname.atii"
 ---- File:
------- "bookname.play" [there could be multiple of them]
----- Folder: "videos"
+------ ["world.xml"] [Do not do this for now ...]
+------ "storyplay1.xml" [there could be multiple of them]
+---- Folder: "photos"
 ------ File: p1.png, p2.png ...
 ---- Folder: "audios"
 ------ File: a1.mp3, a2.mp3 ...
@@ -50,8 +51,5 @@
             <start>0</start>
             <duration>3000</duration>
         </listen>
-    </clip>
-    <clip>
-        ...
     </clip>
 </story>

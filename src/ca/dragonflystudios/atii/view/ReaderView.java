@@ -1,4 +1,4 @@
-package ca.dragonflystudios.atii;
+package ca.dragonflystudios.atii.view;
 
 import android.content.Context;
 import android.graphics.Canvas;

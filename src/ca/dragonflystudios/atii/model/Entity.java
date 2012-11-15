@@ -1,4 +1,4 @@
-package ca.dragonflystudios.atii.story;
+package ca.dragonflystudios.atii.model;
 
 import java.io.IOException;
 

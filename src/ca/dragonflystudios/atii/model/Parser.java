@@ -1,4 +1,4 @@
-package ca.dragonflystudios.atii.story;
+package ca.dragonflystudios.atii.model;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -8,6 +8,8 @@ import java.io.InputStream;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import ca.dragonflystudios.atii.model.story.Story;
 
 import android.graphics.Rect;
 import android.util.Xml;

@@ -1,5 +1,6 @@
-package ca.dragonflystudios.atii;
+package ca.dragonflystudios.atii.view;
 
+import ca.dragonflystudios.atii.BuildConfig;
 import android.content.Context;
 import android.util.Log;
 import android.view.GestureDetector;

@@ -1,14 +1,13 @@
-package ca.dragonflystudios.atii;
+package ca.dragonflystudios.atii.control.tiling;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import ca.dragonflystudios.atii.world.World;
-import ca.dragonflystudios.atii.world.World.ReaderWorldDrawable;
+import ca.dragonflystudios.atii.control.ReaderPerspective.WorldDimensionDelegate;
+import ca.dragonflystudios.atii.model.world.World.ReaderWorldDrawable;
 
 public class ReaderTile implements ReaderWorldDrawable {
     public enum State {
@@ -24,7 +23,13 @@ public class ReaderTile implements ReaderWorldDrawable {
     public int totalColumns;
     public int totalRows;
 
-    public ReaderTile(float scale, RectF rect, int c, int r) {
+    public ReaderTile(WorldDimensionDelegate wdd, float scale, RectF rect, int c, int r) {
+        mWorldDimensionDelegate = wdd;
+        mIncX = wdd.getContentWidth() / GRID_COUNT;
+        mIncY = wdd.getContentHeight() / GRID_COUNT;
+
+        mGridLineWidth = mIncX / 5f; // Grid line width is 20% of grid size
+
         mState = State.NEW;
 
         worldToViewScale = scale;
@@ -35,6 +40,20 @@ public class ReaderTile implements ReaderWorldDrawable {
         // TODO: deal with snapping to grid
         mViewportWidth = (int) (scale * rect.width());
         mViewportHeight = (int) (scale * rect.height());
+    }
+
+    public float getViewportWidth() {
+        return mViewportWidth;
+    }
+
+    public float getViewportHeight() {
+        return mViewportHeight;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        if (null != mBitmap)
+            mBitmap.recycle();
+        mBitmap = bitmap;
     }
 
     public boolean isPending() {
@@ -59,35 +78,37 @@ public class ReaderTile implements ReaderWorldDrawable {
 
     public void setFree() {
         mState = State.FREE;
+        if (null != mBitmap) {
+            mBitmap.recycle();
+            mBitmap = null;
+        }
     }
 
     public static boolean inRange(int x, int y, int columnStart, int rowStart, int columnCount, int rowCount) {
         return (x >= columnStart && x < columnStart + columnCount && y >= rowStart && y < rowStart + rowCount);
     }
 
-    public void render() {
+    public void render(Bitmap contentBitmap, Rect contentBitmapRect) {
         mBitmap = Bitmap.createBitmap(mViewportWidth, mViewportHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mBitmap);
         canvas.scale(worldToViewScale, worldToViewScale);
         canvas.translate(-tileRect.left, -tileRect.top);
 
-        Paint paint = new Paint();
-
-        paint.setStrokeWidth(World.GRID_LINE_WIDTH);
-        drawTile(canvas, paint, State.READY);
+        canvas.drawBitmap(contentBitmap, null, contentBitmapRect, null);
+        /*
+         * Paint paint = new Paint(); paint.setStrokeWidth(mGridLineWidth);
+         * drawTile(canvas, paint, State.READY);
+         */
     }
 
     @Override
     // ReaderWorldDrawable implementation
     public void draw(Canvas canvas, Rect viewRect, Paint paint) {
-        if (isReady()) {
-//            canvas.save();
-//            canvas.setMatrix(new Matrix());
+        if (isReady())
             canvas.drawBitmap(mBitmap, null, viewRect, paint);
-//            canvas.restore();
-        } else if (isPending()) {
+        else if (isPending()) {
             final float strokeWidth = paint.getStrokeWidth();
-            paint.setStrokeWidth(World.GRID_LINE_WIDTH);
+            paint.setStrokeWidth(mGridLineWidth);
             drawTile(canvas, paint, State.PENDING);
             paint.setStrokeWidth(strokeWidth);
         } else
@@ -96,17 +117,19 @@ public class ReaderTile implements ReaderWorldDrawable {
 
     private void drawTile(Canvas canvas, Paint paint, State state) {
         int shade = 0;
-        float top = (tileRect.top < World.CONTENT_TOP) ? World.CONTENT_TOP : tileRect.top;
-        float bottom = (tileRect.bottom > World.CONTENT_BOTTOM) ? World.CONTENT_BOTTOM : tileRect.bottom;
+        float top = (tileRect.top < mWorldDimensionDelegate.getContentTop()) ? mWorldDimensionDelegate.getContentTop()
+                : tileRect.top;
+        float bottom = (tileRect.bottom > mWorldDimensionDelegate.getContentBottom()) ? mWorldDimensionDelegate.getContentBottom()
+                : tileRect.bottom;
 
-        if (top <= bottom && top <= World.CONTENT_BOTTOM && bottom >= World.CONTENT_TOP)
-            for (float lineX = World.CONTENT_LEFT; lineX <= World.CONTENT_RIGHT; lineX += World.X_INC, shade++) {
+        if (top <= bottom && top <= mWorldDimensionDelegate.getContentBottom() && bottom >= mWorldDimensionDelegate.getContentTop())
+            for (float lineX = mWorldDimensionDelegate.getContentLeft(); lineX <= mWorldDimensionDelegate.getContentRight(); lineX += mIncX, shade++) {
                 if (lineX < this.tileRect.left)
                     continue;
                 if (lineX > this.tileRect.right)
                     break;
 
-                int s = (int) (shade * World.COLOR_INC);
+                int s = (int) (shade * COLOR_INC);
                 if (State.PENDING == state)
                     paint.setColor(Color.argb(255, s, s, s));
                 else if (State.READY == state)
@@ -115,17 +138,19 @@ public class ReaderTile implements ReaderWorldDrawable {
             }
 
         shade = 0;
-        float left = (tileRect.left < World.CONTENT_LEFT) ? World.CONTENT_LEFT : tileRect.left;
-        float right = (tileRect.right > World.CONTENT_RIGHT) ? World.CONTENT_RIGHT : tileRect.right;
+        float left = (tileRect.left < mWorldDimensionDelegate.getContentLeft()) ? mWorldDimensionDelegate.getContentLeft()
+                : tileRect.left;
+        float right = (tileRect.right > mWorldDimensionDelegate.getContentRight()) ? mWorldDimensionDelegate.getContentRight()
+                : tileRect.right;
 
-        if (left <= right && left <= World.CONTENT_RIGHT && right >= World.CONTENT_LEFT)
-            for (float lineY = World.CONTENT_TOP; lineY <= World.CONTENT_BOTTOM; lineY += World.Y_INC, shade++) {
+        if (left <= right && left <= mWorldDimensionDelegate.getContentRight() && right >= mWorldDimensionDelegate.getContentLeft())
+            for (float lineY = mWorldDimensionDelegate.getContentTop(); lineY <= mWorldDimensionDelegate.getContentBottom(); lineY += mIncY, shade++) {
                 if (lineY < this.tileRect.top)
                     continue;
                 if (lineY > this.tileRect.bottom)
                     break;
 
-                int s = (int) (shade * World.COLOR_INC);
+                int s = (int) (shade * COLOR_INC);
                 if (State.PENDING == state)
                     paint.setColor(Color.argb(255, s, s, s));
                 else if (State.READY == state)
@@ -134,6 +159,16 @@ public class ReaderTile implements ReaderWorldDrawable {
             }
     }
 
+    // the "world" is made of GRID_COUNT horizontal and GRID_COUNT vertical grid
+    // lines of shades of, respectively, blue and green
+    private static final float GRID_COUNT = 64f;
+    private static final float COLOR_INC = 255f / GRID_COUNT;
+
+    private float mIncX;
+    private float mIncY;
+    private float mGridLineWidth;
+
+    private WorldDimensionDelegate mWorldDimensionDelegate;
     private State mState;
     private int mViewportWidth, mViewportHeight;
     private Bitmap mBitmap;

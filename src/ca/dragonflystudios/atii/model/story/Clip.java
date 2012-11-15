@@ -1,9 +1,12 @@
-package ca.dragonflystudios.atii.story;
+package ca.dragonflystudios.atii.model.story;
 
 import java.io.IOException;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+
+import ca.dragonflystudios.atii.model.Entity;
+import ca.dragonflystudios.atii.model.Parser;
 
 public class Clip extends Entity {
     // We assume that a Clip is a pair for now.

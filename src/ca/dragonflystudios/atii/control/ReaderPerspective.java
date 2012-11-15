@@ -1,14 +1,17 @@
-package ca.dragonflystudios.atii;
+package ca.dragonflystudios.atii.control;
 
 import java.util.ArrayList;
 
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.view.View;
-import ca.dragonflystudios.atii.ReaderGestureView.ReaderGestureListener;
-import ca.dragonflystudios.atii.ReaderPerspectiveTiler.OnTileReadyListener;
-import ca.dragonflystudios.atii.ReaderPerspectiveTiler.TileDrawableSource;
-import ca.dragonflystudios.atii.ReaderView.OnLayoutListener;
+import ca.dragonflystudios.atii.control.tiling.ReaderPerspectiveTiler;
+import ca.dragonflystudios.atii.control.tiling.ReaderTile;
+import ca.dragonflystudios.atii.control.tiling.ReaderPerspectiveTiler.OnTileReadyListener;
+import ca.dragonflystudios.atii.control.tiling.ReaderPerspectiveTiler.TileDrawableSource;
+import ca.dragonflystudios.atii.view.ReaderView;
+import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
+import ca.dragonflystudios.atii.view.ReaderView.OnLayoutListener;
 
 // TODO: part of the data model; should be persisted
 
@@ -28,10 +31,23 @@ import ca.dragonflystudios.atii.ReaderView.OnLayoutListener;
 
 public class ReaderPerspective implements ReaderGestureListener, OnLayoutListener, OnTileReadyListener {
 
-    public static final float MIN_SCALE_FACTOR = 10f;
-    public static final float MAX_SCALE_FACTOR = 500f;
+    public static final float MIN_SCALE_FACTOR = 0.1f;
+    public static final float MAX_SCALE_FACTOR = 5f;
 
-    public interface WorldWindowDelegate {
+    public interface WorldDimensionDelegate {
+
+        public float getContentWidth();
+
+        public float getContentHeight();
+
+        public float getContentLeft();
+
+        public float getContentTop();
+
+        public float getContentRight();
+
+        public float getContentBottom();
+
         public float getLimitMinX(RectF worldWindow);
 
         public float getLimitMinY(RectF worldWindow);
@@ -51,11 +67,11 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
         public void updateCurrentTiles(RectF worldRect, RectF worldWindow, float scale, int columnDirection, int rowDirection);
     }
 
-    public ReaderPerspective(WorldWindowDelegate wdd, TileDrawableSource tds, ReaderView rv) {
+    public ReaderPerspective(WorldDimensionDelegate wdd, TileDrawableSource tds, ReaderView rv) {
         mInitialized = false;
-        mWorldWindowDelegate = wdd;
+        mWorldDimensionDelegate = wdd;
         mReaderView = rv;
-        mReaderTiler = new ReaderPerspectiveTiler(tds, this);
+        mReaderTiler = new ReaderPerspectiveTiler(wdd, tds, this);
     }
 
     public ArrayList<ReaderTile> getCurrentWorldTiles() {
@@ -67,7 +83,7 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
             mViewport = new RectF(left, top, right, bottom);
 
             // fit width
-            mWorldWindow = new RectF(mWorldWindowDelegate.getWorldRect());
+            mWorldWindow = new RectF(mWorldDimensionDelegate.getWorldRect());
             mWorldToViewScale = (right - left + 1) / (mWorldWindow.right - mWorldWindow.left);
             mWorldToViewScale = Math.max(MIN_SCALE_FACTOR, Math.min(mWorldToViewScale, MAX_SCALE_FACTOR));
             mInitialized = true;
@@ -83,7 +99,7 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
 
         mWorldWindow.right = mWorldWindow.left + (right - left + 1) / mWorldToViewScale;
         mWorldWindow.bottom = mWorldWindow.top + (bottom - top + 1) / mWorldToViewScale;
-        mReaderTiler.retile(mWorldWindowDelegate.getWorldRect(), mWorldWindow, mViewport, mWorldToViewScale);
+        mReaderTiler.retile(mWorldDimensionDelegate.getWorldRect(), mWorldWindow, mViewport, mWorldToViewScale);
 
         return true;
     }
@@ -95,13 +111,13 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
         float oldLeft = mWorldWindow.left, oldTop = mWorldWindow.top;
         mWorldWindow.offset(deltaX / mWorldToViewScale, deltaY / mWorldToViewScale);
         mWorldWindow.offsetTo(
-                Math.max(mWorldWindowDelegate.getLimitMinX(mWorldWindow),
-                        Math.min(mWorldWindow.left, mWorldWindowDelegate.getLimitMaxX(mWorldWindow))),
-                Math.max(mWorldWindowDelegate.getLimitMinY(mWorldWindow),
-                        Math.min(mWorldWindow.top, mWorldWindowDelegate.getLimitMaxY(mWorldWindow))));
+                Math.max(mWorldDimensionDelegate.getLimitMinX(mWorldWindow),
+                        Math.min(mWorldWindow.left, mWorldDimensionDelegate.getLimitMaxX(mWorldWindow))),
+                Math.max(mWorldDimensionDelegate.getLimitMinY(mWorldWindow),
+                        Math.min(mWorldWindow.top, mWorldDimensionDelegate.getLimitMaxY(mWorldWindow))));
         boolean panned = (oldLeft != mWorldWindow.left || oldTop != mWorldWindow.top);
         if (panned)
-            mReaderTiler.updateCurrentTiles(mWorldWindowDelegate.getWorldRect(), mWorldWindow, mWorldToViewScale, sign(deltaX),
+            mReaderTiler.updateCurrentTiles(mWorldDimensionDelegate.getWorldRect(), mWorldWindow, mWorldToViewScale, sign(deltaX),
                     sign(deltaY));
 
         return panned;
@@ -131,15 +147,15 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
                 * scaling);
         mWorldWindow.offset(WorldWindowFocusX, WorldWindowFocusY);
         mWorldWindow.offsetTo(
-                Math.max(mWorldWindowDelegate.getLimitMinX(mWorldWindow),
-                        Math.min(mWorldWindow.left, mWorldWindowDelegate.getLimitMaxX(mWorldWindow))),
-                Math.max(mWorldWindowDelegate.getLimitMinY(mWorldWindow),
-                        Math.min(mWorldWindow.top, mWorldWindowDelegate.getLimitMaxY(mWorldWindow))));
+                Math.max(mWorldDimensionDelegate.getLimitMinX(mWorldWindow),
+                        Math.min(mWorldWindow.left, mWorldDimensionDelegate.getLimitMaxX(mWorldWindow))),
+                Math.max(mWorldDimensionDelegate.getLimitMinY(mWorldWindow),
+                        Math.min(mWorldWindow.top, mWorldDimensionDelegate.getLimitMaxY(mWorldWindow))));
 
         boolean scaled = (oldLeft != mWorldWindow.left || oldTop != mWorldWindow.top || oldRight != mWorldWindow.right || oldBottom != mWorldWindow.bottom);
 
         if (scaled)
-            mReaderTiler.retile(mWorldWindowDelegate.getWorldRect(), mWorldWindow, mViewport, mWorldToViewScale);
+            mReaderTiler.retile(mWorldDimensionDelegate.getWorldRect(), mWorldWindow, mViewport, mWorldToViewScale);
 
         return scaled;
     }
@@ -157,10 +173,10 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
     }
 
     public Rect getViewRectForWorldRect(RectF worldRect) {
-        return new Rect((int)((worldRect.left - mWorldWindow.left) * mWorldToViewScale),
-                (int)((worldRect.top - mWorldWindow.top) * mWorldToViewScale),
-                (int)((worldRect.right - mWorldWindow.left) * mWorldToViewScale),
-                (int)((worldRect.bottom - mWorldWindow.top) * mWorldToViewScale));
+        return new Rect((int) ((worldRect.left - mWorldWindow.left) * mWorldToViewScale),
+                (int) ((worldRect.top - mWorldWindow.top) * mWorldToViewScale),
+                (int) ((worldRect.right - mWorldWindow.left) * mWorldToViewScale),
+                (int) ((worldRect.bottom - mWorldWindow.top) * mWorldToViewScale));
     }
 
     @Override
@@ -192,7 +208,7 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
         mReaderView.postInvalidate();
     }
 
-    private WorldWindowDelegate mWorldWindowDelegate;
+    private WorldDimensionDelegate mWorldDimensionDelegate;
     private ReaderView mReaderView;
 
     private RectF mViewport;
