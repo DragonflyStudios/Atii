@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.widget.RelativeLayout;
 import ca.dragonflystudios.android.storage.Storage;
 import ca.dragonflystudios.atii.story.Story;
+import ca.dragonflystudios.atii.world.World;
 
 public class MainActivity extends Activity {
 
@@ -28,7 +29,7 @@ public class MainActivity extends Activity {
             story = new Story(storyFolder);
         }
 
-        ReaderWorld world = new ReaderWorld(story);
+        World world = new World(story);
         ReaderView readerView = new ReaderView(this);
 
         ReaderPerspective readerPerspective = new ReaderPerspective(world, world, readerView);

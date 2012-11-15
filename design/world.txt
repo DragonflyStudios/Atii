@@ -1,0 +1,17 @@
+The "world" is about the "lay" of the "land".
+
+Implementation --
+
+- A "world.xml" file specifies the land
+-- The dimensions of the world
+-- The list of photos (and videos), their dimensions, their whereabouts, (and their whenabouts?)
+-- The list of audios (and their whenabouts?)
+
+{- Time, place [+ orientation], auditory, visual, tactile ...}
+
+- A "story.xml" file specifies the story telling over the "land" by specifying "clips" in terms of
+-- "looks" of photos, and
+-- "listens" of audios
+--- referencing photos and audios? or reference place & time?
+-- clip transitions ...
+

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import android.graphics.RectF;
 import ca.dragonflystudios.atii.ReaderPerspective.TilingDelegate;
-import ca.dragonflystudios.atii.ReaderWorld.TileDrawableCallback;
+import ca.dragonflystudios.atii.world.World.TileDrawableCallback;
 
 /*
  * TODOs:
