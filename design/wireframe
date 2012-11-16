@@ -1,0 +1,45 @@
+"Wireframe" -- for Atii Prototype -- to be ready by end of 2012.
+
+- Start the app
+
+-- Book Listing
+--- With a "Create Story" option
+--- Tap on a book "opens" it for "Story Play"
+--- Tap on "Create Story" starts "Create from Pictures"
+
+-- For the following: Single Tap show and hide the action bar as well as the action icons ...
+
+-- Story Play
+--- Show Page (no pan or zoom; no fancy replay control)
+---- If there is audio, start playing it (after initial delay after page image is ready)
+---- Show "Play" and "Record" icons
+----- "Play" becomes "Pause" during playing
+---- Tap "Record" icon to re-record (overwrite existing audio)
+----- "Record" becomes "Stop" during recording
+---- Tap left or right to change page
+
+--- Image display
+---- Fit into page by default
+---- Double Tap zoom in ...
+
+-- Create from Pictures
+--- Use current orientation of device
+--- Book Title: Could be changed by tapping the ActionBar's "Book Title" part
+---- A "start" button
+--- Press "Start" begins creation of a new book from camera
+--- Show Page
+---- If use camera
+----- Show preview
+----- Show "Capture" icon
+---- After "Capture", everything is the same as "Show Page" above
+----- Except that there is a "camera" icon for retaking the page image.
+---- If use Camera Roll/files ... 
+
+-- Upload to YouTube ...
+--- Through "share" button on ActionBar ...
+
+-- Integration with Google Drive ...
+
+
+
+
