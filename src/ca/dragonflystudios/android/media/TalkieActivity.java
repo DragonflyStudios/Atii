@@ -1,4 +1,4 @@
-package ca.dragonflystudios.media;
+package ca.dragonflystudios.android.media;
 
 import java.io.File;
 import java.io.FileNotFoundException;
