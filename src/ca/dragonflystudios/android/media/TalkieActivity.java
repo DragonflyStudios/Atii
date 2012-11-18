@@ -277,7 +277,7 @@ public class TalkieActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_talkie, menu);
+       // getMenuInflater().inflate(R.menu.activity_talkie, menu);
         return true;
     }
 
