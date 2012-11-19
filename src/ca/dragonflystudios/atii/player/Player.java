@@ -1,22 +1,17 @@
 package ca.dragonflystudios.atii.player;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import ca.dragonflystudios.atii.BookListActivity;
 import ca.dragonflystudios.atii.R;
 import ca.dragonflystudios.utilities.Pathname;
-import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 /*
  * TODO:
@@ -39,7 +34,7 @@ public class Player extends FragmentActivity {
 
         mStoryPath = getIntent().getExtras().getString(BookListActivity.STORY_EXTRA_KEY);
         File storyDir = new File(mStoryPath);
-        mStoryTitle = storyDir.getName();
+        mStoryTitle = Pathname.extractStem(storyDir.getName());
 
         getActionBar().setTitle(mStoryTitle);
 

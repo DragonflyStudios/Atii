@@ -20,7 +20,7 @@ public class PageFragment extends Fragment {
         mPageNum = pageNum;
         mNumPages = numPages;
     }
-    
+
     /**
      * When creating, retrieve this instance's number from its arguments.
      */
@@ -30,19 +30,18 @@ public class PageFragment extends Fragment {
     }
 
     /**
-     * The Fragment's UI is just a simple text view showing its instance
-     * number.
+     * The Fragment's UI is just a simple text view showing its instance number.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //super.onCreateView(inflater, container, savedInstanceState);
-        
+        // super.onCreateView(inflater, container, savedInstanceState);
+
         View v = inflater.inflate(R.layout.page, container, false);
         ImageView iv = (ImageView) v.findViewById(R.id.page_image);
         Bitmap mBitmap = BitmapFactory.decodeFile(mPageFile.getAbsolutePath());
         iv.setImageBitmap(mBitmap);
         View tv = v.findViewById(R.id.page_num);
-        ((TextView) tv).setText(mPageNum + "/" + mNumPages);
+        ((TextView) tv).setText((mPageNum+1) + "/" + mNumPages);
         return v;
     }
 
@@ -53,14 +52,14 @@ public class PageFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        //super.onDestroyView();
-        
+        super.onDestroyView();
+
         if (null != mBitmap) {
             mBitmap.recycle();
             mBitmap = null;
         }
     }
-    
+
     private Bitmap mBitmap;
     private File mPageFile;
     private int mPageNum;
