@@ -10,6 +10,7 @@ import java.util.List;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -17,9 +18,12 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import ca.dragonflystudios.atii.player.Player;
 import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
@@ -29,6 +33,7 @@ import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 public class BookListActivity extends Activity
 {
+    public static final String STORY_EXTRA_KEY = "STORY_FOLDER_NAME";
     public BookListActivity()
     {
         mBookDirs = new ArrayList<File>();
@@ -49,12 +54,20 @@ public class BookListActivity extends Activity
         listBooks();
         mBookListAdapter = new BookListAdapter(this, mBookDirs);
         mBookListView.setAdapter(mBookListAdapter);
+        mBookListView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent playIntent = new Intent(BookListActivity.this, Player.class);
+                playIntent.putExtra(STORY_EXTRA_KEY, mBookDirs.get(position).getAbsolutePath());
+                startActivity(playIntent);
+            }
+        });
 
         setContentView(mBookListView);
         mActionBar = getActionBar();
     }
 
-    public static class BookListAdapter extends ArrayAdapter<File>
+    private static class BookListAdapter extends ArrayAdapter<File>
     {
         public BookListAdapter(Context context, List<File> bookList)
         {
