@@ -32,7 +32,7 @@ public class PlayerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return PageFragment.newInstance(position);
+        return new PageFragment(mPageFiles.get(position), position, mNumPages);
     }
 
     public boolean hasFrontCover() {
