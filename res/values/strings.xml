@@ -4,7 +4,7 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="menu_create">Create</string>
     <string name="menu_settings">Settings</string>
-    <string name="first">First</string>
-    <string name="last">Last</string>
+    <string name="first">|&lt;</string>
+    <string name="last">&gt;|</string>
 
 </resources>

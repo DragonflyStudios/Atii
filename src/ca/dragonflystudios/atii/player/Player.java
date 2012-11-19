@@ -2,6 +2,7 @@ package ca.dragonflystudios.atii.player;
 
 import java.io.File;
 
+import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -15,14 +16,17 @@ import ca.dragonflystudios.utilities.Pathname;
 
 /*
  * TODO:
- * [ ] Playback a series of photos 1-day
- * [ ] Double tap to zoom in 0.5-day
- * [ ] Page-based navigation 0.5-day
+ * [x] Playback a series of photos 1-day
+ * [x] Page-based navigation 0.5-day
  * [ ] Playback a series of PDF pages 1-day
  * [ ] Playback audios 1-day
  * [ ] Basic control for playback in place 1-day
  * [ ] Replace audio with recording 0.5-day
  * [ ] Replace page image with photo 0.5-day
+ * [ ] Double tap to zoom in 0.5-day
+ * [ ] Make buttons translucent & pretty
+ * [ ] Single tap toggle control buttons, action bar and page number view
+ * [ ] Put stock stories in assets
  */
 
 public class Player extends FragmentActivity {
@@ -37,6 +41,7 @@ public class Player extends FragmentActivity {
         mStoryTitle = Pathname.extractStem(storyDir.getName());
 
         getActionBar().setTitle(mStoryTitle);
+        getActionBar().hide();
 
         setContentView(R.layout.player);
 

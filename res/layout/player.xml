@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
@@ -8,31 +8,24 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="1" >
-    </android.support.v4.view.ViewPager>
+        android:layout_height="match_parent"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/goto_first"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:gravity="center"
-        android:measureWithLargestChild="true"
-        android:orientation="horizontal" >
+        android:layout_gravity="left|center_vertical"
+        android:layout_marginLeft="15dp"
+        android:text="@string/first" >
+    </Button>
 
-        <Button
-            android:id="@+id/goto_first"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/first" >
-        </Button>
+    <Button
+        android:id="@+id/goto_last"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginRight="15dp"
+        android:text="@string/last" >
+    </Button>
 
-        <Button
-            android:id="@+id/goto_last"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/last" >
-        </Button>
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>
