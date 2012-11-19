@@ -92,7 +92,7 @@ public class BookListActivity extends Activity
     private void listBooks()
     {
         File atiiDir = new File(Environment.getExternalStorageDirectory(),
-                "Atii");
+                "Atii/Stories");
         FileFilter filter = new FileFilter() {
             @Override
             public boolean accept(File path)
