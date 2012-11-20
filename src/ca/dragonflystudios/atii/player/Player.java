@@ -1,8 +1,8 @@
 package ca.dragonflystudios.atii.player;
 
 import java.io.File;
+import java.util.Observable;
 
-import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -27,8 +27,12 @@ import ca.dragonflystudios.utilities.Pathname;
  * [ ] Single tap toggle buttons, action bar & page number view  0.5-day
  * [ ] Playback a series of PDF pages      1-day
  * [ ] Double tap to zoom in               0.5-day
+ * 
  * ~~ The following breaks 1-audio-per-page correspondence ~~
  * [ ] Audio for zoomed-in state           1-day
+ * 
+ * ~~ The following starts the sharing business ~~
+ * [ ] Google Drive integration
  */
 
 public class Player extends FragmentActivity {
@@ -45,16 +49,14 @@ public class Player extends FragmentActivity {
         getActionBar().setTitle(mStoryTitle);
         getActionBar().hide();
 
-        setContentView(R.layout.player);
-
         // TODO: get the directory from intent and use that to initialize
         // PlayerAdapter ...
         mAdapter = new PlayerAdapter(getSupportFragmentManager(), storyDir);
 
+        setContentView(R.layout.player);
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
-
-        this.getActionBar();
+        mPager.setOnPageChangeListener(mAdapter);
 
         // Watch for button clicks.
         Button button = (Button) findViewById(R.id.goto_first);
@@ -70,7 +72,7 @@ public class Player extends FragmentActivity {
                 mPager.setCurrentItem(mAdapter.getCount() - 1);
             }
         });
-    }
+}
 
     public String getStoryTitle() {
         return mStoryTitle;

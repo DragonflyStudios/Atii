@@ -5,14 +5,16 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Observable;
 
-import ca.dragonflystudios.utilities.Pathname;
-import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import ca.dragonflystudios.utilities.Pathname;
+import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
-public class PlayerAdapter extends FragmentStatePagerAdapter {
+public class PlayerAdapter extends FragmentStatePagerAdapter implements ViewPager.OnPageChangeListener {
 
     public PlayerAdapter(FragmentManager fm, File storyDir) {
         super(fm);
@@ -21,8 +23,17 @@ public class PlayerAdapter extends FragmentStatePagerAdapter {
         mNumPages = -1;
         mHasFrontCover = false;
         mHasBackCover = false;
-
+        mPageChangeObservable = new PageChangeObservable();
+        
         listPages(storyDir);
+    }
+    
+    // TODO: It's unfortunate that the ViewPager/FragmentStatePagerAdapter API is inadequate such that
+    //       we have to introduce these extras to get notifications of page change for the Fragments. TAI!
+    public static class PageChangeObservable extends Observable {
+        protected void setChanged() {
+            super.setChanged();
+        }
     }
 
     @Override
@@ -32,9 +43,26 @@ public class PlayerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return new PageFragment(mPageFiles.get(position), position, mNumPages);
+        return new PageFragment(mPageFiles.get(position), mPageChangeObservable, position, mNumPages);
     }
 
+    @Override
+    // implementation for OnPageChangeListener
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    @Override
+    // implementation for OnPageChangeListener
+    public void onPageSelected(int position) {
+        mPageChangeObservable.setChanged();
+        mPageChangeObservable.notifyObservers(new Integer(position));
+    }
+
+    @Override
+    // implementation for OnPageChangeListener
+    public void onPageScrollStateChanged(int state) {
+    }
+    
     public boolean hasFrontCover() {
         return mHasFrontCover;
     }
@@ -77,4 +105,7 @@ public class PlayerAdapter extends FragmentStatePagerAdapter {
     private int mNumPages;
     private boolean mHasFrontCover;
     private boolean mHasBackCover;
+    
+    private PageChangeObservable mPageChangeObservable;
+
 }
