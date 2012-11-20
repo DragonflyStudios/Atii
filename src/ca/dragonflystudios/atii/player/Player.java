@@ -72,7 +72,7 @@ public class Player extends FragmentActivity {
                 mPager.setCurrentItem(mAdapter.getCount() - 1);
             }
         });
-}
+    }
 
     public String getStoryTitle() {
         return mStoryTitle;

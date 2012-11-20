@@ -31,6 +31,8 @@ public class PageFragment extends Fragment implements Observer {
         mAutoPlayed = false;
         mIsPlaying = false;
         mPageChangeObservable = pageChangeObservable;
+        
+        mFirstPageShown = false;
     }
 
     /**
@@ -66,6 +68,12 @@ public class PageFragment extends Fragment implements Observer {
     public void onResume() {
         super.onResume();
         mPageChangeObservable.addObserver(this);
+        
+        // pure hack! to force playing of the 1st page when stories is first played
+        if (!mFirstPageShown && 0 == mPageNum && mHasAudio && !mIsPlaying) {
+            startPlaying();
+            mFirstPageShown = true;
+        }
     }
 
     @Override
@@ -147,4 +155,6 @@ public class PageFragment extends Fragment implements Observer {
     private boolean mIsPlaying;
     
     private PageChangeObservable mPageChangeObservable;
+    
+    private boolean mFirstPageShown; // hack to force playing audio when first page is shown
 }
