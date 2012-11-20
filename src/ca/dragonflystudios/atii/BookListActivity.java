@@ -11,6 +11,7 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -23,17 +24,19 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import ca.dragonflystudios.android.storage.Storage;
 import ca.dragonflystudios.atii.player.Player;
 import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 // TODO: handle the case when no book was found & show empty view
 
-
-
 public class BookListActivity extends Activity
 {
-    public static final String STORY_EXTRA_KEY = "STORY_FOLDER_NAME";
+    public static final String  STORY_EXTRA_KEY = "STORY_FOLDER_NAME";
+    private static final String SETTINGS        = "atii_settings";
+    private static final String FIRST_LAUNCH    = "first_launch";
+
     public BookListActivity()
     {
         mBookDirs = new ArrayList<File>();
@@ -48,15 +51,26 @@ public class BookListActivity extends Activity
         if (null == sAppContext)
             sAppContext = getApplicationContext();
 
+        File storiesDir = new File(Environment.getExternalStorageDirectory(), "Atii/Stories");
+        if (!storiesDir.exists())
+            storiesDir.mkdirs();
+
+        SharedPreferences prefs = getSharedPreferences(SETTINGS, MODE_PRIVATE);
+        if (prefs.getBoolean(FIRST_LAUNCH, true)) {
+            Storage.copyAssets(getAssets(), "stories", storiesDir.getAbsolutePath());
+            prefs.edit().putBoolean(FIRST_LAUNCH, false).commit();
+        }
+
         // initialize mStoryListView
         mBookListView = new ListView(this);
 
-        listBooks();
+        listBooks(storiesDir);
         mBookListAdapter = new BookListAdapter(this, mBookDirs);
         mBookListView.setAdapter(mBookListAdapter);
         mBookListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
                 Intent playIntent = new Intent(BookListActivity.this, Player.class);
                 playIntent.putExtra(STORY_EXTRA_KEY, mBookDirs.get(position).getAbsolutePath());
                 startActivity(playIntent);
@@ -82,7 +96,7 @@ public class BookListActivity extends Activity
             }
 
             File book = getItem(position);
-            TextView bookNameView = (TextView)convertView.findViewById(R.id.book_name);
+            TextView bookNameView = (TextView) convertView.findViewById(R.id.book_name);
             bookNameView.setText(Pathname.extractStem(book.getName()));
             return convertView;
         }
@@ -102,22 +116,17 @@ public class BookListActivity extends Activity
 
     // design layout for BookList
 
-    private void listBooks()
+    private void listBooks(File storiesDir)
     {
-        File atiiDir = new File(Environment.getExternalStorageDirectory(),
-                "Atii/Stories");
         FileFilter filter = new FileFilter() {
             @Override
             public boolean accept(File path)
             {
-                return path.exists()
-                        && path.isDirectory()
-                        && "atii".equalsIgnoreCase(Pathname
-                                .extractExtension(path.getName()));
+                return path.exists() && path.isDirectory() && "atii".equalsIgnoreCase(Pathname.extractExtension(path.getName()));
             }
         };
 
-        File[] bookList = atiiDir.listFiles(filter);
+        File[] bookList = storiesDir.listFiles(filter);
         if (bookList != null) {
             mBookDirs.clear();
             mBookDirs.addAll(Arrays.asList(bookList));
@@ -126,7 +135,8 @@ public class BookListActivity extends Activity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         getMenuInflater().inflate(R.menu.book_list, menu);
         return true;
     }
