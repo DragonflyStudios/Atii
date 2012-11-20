@@ -19,14 +19,17 @@ import ca.dragonflystudios.utilities.Pathname;
  * [x] Playback a series of photos         1-day
  * [x] Page-based navigation               0.5-day
  * [x] Put stock stories in assets         0.5-day
- * [ ] Playback audios                     1-day
+ * [x] Playback audios                     1-day
  * [ ] Basic control for playback in place 1-day
  * [ ] Replace audio with recording        0.5-day
  * [ ] Replace page image with photo       0.5-day
  * [ ] Make buttons translucent & pretty   1-day
  * [ ] Single tap toggle buttons, action bar & page number view  0.5-day
- * [ ] Playback a series of PDF pages      1-day
+ *      [ ] Make them decor of the ViewPager
  * [ ] Double tap to zoom in               0.5-day
+ *
+ * ~~ The following opens up page image source to alternatives ~~
+ * [ ] Playback a series of PDF pages      1-day
  * 
  * ~~ The following breaks 1-audio-per-page correspondence ~~
  * [ ] Audio for zoomed-in state           1-day

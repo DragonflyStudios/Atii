@@ -29,6 +29,9 @@ import ca.dragonflystudios.atii.player.Player;
 import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
+// TODO: 
+// [ ] Turn this into a GridView with Previews and Title     1 day
+
 // TODO: handle the case when no book was found & show empty view
 
 public class BookListActivity extends Activity
