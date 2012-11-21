@@ -1,7 +1,6 @@
 package ca.dragonflystudios.atii.player;
 
 import java.io.File;
-import java.util.Observable;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -9,7 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.Button;
+import android.widget.ImageButton;
 import ca.dragonflystudios.atii.BookListActivity;
 import ca.dragonflystudios.atii.R;
 import ca.dragonflystudios.utilities.Pathname;
@@ -21,11 +20,11 @@ import ca.dragonflystudios.utilities.Pathname;
  * [x] Put stock stories in assets         0.5-day
  * [x] Playback audios                     1-day
  * [ ] Basic control for playback in place 1-day
- * [ ] Replace audio with recording        0.5-day
- * [ ] Replace page image with photo       0.5-day
  * [ ] Make buttons translucent & pretty   1-day
  * [ ] Single tap toggle buttons, action bar & page number view  0.5-day
  *      [ ] Make them decor of the ViewPager
+ * [ ] Replace audio with recording        0.5-day
+ * [ ] Replace page image with photo       0.5-day
  * [ ] Double tap to zoom in               0.5-day
  *
  * ~~ The following opens up page image source to alternatives ~~
@@ -36,6 +35,7 @@ import ca.dragonflystudios.utilities.Pathname;
  * 
  * ~~ The following starts the sharing business ~~
  * [ ] Google Drive integration
+ * 
  */
 
 public class Player extends FragmentActivity {
@@ -62,14 +62,14 @@ public class Player extends FragmentActivity {
         mPager.setOnPageChangeListener(mAdapter);
 
         // Watch for button clicks.
-        Button button = (Button) findViewById(R.id.goto_first);
+        ImageButton button = (ImageButton) findViewById(R.id.goto_first);
         button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mPager.setCurrentItem(0);
             }
         });
 
-        button = (Button) findViewById(R.id.goto_last);
+        button = (ImageButton) findViewById(R.id.goto_last);
         button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mPager.setCurrentItem(mAdapter.getCount() - 1);

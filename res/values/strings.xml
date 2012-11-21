@@ -4,7 +4,12 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="menu_create">Create</string>
     <string name="menu_settings">Settings</string>
-    <string name="first">|&lt;</string>
-    <string name="last">&gt;|</string>
+
+    <!-- buttons -->
+    <string name="first">Goto First Page</string>
+    <string name="last">Goto Last Page</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
+    <string name="repeat">Repeat</string>
 
 </resources>
