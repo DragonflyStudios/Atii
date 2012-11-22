@@ -60,7 +60,7 @@ Story Player UI:
  *              [ ] Repeat when replay is complete
  *          [ ] Action bar
  *              [ ] Title: title of the book + "2 / 23"
- *              [ ] Audio Record, Photo Capture, Add Page, Settings
+ *              [ ] Options Menu: Audio Record, Photo Capture, Share, Add Page, Settings
  *          [ ] During playing, disappears after a certain delay (e.g. 5 seconds); otherwise stays
  *      Future: [ ] Show draggable progress bar.
  *      Future: [ ] Make buttons translucent & pretty

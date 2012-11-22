@@ -34,16 +34,6 @@
         </ImageButton>
 
         <ImageButton
-            android:id="@+id/repeat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/repeat"
-            android:src="@drawable/button_repeat" >
-        </ImageButton>
-
-        <ImageButton
             android:id="@+id/play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -61,6 +51,16 @@
             android:background="@android:color/transparent"
             android:contentDescription="@string/pause"
             android:src="@drawable/button_pause" >
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/repeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/repeat"
+            android:src="@drawable/button_repeat" >
         </ImageButton>
 
         <ImageButton

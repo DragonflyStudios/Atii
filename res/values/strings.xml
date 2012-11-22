@@ -2,8 +2,6 @@
 
     <string name="app_name">Atii</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="menu_create">Create</string>
-    <string name="menu_settings">Settings</string>
 
     <!-- buttons -->
     <string name="first">Goto First Page</string>
@@ -11,5 +9,17 @@
     <string name="pause">Pause</string>
     <string name="play">Play</string>
     <string name="repeat">Repeat</string>
+
+    <!-- action items -->
+    <string name="menu_settings">Settings</string>
+
+    <!-- action items - book list -->
+    <string name="menu_create">Create</string>
+
+    <!-- action items - player -->
+    <string name="menu_record_audio">Record Audio</string>
+    <string name="menu_capture_photo">Capture Photo</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_add_page">Add Page</string>
 
 </resources>
