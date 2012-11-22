@@ -41,7 +41,8 @@ public class MainActivity extends Activity {
         ReaderViewDrawer viewDrawer = new ReaderViewDrawer(readerPerspective);
         readerView.setDrawingDelegate(viewDrawer);
 
-        ReaderGestureView gestureView = new ReaderGestureView(this, readerPerspective);
+        ReaderGestureView gestureView = new ReaderGestureView(this);
+        gestureView.setReaderGestureListener(readerPerspective);
 
         RelativeLayout mainView = (RelativeLayout) LayoutInflater.from(this).inflate(R.layout.activity_main, null);
         mainView.addView(readerView);

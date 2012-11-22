@@ -62,7 +62,10 @@ Story Player UI:
  *              [ ] Title: title of the book + "2 / 23"
  *              [ ] Options Menu: Audio Record, Photo Capture, Share, Add Page, Settings
  *          [ ] During playing, disappears after a certain delay (e.g. 5 seconds); otherwise stays
+ *      See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
  *      Future: [ ] Show draggable progress bar.
+ *                  [ ] For audio
+ *                  [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
  *      Future: [ ] Make buttons translucent & pretty
  * [ ] Replace audio with recording        0.5-day
  * [ ] Replace page image with photo       0.5-day

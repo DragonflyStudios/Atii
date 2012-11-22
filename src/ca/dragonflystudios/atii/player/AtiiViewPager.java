@@ -1,55 +1,35 @@
-package ca.dragonflystudios.atii.view;
+package ca.dragonflystudios.atii.player;
 
 import android.content.Context;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
-import android.widget.FrameLayout;
 import ca.dragonflystudios.atii.BuildConfig;
+import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
 
-public class ReaderGestureView extends FrameLayout implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,
-        ScaleGestureDetector.OnScaleGestureListener {
-
-    public interface ReaderGestureListener {
-        // in view coordinates
-        public void onPanning(float deltaX, float deltaY);
-
-        // in view coordinates
-        public void onScaling(float scaling, float focusX, float focusY);
-        
-        public void onSingleTap(float x, float y);
-    }
-
-    public ReaderGestureView(Context context) {
+public class AtiiViewPager extends ViewPager implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+    public AtiiViewPager(Context context) {
         super(context);
         init();
     }
 
-    public ReaderGestureView(Context context, AttributeSet attributes) {
+    public AtiiViewPager(Context context, AttributeSet attributes) {
         super(context, attributes);
         init();
     }
 
-    public ReaderGestureView(Context context, AttributeSet attributes, int style) {
-        super(context, attributes, style);
-        init();
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+       return super.onInterceptTouchEvent(ev);
     }
 
     private void init() {
         mGestureDetector = new GestureDetector(getContext(), this);
         mGestureDetector.setIsLongpressEnabled(true);
         mGestureDetector.setOnDoubleTapListener(this);
-        mScaleGestureDetector = new ScaleGestureDetector(getContext(), this);
     }
-
-    private ReaderGestureListener mListener;
-
-    private GestureDetector mGestureDetector;
-    private ScaleGestureDetector mScaleGestureDetector;
-
-    private boolean mScaling; // Whether the user is currently pinch zooming
 
     public void setReaderGestureListener(ReaderGestureListener listener) {
         mListener = listener;
@@ -136,46 +116,16 @@ public class ReaderGestureView extends FrameLayout implements GestureDetector.On
         return true;
     }
 
-    //
-    // ScaleGestureDetector.OnScaleGestureListener implementation
-    //
+    private ReaderGestureListener mListener;
 
-    @Override
-    public boolean onScaleBegin(ScaleGestureDetector detector) {
-        if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onScaleBegin -- " + "focus: (" + detector.getFocusX() + ", " + detector.getFocusY() + ")"
-                    + "scale: " + detector.getScaleFactor());
-
-        mScaling = true;
-        return true;
-    }
-
-    @Override
-    public boolean onScale(ScaleGestureDetector detector) {
-        if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onScaleBegin -- " + "focus: (" + detector.getFocusX() + ", " + detector.getFocusY() + ")"
-                    + "scale: " + detector.getScaleFactor());
-
-        mListener.onScaling(detector.getScaleFactor(), detector.getFocusX() - getLeft(), detector.getFocusY() - getTop());
-        return true;
-    }
-
-    @Override
-    public void onScaleEnd(ScaleGestureDetector detector) {
-        if (BuildConfig.DEBUG)
-            Log.d(getClass().getName(), "onScaleBegin -- " + "focus: (" + detector.getFocusX() + ", " + detector.getFocusY() + ")"
-                    + "scale: " + detector.getScaleFactor());
-
-        mScaling = false;
-    }
+    private GestureDetector mGestureDetector;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        mScaleGestureDetector.onTouchEvent(event);
+        if (!mGestureDetector.onTouchEvent(event))
+            return super.onTouchEvent(event);
 
-        if (!mScaling)
-            mGestureDetector.onTouchEvent(event);
-
-        return false;
+        return true;
     }
+
 }

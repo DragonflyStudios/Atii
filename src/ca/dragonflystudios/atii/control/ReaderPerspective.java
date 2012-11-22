@@ -195,6 +195,11 @@ public class ReaderPerspective implements ReaderGestureListener, OnLayoutListene
     }
 
     @Override
+    // ReaderGestureListener implementation
+    public void onSingleTap(float x, float y) {
+    }
+
+    @Override
     // OnLayoutListener implementation
     public void onLayout(View view, boolean changed, int left, int top, int right, int bottom) {
         if (changed && updateViewport(left, top, right, bottom)) {
