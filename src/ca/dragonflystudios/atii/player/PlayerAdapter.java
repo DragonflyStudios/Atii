@@ -11,6 +11,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.ViewGroup;
 import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
@@ -24,12 +26,15 @@ public class PlayerAdapter extends FragmentStatePagerAdapter implements ViewPage
         mHasFrontCover = false;
         mHasBackCover = false;
         mPageChangeObservable = new PageChangeObservable();
-        
+
         listPages(storyDir);
     }
-    
-    // TODO: It's unfortunate that the ViewPager/FragmentStatePagerAdapter API is inadequate such that
-    //       we have to introduce these extras to get notifications of page change for the Fragments. TAI!
+
+    // TODO: It's unfortunate that the ViewPager/FragmentStatePagerAdapter API
+    // is inadequate such that
+    // we have to introduce these extras to get notifications of page change for
+    // the Fragments. TAI!
+    // Could make a better version of PageFragment that get callbacks?
     public static class PageChangeObservable extends Observable {
         protected void setChanged() {
             super.setChanged();
@@ -43,7 +48,7 @@ public class PlayerAdapter extends FragmentStatePagerAdapter implements ViewPage
 
     @Override
     public Fragment getItem(int position) {
-        return new PageFragment(mPageFiles.get(position), mPageChangeObservable, position, mNumPages);
+        return new PageFragment(mPageFiles.get(position), mPlayerState, mPageChangeObservable, position, mNumPages);
     }
 
     @Override
@@ -54,21 +59,33 @@ public class PlayerAdapter extends FragmentStatePagerAdapter implements ViewPage
     @Override
     // implementation for OnPageChangeListener
     public void onPageSelected(int position) {
+        Log.w(getClass().getName(), "page selected: " + position);
+        mPlayerState.setCurrentPageNum(position);
         mPageChangeObservable.setChanged();
-        mPageChangeObservable.notifyObservers(new Integer(position));
+        mPageChangeObservable.notifyObservers(position);
     }
 
     @Override
     // implementation for OnPageChangeListener
     public void onPageScrollStateChanged(int state) {
     }
-    
+
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        Log.w(getClass().getName(), "set primary item: " + position);
+        mPlayerState.setCurrentPageNum(position);
+    }
+
     public boolean hasFrontCover() {
         return mHasFrontCover;
     }
 
     public boolean hasBackCover() {
         return mHasBackCover;
+    }
+
+    public void setPlayerState(PlayerState ps) {
+        mPlayerState = ps;
     }
 
     // TODO: refactor and combine with listBooks() in BookListActivity?
@@ -105,7 +122,9 @@ public class PlayerAdapter extends FragmentStatePagerAdapter implements ViewPage
     private int mNumPages;
     private boolean mHasFrontCover;
     private boolean mHasBackCover;
-    
+
     private PageChangeObservable mPageChangeObservable;
+
+    private PlayerState mPlayerState;
 
 }

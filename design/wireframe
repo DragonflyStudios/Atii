@@ -41,8 +41,6 @@
 -- Integration with Google Drive ...
 
 
-
-
 Story Player UI:
 
 /*
@@ -53,16 +51,16 @@ Story Player UI:
  * [x] Playback audios                     1-day
  * [ ] Basic control in place              1.5-days
  *      [ ] At end of replay, show "Repeat" button at center
- *      [ ] Single tap toggle buttons, action bar
- *          [ ] Center: Pause, Play or Repeat button
- *              [ ] Pause when replaying is going on
- *              [ ] Play when start or when pause
- *              [ ] Repeat when replay is complete
- *          [ ] Action bar
+ *      [x] Single tap toggle buttons, action bar
+ *          [x] Center: Pause, Play or Repeat button
+ *              [x] Pause when replaying is going on
+ *              [x] Play when start or when pause
+ *              [x] Repeat when replay is complete
+ *          [x] Action bar
  *              [ ] Title: title of the book + "2 / 23"
- *              [ ] Options Menu: Audio Record, Photo Capture, Share, Add Page, Settings
- *          [ ] During playing, disappears after a certain delay (e.g. 5 seconds); otherwise stays
+ *              [x] Options Menu: Audio Record, Photo Capture, Share, Add Page, Settings
  *      See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
+ *      Future: [ ] Fading: during playing, disappears after a certain delay (e.g. 5 seconds); otherwise stays
  *      Future: [ ] Show draggable progress bar.
  *                  [ ] For audio
  *                  [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata

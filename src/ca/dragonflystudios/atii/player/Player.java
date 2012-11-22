@@ -5,7 +5,6 @@ import java.io.File;
 import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -13,11 +12,12 @@ import android.view.Window;
 import android.widget.ImageButton;
 import ca.dragonflystudios.atii.BookListActivity;
 import ca.dragonflystudios.atii.R;
-import ca.dragonflystudios.atii.view.ReaderGestureView;
+import ca.dragonflystudios.atii.player.PlayerState.OnReplayChangeListener;
+import ca.dragonflystudios.atii.player.PlayerState.ReplayState;
 import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
 import ca.dragonflystudios.utilities.Pathname;
 
-public class Player extends FragmentActivity implements ReaderGestureListener {
+public class Player extends FragmentActivity implements ReaderGestureListener, OnReplayChangeListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener {
         // TODO: get the directory from intent and use that to initialize
         // PlayerAdapter ...
         mAdapter = new PlayerAdapter(getSupportFragmentManager(), storyDir);
+        mPlayerState = new PlayerState(mAdapter.getCount(), this);
+        mPlayerState.setAutoReplay(false);
+        mAdapter.setPlayerState(mPlayerState);
 
         setContentView(R.layout.player);
         mPager = (AtiiViewPager) findViewById(R.id.pager);
@@ -90,6 +93,31 @@ public class Player extends FragmentActivity implements ReaderGestureListener {
         toggleControls();
     }
 
+    @Override
+    // implementation for OnReplayChangeListener
+    public void onReplayStateChanged(ReplayState newState) {
+        switch (newState) {
+        case NOT_STARTED:
+            switchPlaybackButton(mPlayButton);
+            break;
+        case FINISHED:
+            switchPlaybackButton(mRepeatButton);
+            break;
+        case PLAYING:
+            switchPlaybackButton(mPauseButton);
+            break;
+        default:
+            break;
+        }
+    }
+
+    private void switchPlaybackButton(ImageButton button) {
+        mCurrentPlaybackButton.setVisibility(View.INVISIBLE);
+        mCurrentPlaybackButton = button;
+        if (getActionBar().isShowing())
+            mCurrentPlaybackButton.setVisibility(View.VISIBLE);
+    }
+
     private void hideAllControls() {
         getActionBar().hide();
         mPlayButton.setVisibility(View.INVISIBLE);
@@ -123,4 +151,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener {
     private PlayerAdapter mAdapter;
     private AtiiViewPager mPager;
     private ImageButton mCurrentPlaybackButton, mPlayButton, mPauseButton, mRepeatButton, mFirstButton, mLastButton;
+
+    private PlayerState mPlayerState;
+
 }
