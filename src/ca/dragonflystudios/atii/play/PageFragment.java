@@ -125,6 +125,8 @@ public class PageFragment extends Fragment implements Observer, OnCompletionList
     }
 
     public void startRecording() {
+        stopPlaying();
+
         if (null == mMediaRecorder) {
             try {
                 mMediaRecorder = new MediaRecorder();
