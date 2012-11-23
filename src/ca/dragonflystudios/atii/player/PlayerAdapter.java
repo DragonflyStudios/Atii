@@ -59,7 +59,6 @@ public class PlayerAdapter extends FragmentStatePagerAdapter implements ViewPage
     @Override
     // implementation for OnPageChangeListener
     public void onPageSelected(int position) {
-        Log.w(getClass().getName(), "page selected: " + position);
         mPlayerState.setCurrentPageNum(position);
         mPageChangeObservable.setChanged();
         mPageChangeObservable.notifyObservers(position);
@@ -72,7 +71,6 @@ public class PlayerAdapter extends FragmentStatePagerAdapter implements ViewPage
 
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
-        Log.w(getClass().getName(), "set primary item: " + position);
         mPlayerState.setCurrentPageNum(position);
     }
 

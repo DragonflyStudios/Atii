@@ -8,6 +8,7 @@ import java.util.Observer;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -15,13 +16,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 import ca.dragonflystudios.atii.R;
 import ca.dragonflystudios.atii.player.PlayerAdapter.PageChangeObservable;
 import ca.dragonflystudios.atii.player.PlayerState.ReplayState;
 import ca.dragonflystudios.utilities.Pathname;
 
-public class PageFragment extends Fragment implements Observer {
+public class PageFragment extends Fragment implements Observer, OnCompletionListener {
 
     // TODO: Use delegate pattern for PlayerState? TAI!
 
@@ -42,6 +42,8 @@ public class PageFragment extends Fragment implements Observer {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (mPageNum == mPlayerState.getCurrentPageNum())
+            mPlayerState.setCurrentPageFragment(this);
     }
 
     /**
@@ -55,8 +57,7 @@ public class PageFragment extends Fragment implements Observer {
         ImageView iv = (ImageView) v.findViewById(R.id.page_image);
         Bitmap mBitmap = BitmapFactory.decodeFile(mPageFile.getAbsolutePath());
         iv.setImageBitmap(mBitmap);
-        View tv = v.findViewById(R.id.page_num);
-        ((TextView) tv).setText((mPageNum + 1) + "/" + mNumPages);
+
         return v;
     }
 
@@ -86,27 +87,41 @@ public class PageFragment extends Fragment implements Observer {
         }
     }
 
-    private void startPlaying() {
-        mMediaPlayer = new MediaPlayer();
+    public void startPlaying() {
+        if (null == mMediaPlayer) {
+            try {
+                mMediaPlayer = new MediaPlayer();
+                mMediaPlayer.setOnCompletionListener(this);
+                mMediaPlayer.setDataSource(mPageAudio.getPath());
+                mMediaPlayer.prepare();
+            } catch (IOException e) {
+                Log.e(getClass().getName(), "prepare() failed with IOException");
+                e.printStackTrace();
+            }
+        }
 
-        try {
-            mMediaPlayer.setDataSource(mPageAudio.getPath());
-            mMediaPlayer.prepare();
-            mMediaPlayer.start();
-            mPlayerState.setPageState(mPageNum, ReplayState.PLAYING);
-        } catch (IOException e) {
-            Log.e(getClass().getName(), "prepare() failed with IOException");
-            e.printStackTrace();
+        mMediaPlayer.start();
+        mPlayerState.setPageState(mPageNum, ReplayState.PLAYING);
+    }
+
+    public void pausePlaying() {
+        if (null != mMediaPlayer) {
+            mMediaPlayer.pause();
+            mPlayerState.setPageState(mPageNum, ReplayState.PAUSED);
         }
     }
 
-    private void stopPlaying() {
+    public void stopPlaying() {
         if (null != mMediaPlayer) {
             mMediaPlayer.release();
             mMediaPlayer = null;
 
             mPlayerState.setPageState(mPageNum, ReplayState.FINISHED);
         }
+    }
+
+    public boolean hasAudio() {
+        return mHasAudio;
     }
 
     private boolean audioForPage(File pageFile) {
@@ -141,14 +156,25 @@ public class PageFragment extends Fragment implements Observer {
     @Override
     // implementation for Observer
     public void update(Observable pageChangeObservable, Object page) {
+        int p = (Integer) page;
+
+        if (p == mPageNum)
+            mPlayerState.setCurrentPageFragment(this);
+
         if (isResumed() && mHasAudio) {
-            int p = (Integer) page;
             if (p == mPageNum) {
                 if (mPlayerState.isAutoReplay() && !mPlayerState.isPlaying(mPageNum))
                     startPlaying(); // TODO: resume
             } else if (mPlayerState.isPlaying(mPageNum) || mPlayerState.isPaused(mPageNum))
                 stopPlaying();
         }
+    }
+
+    @Override
+    // implementation for MediaPlayer.OnCompletionListener
+    public void onCompletion(MediaPlayer mp) {
+        if (mMediaPlayer == mp)
+            stopPlaying();
     }
 
     private Bitmap mBitmap;

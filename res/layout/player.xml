@@ -70,4 +70,17 @@
         android:src="@drawable/button_last" >
     </ImageButton>
 
+    <TextView
+        android:id="@+id/page_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="20dp"
+        android:paddingTop = "5dp"
+        android:paddingBottom = "5dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/rounded_rect" />
+
 </FrameLayout>

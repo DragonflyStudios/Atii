@@ -10,14 +10,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import ca.dragonflystudios.atii.BookListActivity;
 import ca.dragonflystudios.atii.R;
+import ca.dragonflystudios.atii.player.PlayerState.OnPageChangeListener;
 import ca.dragonflystudios.atii.player.PlayerState.OnReplayChangeListener;
 import ca.dragonflystudios.atii.player.PlayerState.ReplayState;
 import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
 import ca.dragonflystudios.utilities.Pathname;
 
-public class Player extends FragmentActivity implements ReaderGestureListener, OnReplayChangeListener {
+public class Player extends FragmentActivity implements ReaderGestureListener, OnReplayChangeListener, OnPageChangeListener {
+
+    // TODO: hide Playback buttons when there is no audio
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +37,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         // TODO: get the directory from intent and use that to initialize
         // PlayerAdapter ...
         mAdapter = new PlayerAdapter(getSupportFragmentManager(), storyDir);
-        mPlayerState = new PlayerState(mAdapter.getCount(), this);
-        mPlayerState.setAutoReplay(false);
+        mPlayerState = new PlayerState(mAdapter.getCount(), this, this);
+        mPlayerState.setAutoReplay(true);
         mAdapter.setPlayerState(mPlayerState);
 
         setContentView(R.layout.player);
@@ -44,8 +48,26 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mPager.setReaderGestureListener(this);
 
         mPlayButton = (ImageButton) findViewById(R.id.play);
+        mPlayButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mPlayerState.startPlaying();
+            }
+        });
+
         mPauseButton = (ImageButton) findViewById(R.id.pause);
+        mPauseButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mPlayerState.pausePlaying();
+            }
+        });
+
         mRepeatButton = (ImageButton) findViewById(R.id.repeat);
+        mRepeatButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mPlayerState.startPlaying();
+            }
+        });
+
         mCurrentPlaybackButton = mPlayButton;
 
         // Watch for button clicks.
@@ -62,6 +84,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
                 mPager.setCurrentItem(mAdapter.getCount() - 1);
             }
         });
+
+        mPageNumView = (TextView) findViewById(R.id.page_num);
 
         hideAllControls();
     }
@@ -100,21 +124,33 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         case NOT_STARTED:
             switchPlaybackButton(mPlayButton);
             break;
-        case FINISHED:
-            switchPlaybackButton(mRepeatButton);
-            break;
         case PLAYING:
             switchPlaybackButton(mPauseButton);
+            break;
+        case PAUSED:
+            switchPlaybackButton(mPlayButton);
+            break;
+        case FINISHED:
+            switchPlaybackButton(mRepeatButton);
             break;
         default:
             break;
         }
     }
 
+    @Override
+    // implementation for OnPageChangeListener
+    public void onPageChanged(int newPage) {
+        mPageNumView.setText((newPage+1) + "/" + mPlayerState.getNumPages());
+    }
+
     private void switchPlaybackButton(ImageButton button) {
-        mCurrentPlaybackButton.setVisibility(View.INVISIBLE);
-        mCurrentPlaybackButton = button;
-        if (getActionBar().isShowing())
+        if (mCurrentPlaybackButton != button) {
+            mCurrentPlaybackButton.setVisibility(View.INVISIBLE);
+            mCurrentPlaybackButton = button;
+        }
+
+        if (getActionBar().isShowing() && mPlayerState.hasAudioOnCurrentPage())
             mCurrentPlaybackButton.setVisibility(View.VISIBLE);
     }
 
@@ -125,6 +161,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mRepeatButton.setVisibility(View.INVISIBLE);
         mFirstButton.setVisibility(View.INVISIBLE);
         mLastButton.setVisibility(View.INVISIBLE);
+        mPageNumView.setVisibility(View.INVISIBLE);
     }
 
     private void toggleControls() {
@@ -137,6 +174,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         toggleView(mFirstButton);
         toggleView(mLastButton);
         toggleView(mCurrentPlaybackButton);
+
+        toggleView(mPageNumView);
     }
 
     private void toggleView(View v) {
@@ -151,6 +190,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     private PlayerAdapter mAdapter;
     private AtiiViewPager mPager;
     private ImageButton mCurrentPlaybackButton, mPlayButton, mPauseButton, mRepeatButton, mFirstButton, mLastButton;
+    private TextView mPageNumView;
 
     private PlayerState mPlayerState;
 
