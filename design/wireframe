@@ -66,6 +66,12 @@ Story Player UI:
  *                  [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
  *      Future: [ ] Make buttons translucent & pretty
  * [ ] Replace audio with recording        0.5-day
+ *     [ ] Buttons: Record & Stop
+ *     [ ] Button switching when tapping Microphone icon
+ *     [ ] Button actions:
+ *         - Record: start recording
+ *         - Stop: switch back to Playback
+ *     Future: [ ] Real-time spectrum or at least volume indicator
  * [ ] Replace page image with photo       0.5-day
  * [ ] Double tap to zoom in               0.5-day
  * 

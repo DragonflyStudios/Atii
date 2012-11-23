@@ -1,4 +1,4 @@
-package ca.dragonflystudios.atii.player;
+package ca.dragonflystudios.atii.play;
 
 import java.util.ArrayList;
 
@@ -6,27 +6,36 @@ public class PlayerState {
 
     // TODO: auto (page) advance ...
 
+    public interface OnModeChangeListener {
+        public void onModeChanged(PlayerMode newMode);
+    }
+
     public interface OnReplayChangeListener {
         // does not differentiate cross from within page changes
         public void onReplayStateChanged(ReplayState newState);
     }
 
     public interface OnPageChangeListener {
-        // does not differentiate cross from within page changes
         public void onPageChanged(int newPage);
     }
 
-    public enum ReplayState {
-        INVALID, NOT_STARTED, PLAYING, PAUSED, FINISHED
+    public enum PlayerMode {
+        INVALID, PLAYBACK, RECORD, CAPTURE
     }
 
-    public PlayerState(int numPages, OnReplayChangeListener rl, OnPageChangeListener pl) {
+    public enum ReplayState {
+        INVALID, NOT_STARTED, PLAYING, PAUSED, FINISHED, RECORDING
+    }
+
+    public PlayerState(int numPages, OnModeChangeListener ml, OnReplayChangeListener rl, OnPageChangeListener pl) {
         mNumPages = numPages;
         mPageStates = new ArrayList<ReplayState>(numPages);
 
         for (int i = 0; i < numPages; i++)
             mPageStates.add(ReplayState.NOT_STARTED);
 
+        mCurrentMode = PlayerMode.PLAYBACK;
+        mOnModeChangeListener = ml;
         mOnReplayChangeListener = rl;
         mOnPageChangeListener = pl;
         mCurrentPageFragment = null;
@@ -34,7 +43,7 @@ public class PlayerState {
     }
 
     public boolean isAutoReplay() {
-        return mAutoReplay;
+        return mAutoReplay && (mCurrentMode == PlayerMode.PLAYBACK);
     }
 
     public void setAutoReplay(boolean auto) {
@@ -124,12 +133,52 @@ public class PlayerState {
             mCurrentPageFragment.stopPlaying();
     }
 
+    public void startRecording() {
+        setPageState(mCurrentPageNum, ReplayState.RECORDING);
+    }
+
+    public void stopRecording() {
+        switchMode(PlayerMode.PLAYBACK);
+    }
+
+    public void switchMode(PlayerMode newMode) {
+        switch (newMode) {
+        case RECORD  :
+            if (PlayerMode.PLAYBACK == mCurrentMode) {
+                stopPlaying();
+                mCurrentMode = newMode;
+                if (null != mOnModeChangeListener)
+                    mOnModeChangeListener.onModeChanged(newMode);
+            }
+            break;
+        case PLAYBACK :
+            if (PlayerMode.RECORD == mCurrentMode) {
+                setPageState(mCurrentPageNum, ReplayState.NOT_STARTED);
+                mCurrentMode = newMode;
+                if (null != mOnModeChangeListener)
+                    mOnModeChangeListener.onModeChanged(newMode);
+            }
+        default :
+            break;
+        }
+    }
+
+    public void toggleModeWithPlayback(PlayerMode mode) {
+        if (mCurrentMode != mode)
+            switchMode(mode);
+        else
+            switchMode(PlayerMode.PLAYBACK);
+    }
+    
     private ArrayList<ReplayState> mPageStates;
     private int mCurrentPageNum;
     private int mNumPages;
     private boolean mAutoReplay;
     private PageFragment mCurrentPageFragment;
 
+    private PlayerMode mCurrentMode;
+
+    private OnModeChangeListener mOnModeChangeListener;
     private OnReplayChangeListener mOnReplayChangeListener;
     private OnPageChangeListener mOnPageChangeListener;
 }

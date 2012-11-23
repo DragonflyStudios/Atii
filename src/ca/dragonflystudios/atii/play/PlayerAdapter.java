@@ -1,4 +1,4 @@
-package ca.dragonflystudios.atii.player;
+package ca.dragonflystudios.atii.play;
 
 import java.io.File;
 import java.io.FileFilter;

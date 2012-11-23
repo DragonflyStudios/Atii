@@ -25,7 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import ca.dragonflystudios.android.storage.Storage;
-import ca.dragonflystudios.atii.player.Player;
+import ca.dragonflystudios.atii.play.Player;
 import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 

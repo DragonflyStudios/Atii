@@ -9,7 +9,9 @@
     <string name="pause">Pause</string>
     <string name="play">Play</string>
     <string name="repeat">Repeat</string>
-
+    <string name="record">Record</string>
+    <string name="stop">Stop</string>
+    
     <!-- action items -->
     <string name="menu_settings">Settings</string>
 

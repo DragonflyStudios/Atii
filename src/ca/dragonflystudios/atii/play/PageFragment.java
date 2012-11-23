@@ -1,4 +1,4 @@
-package ca.dragonflystudios.atii.player;
+package ca.dragonflystudios.atii.play;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import ca.dragonflystudios.atii.R;
-import ca.dragonflystudios.atii.player.PlayerAdapter.PageChangeObservable;
-import ca.dragonflystudios.atii.player.PlayerState.ReplayState;
+import ca.dragonflystudios.atii.play.PlayerAdapter.PageChangeObservable;
+import ca.dragonflystudios.atii.play.PlayerState.ReplayState;
 import ca.dragonflystudios.utilities.Pathname;
 
 public class PageFragment extends Fragment implements Observer, OnCompletionListener {

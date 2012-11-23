@@ -5,15 +5,7 @@
     android:orientation="vertical"
     android:padding="4dip" >
 
-    <!--
-        <ca.dragonflystudios.atii.view.ReaderGestureView
-            android:id="@+id/gesture_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-        </ca.dragonflystudios.atii.view.ReaderGestureView>
-    -->
-
-    <ca.dragonflystudios.atii.player.AtiiViewPager
+    <ca.dragonflystudios.atii.play.AtiiViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -44,6 +36,24 @@
         android:background="@android:color/transparent"
         android:contentDescription="@string/repeat"
         android:src="@drawable/button_repeat" />
+
+    <ImageButton
+        android:id="@+id/record"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/record"
+        android:src="@drawable/button_record" />
+
+    <ImageButton
+        android:id="@+id/stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/stop"
+        android:src="@drawable/button_stop" />
 
     <FrameLayout
         android:layout_width="match_parent"
