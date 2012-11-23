@@ -234,7 +234,16 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
 
         toggleView(mFirstButton);
         toggleView(mLastButton);
-        toggleView(mCurrentPlaybackButton);
+        switch (mPlayerState.getCurrentMode()) {
+        case PLAYBACK:
+            toggleView(mCurrentPlaybackButton);
+            break;
+        case RECORD:
+            toggleView(mCurrentRecordButton);
+            break;
+        default:
+            break;
+        }
 
         toggleView(mPageNumView);
     }

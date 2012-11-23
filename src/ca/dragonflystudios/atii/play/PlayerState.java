@@ -143,7 +143,7 @@ public class PlayerState {
 
     public void switchMode(PlayerMode newMode) {
         switch (newMode) {
-        case RECORD  :
+        case RECORD:
             if (PlayerMode.PLAYBACK == mCurrentMode) {
                 stopPlaying();
                 mCurrentMode = newMode;
@@ -151,14 +151,14 @@ public class PlayerState {
                     mOnModeChangeListener.onModeChanged(newMode);
             }
             break;
-        case PLAYBACK :
+        case PLAYBACK:
             if (PlayerMode.RECORD == mCurrentMode) {
                 setPageState(mCurrentPageNum, ReplayState.NOT_STARTED);
                 mCurrentMode = newMode;
                 if (null != mOnModeChangeListener)
                     mOnModeChangeListener.onModeChanged(newMode);
             }
-        default :
+        default:
             break;
         }
     }
@@ -169,7 +169,11 @@ public class PlayerState {
         else
             switchMode(PlayerMode.PLAYBACK);
     }
-    
+
+    public PlayerMode getCurrentMode() {
+        return mCurrentMode;
+    }
+
     private ArrayList<ReplayState> mPageStates;
     private int mCurrentPageNum;
     private int mNumPages;
