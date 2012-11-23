@@ -107,6 +107,10 @@ public class PlayerState {
         return mPageStates.get(pageNum) == ReplayState.FINISHED;
     }
 
+    public boolean isRecording(int pageNum) {
+        return mPageStates.get(pageNum) == ReplayState.RECORDING;
+    }
+
     public PageFragment getCurrentPageFragment() {
         return mCurrentPageFragment;
     }
@@ -134,11 +138,14 @@ public class PlayerState {
     }
 
     public void startRecording() {
-        setPageState(mCurrentPageNum, ReplayState.RECORDING);
+        mCurrentPageFragment.startRecording();
     }
 
     public void stopRecording() {
-        switchMode(PlayerMode.PLAYBACK);
+        if (isRecording(mCurrentPageNum)) {
+            mCurrentPageFragment.stopRecording();
+            switchMode(PlayerMode.PLAYBACK);
+        }
     }
 
     public void switchMode(PlayerMode newMode) {
@@ -153,7 +160,6 @@ public class PlayerState {
             break;
         case PLAYBACK:
             if (PlayerMode.RECORD == mCurrentMode) {
-                setPageState(mCurrentPageNum, ReplayState.NOT_STARTED);
                 mCurrentMode = newMode;
                 if (null != mOnModeChangeListener)
                     mOnModeChangeListener.onModeChanged(newMode);

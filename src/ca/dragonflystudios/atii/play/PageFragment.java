@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -85,6 +86,9 @@ public class PageFragment extends Fragment implements Observer, OnCompletionList
         if (mHasAudio && mPlayerState.isPlaying(mPageNum)) {
             stopPlaying(); // TODO: save the current position ...
         }
+
+        if (mPlayerState.isRecording(mPageNum))
+            stopRecording();
     }
 
     public void startPlaying() {
@@ -120,20 +124,55 @@ public class PageFragment extends Fragment implements Observer, OnCompletionList
         }
     }
 
+    public void startRecording() {
+        if (null == mMediaRecorder) {
+            try {
+                mMediaRecorder = new MediaRecorder();
+                mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                mMediaRecorder.setOutputFile(getAudioOutputPath());
+                mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+                mMediaRecorder.prepare();
+            } catch (IOException e) {
+                Log.e(getClass().getName(), "media recorder prepare() failed");
+            }
+        }
+
+        mMediaRecorder.start();
+        mPlayerState.setPageState(mPageNum, ReplayState.RECORDING);
+    }
+
+    public void stopRecording() {
+        if (null != mMediaRecorder) {
+            mMediaRecorder.stop();
+            mMediaRecorder.release();
+            mMediaRecorder = null;
+
+            mHasAudio = true;
+            mPlayerState.setPageState(mPageNum, ReplayState.NOT_STARTED);
+        }
+    }
+
+    private String getAudioOutputPath() {
+        String nameStem = Pathname.extractStem(mPageAudio.getName());
+        mPageAudio = new File(mPageAudio.getParent(), nameStem + ".3gp");
+
+        return mPageAudio.getAbsolutePath();
+    }
+
     public boolean hasAudio() {
         return mHasAudio;
     }
 
     private boolean audioForPage(File pageFile) {
         String nameStem = Pathname.extractStem(pageFile.getName());
-        File audioFile = new File(pageFile.getParent(), nameStem + ".mp3");
+        mPageAudio = new File(pageFile.getParent(), nameStem + ".3gp");
 
-        if (audioFile.exists()) {
-            mPageAudio = audioFile;
-            return true;
-        }
+        if (!mPageAudio.exists())
+            mPageAudio = new File(pageFile.getParent(), nameStem + ".mp3");
 
-        return false;
+        return mPageAudio.exists();
     }
 
     @Override
@@ -185,6 +224,7 @@ public class PageFragment extends Fragment implements Observer, OnCompletionList
     private boolean mHasAudio;
     private File mPageAudio;
     private MediaPlayer mMediaPlayer;
+    private MediaRecorder mMediaRecorder;
 
     private PageChangeObservable mPageChangeObservable;
 
