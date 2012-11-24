@@ -65,14 +65,25 @@ Story Player UI:
  *                  [ ] For audio
  *                  [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
  *      Future: [ ] Make buttons translucent & pretty
- * [ ] Replace audio with recording        0.5-day
- *     [ ] Buttons: Record & Stop
- *     [ ] Button switching when tapping Microphone icon
- *     [ ] Button actions:
+ * [x] Replace audio with recording        0.5-day
+ *     [x] Buttons: Record & Stop
+ *     [x] Button switching when tapping Microphone icon
+ *     [x] Button actions:
  *         - Record: start recording
  *         - Stop: switch back to Playback
  *     Future: [ ] Real-time spectrum or at least volume indicator
  * [ ] Replace page image with photo       0.5-day
+ *     [ ] Show preview
+ *     [ ] Show button in the middle
+ *     [ ] Replace page image
+ * [ ] Page operations
+ *     [ ] Add page after
+ *     [ ] Add page before
+ *     [ ] Delete page
+ * ~~ The following starts the sharing business ~~
+ * [ ] Google Drive integration
+ * 
+ * ~~ Future: 
  * [ ] Double tap to zoom in               0.5-day
  * 
  * ~~ The following opens up page image source to alternatives ~~
@@ -80,9 +91,6 @@ Story Player UI:
  * 
  * ~~ The following breaks 1-audio-per-page correspondence ~~
  * [ ] Audio for zoomed-in state           1-day
- * 
- * ~~ The following starts the sharing business ~~
- * [ ] Google Drive integration
  * 
  */
 
