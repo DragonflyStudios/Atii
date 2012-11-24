@@ -3,6 +3,10 @@
     <string name="app_name">Atii</string>
     <string name="title_activity_main">MainActivity</string>
 
+    <!-- modes -->
+    <string name="playback">Play Back</string>
+    <string name="playup">Play Up</string>
+
     <!-- buttons -->
     <string name="first">Goto First Page</string>
     <string name="last">Goto Last Page</string>
@@ -11,7 +15,7 @@
     <string name="repeat">Repeat</string>
     <string name="record">Record</string>
     <string name="stop">Stop</string>
-    
+
     <!-- action items -->
     <string name="menu_settings">Settings</string>
 
