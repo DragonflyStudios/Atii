@@ -19,30 +19,15 @@
 
         <!-- Mode Switcher Begin -->
 
-        <RadioGroup
+        <ca.dragonflystudios.android.view.SeesawButton
+            android:id="@+id/mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:background="#33333333"
-            android:orientation="vertical" >
-
-            <RadioButton
-                android:id="@+id/radio_playback"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:drawableLeft="@drawable/playback_green_32"
-                android:onClick="onRadioButtonClicked" />
-
-            <RadioButton
-                android:id="@+id/radio_playup"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="false"
-                android:drawableLeft="@drawable/playup_orange_32"
-                android:onClick="onRadioButtonClicked" />
-        </RadioGroup>
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/mode"
+            android:src="@drawable/button_mode" />
 
         <!-- Mode Switcher End -->
 

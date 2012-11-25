@@ -20,7 +20,7 @@ public class PlayerState {
     }
 
     public enum PlayerMode {
-        INVALID, PLAYBACK, RECORD, CAPTURE
+        INVALID, PLAYBACK, PLAYOUT, RECORD, CAPTURE
     }
 
     public enum ReplayState {
@@ -59,6 +59,9 @@ public class PlayerState {
     }
 
     public boolean hasAudioOnCurrentPage() {
+        if (null == mCurrentPageFragment)
+            return false;
+
         return mCurrentPageFragment.hasAudio();
     }
 
@@ -150,7 +153,7 @@ public class PlayerState {
 
     public void switchMode(PlayerMode newMode) {
         switch (newMode) {
-        case RECORD:
+        case PLAYOUT:
             if (PlayerMode.PLAYBACK == mCurrentMode) {
                 stopPlaying();
                 mCurrentMode = newMode;
@@ -159,7 +162,7 @@ public class PlayerState {
             }
             break;
         case PLAYBACK:
-            if (PlayerMode.RECORD == mCurrentMode) {
+            if (PlayerMode.PLAYOUT == mCurrentMode) {
                 mCurrentMode = newMode;
                 if (null != mOnModeChangeListener)
                     mOnModeChangeListener.onModeChanged(newMode);
@@ -169,11 +172,11 @@ public class PlayerState {
         }
     }
 
-    public void toggleModeWithPlayback(PlayerMode mode) {
-        if (mCurrentMode != mode)
-            switchMode(mode);
-        else
+    public void toggleMode() {
+        if (mCurrentMode != PlayerMode.PLAYBACK)
             switchMode(PlayerMode.PLAYBACK);
+        else
+            switchMode(PlayerMode.PLAYOUT);
     }
 
     public PlayerMode getCurrentMode() {

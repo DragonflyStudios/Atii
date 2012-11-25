@@ -69,24 +69,23 @@ Story Player UI:
  *
  * The following defines the Christmas version 
  *
- * [ ] No ActionBar
- * [ ] Differentiate Playback and Playout UIs
- *     [ ] For now, hard code the difference; in the future ... could introduce "group" property for "command buttons"
- *     [ ] A single "seesaw", visible on both sets of UIs, for quickly switching between the two sets of UIs
- *     [ ] Playback
- *         [ ] "Seesaw" at top right corner (where Settings would be)
- *             [ ] Use radio buttons for now
- *         [ ] "Playback group" (Play, Pause, Repeat) at center
- *         [ ] A progress bar at bottom
- *     [ ] Playout; on top of the above; show
- *         [ ] Middle row, left to right
- *             [ ] Add page (at left edge): add a page before the current page
- *             [ ] Add page (at right edge): add a page after the current page
+ * [x] No ActionBar
+ * [x] Differentiate Playback and Playout UIs
+ *     [x] For now, hard code the difference; in the future ... could introduce "group" property for "command buttons"
+ *     [x] A single "seesaw", visible on both sets of UIs, for quickly switching between the two sets of UIs
+ *     [x] Playback
+ *         [x] "Seesaw" at top right corner (where Settings would be)
+ *         [x] "Playback group" (Play, Pause, Repeat) at center
+ *         [x] A progress bar at bottom
+ *     [x] Playout; on top of the above; show
+ *         [x] Middle row, left to right
+ *             [x] Add page (at left edge): add a page before the current page
+ *             [x] Add page (at right edge): add a page after the current page
  *             [ ] When story is empty automatically create a blank page
- *         [ ] Center group
- *             [ ] Record (microphone button): on left of the "Playback group"
- *             [ ] Capture (camera button): on right of the "Playback group"
- *         [ ] Bottom: lower right corner: Page deletion button
+ *         [x] Center group
+ *             [x] Record (microphone button): on left of the "Playback group"
+ *             [x] Capture (camera button): on right of the "Playback group"
+ *         [x] Bottom: lower right corner: Page deletion button
  *         Future: When recording --
  *             [ ] Hide all buttons
  *             [ ] Superimpose transparent equalizer/volume feedback

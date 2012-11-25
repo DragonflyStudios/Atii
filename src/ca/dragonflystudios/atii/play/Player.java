@@ -9,8 +9,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import ca.dragonflystudios.android.view.SeesawButton;
 import ca.dragonflystudios.atii.BookListActivity;
 import ca.dragonflystudios.atii.R;
 import ca.dragonflystudios.atii.play.PlayerState.OnModeChangeListener;
@@ -22,15 +24,14 @@ import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
 import ca.dragonflystudios.utilities.Pathname;
 
 public class Player extends FragmentActivity implements ReaderGestureListener, OnModeChangeListener, OnReplayChangeListener,
-        OnPageChangeListener
-{
+        OnPageChangeListener {
 
     // TODO: hide Playback buttons when there is no audio
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         mStoryPath = getIntent().getExtras().getString(BookListActivity.STORY_EXTRA_KEY);
         File storyDir = new File(mStoryPath);
@@ -51,26 +52,31 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
 
         mControlsView = (ViewGroup) findViewById(R.id.controls);
 
+        mModeButton = (SeesawButton) mControlsView.findViewById(R.id.mode);
+        mModeButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mModeButton.seesaw();
+                mPlayerState.toggleMode();
+            }
+        });
+
         mPlayButton = (ImageButton) mControlsView.findViewById(R.id.play);
         mPlayButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 mPlayerState.startPlaying();
             }
         });
 
         mPauseButton = (ImageButton) mControlsView.findViewById(R.id.pause);
         mPauseButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 mPlayerState.pausePlaying();
             }
         });
 
         mRepeatButton = (ImageButton) mControlsView.findViewById(R.id.repeat);
         mRepeatButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 mPlayerState.startPlaying();
             }
         });
@@ -79,47 +85,41 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
 
         mRecordButton = (ImageButton) mControlsView.findViewById(R.id.record);
         mRecordButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 mPlayerState.startRecording();
             }
         });
         mStopButton = (ImageButton) mControlsView.findViewById(R.id.stop);
         mStopButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 mPlayerState.stopRecording();
             }
         });
 
         mCaptureButton = (ImageButton) mControlsView.findViewById(R.id.capture);
         mCaptureButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 mPlayerState.stopRecording();
             }
         });
 
         mAddBeforeButton = (ImageButton) mControlsView.findViewById(R.id.add_before);
         mAddBeforeButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 mPlayerState.stopRecording();
             }
         });
 
         mAddAfterButton = (ImageButton) mControlsView.findViewById(R.id.add_after);
         mAddAfterButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 mPlayerState.stopRecording();
             }
         });
 
         mDeleteButton = (ImageButton) mControlsView.findViewById(R.id.delete);
         mDeleteButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 mPlayerState.stopRecording();
             }
         });
@@ -127,46 +127,40 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mCurrentRecordButton = mRecordButton;
         mPageNumView = (TextView) mControlsView.findViewById(R.id.page_num);
 
-        hidePlayupControls();
+        setPlayoutControlsVisibility(View.INVISIBLE, false);
         hideAllControls();
     }
 
-    public String getStoryTitle()
-    {
+    public String getStoryTitle() {
         return mStoryTitle;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.player, menu);
         return true;
     }
 
     @Override
     // implementation for ReaderGestureListener
-    public void onPanning(float deltaX, float deltaY)
-    {
+    public void onPanning(float deltaX, float deltaY) {
     }
 
     @Override
     // implementation for ReaderGestureListener
-    public void onScaling(float scaling, float focusX, float focusY)
-    {
+    public void onScaling(float scaling, float focusX, float focusY) {
 
     }
 
     @Override
     // implementation for ReaderGestureListener
-    public void onSingleTap(float x, float y)
-    {
+    public void onSingleTap(float x, float y) {
         toggleAllControls();
     }
 
     @Override
     // implementation for OnReplayChangeListener
-    public void onReplayStateChanged(ReplayState newState)
-    {
+    public void onReplayStateChanged(ReplayState newState) {
         switch (newState) {
         case NOT_STARTED:
             switchPlaybackButton(mPlayButton);
@@ -189,8 +183,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
 
     @Override
     // implementation for OnPageChangeListener
-    public void onPageChanged(int newPage)
-    {
+    public void onPageChanged(int newPage) {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < newPage; i++)
@@ -204,27 +197,20 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
 
     @Override
     // implementation for OnModeChangeListener
-    public void onModeChanged(PlayerMode newMode)
-    {
+    public void onModeChanged(PlayerMode newMode) {
         switch (newMode) {
         case PLAYBACK:
-            mCurrentRecordButton.setVisibility(View.INVISIBLE);
-            mCurrentRecordButton = mRecordButton;
-            mCurrentRecordButton.setVisibility(View.INVISIBLE);
-            if (mPlayerState.hasAudioOnCurrentPage())
-                mCurrentPlaybackButton.setVisibility(View.VISIBLE);
+            setPlayoutControlsVisibility(View.INVISIBLE, true);
             break;
-        case PLAYUP:
-            mCurrentPlaybackButton.setVisibility(View.INVISIBLE);
-            mCurrentRecordButton.setVisibility(View.VISIBLE);
+        case PLAYOUT:
+            setPlayoutControlsVisibility(View.VISIBLE, true);
             break;
         default:
             break;
         }
     }
 
-    private void switchPlaybackButton(ImageButton button)
-    {
+    private void switchPlaybackButton(ImageButton button) {
         if (mCurrentPlaybackButton != button) {
             mCurrentPlaybackButton.setVisibility(View.INVISIBLE);
             mCurrentPlaybackButton = button;
@@ -234,77 +220,56 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
             mCurrentPlaybackButton.setVisibility(View.VISIBLE);
     }
 
-    private void switchRecordButton(ImageButton button)
-    {
+    private void switchRecordButton(ImageButton button) {
         if (mCurrentRecordButton != button) {
             mCurrentRecordButton.setVisibility(View.INVISIBLE);
             mCurrentRecordButton = button;
         }
 
-            mCurrentRecordButton.setVisibility(View.VISIBLE);
+        mCurrentRecordButton.setVisibility(View.VISIBLE);
     }
 
-    private void hideAllControls()
-    {
+    private void hideAllControls() {
         mControlsView.setVisibility(View.INVISIBLE);
     }
 
-    private void toggleAllControls()
-    {
-        toggleView(mControlsView);
+    private void toggleAllControls() {
+        toggleViewVisibility(mControlsView);
     }
 
-    private void hidePlayupControls()
-    {
-        mRecordButton.setVisibility(View.INVISIBLE);
-        mStopButton.setVisibility(View.INVISIBLE);
-        mCaptureButton.setVisibility(View.INVISIBLE);
-        mAddBeforeButton.setVisibility(View.INVISIBLE);
-        mAddAfterButton.setVisibility(View.INVISIBLE);
-        mDeleteButton.setVisibility(View.INVISIBLE);
+    private void setPlayoutControlsVisibility(int visibility, boolean currentOnly) {
+        if (currentOnly)
+            mCurrentRecordButton.setVisibility(visibility);
+        else {
+            mRecordButton.setVisibility(visibility);
+            mStopButton.setVisibility(visibility);
+        }
+        mCaptureButton.setVisibility(visibility);
+        mAddBeforeButton.setVisibility(visibility);
+        mAddAfterButton.setVisibility(visibility);
+        mDeleteButton.setVisibility(visibility);
     }
 
-    private void togglePlayupControls()
-    {
-        toggleView(mCurrentRecordButton);
-        toggleView(mCaptureButton);
-        toggleView(mAddBeforeButton);
-        toggleView(mAddAfterButton);
-        toggleView(mDeleteButton);
-    }
-
-    private void toggleView(View v)
-    {
+    private void toggleViewVisibility(View v) {
         if (View.VISIBLE == v.getVisibility())
             v.setVisibility(View.INVISIBLE);
         else
             v.setVisibility(View.VISIBLE);
     }
 
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle item selection
-        switch (item.getItemId()) {
-        case R.id.menu_record_audio:
-            mPlayerState.toggleModeWithPlayback(PlayerMode.RECORD);
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private String        mStoryPath;
-    private String        mStoryTitle;
+    private String mStoryPath;
+    private String mStoryTitle;
     private PlayerAdapter mAdapter;
     private AtiiViewPager mPager;
-    private ImageButton   mCurrentPlaybackButton, mPlayButton, mPauseButton, mRepeatButton;
-    private ImageButton   mCurrentRecordButton, mRecordButton, mStopButton;
-    private ImageButton   mCaptureButton;
-    private ImageButton   mAddBeforeButton, mAddAfterButton, mDeleteButton;
-    private TextView      mPageNumView;
+    private SeesawButton mModeButton;
+    private ImageButton mCurrentPlaybackButton, mPlayButton, mPauseButton, mRepeatButton;
+    private ImageButton mCurrentRecordButton, mRecordButton, mStopButton;
+    private ImageButton mCaptureButton;
+    private ImageButton mAddBeforeButton, mAddAfterButton, mDeleteButton;
+    private TextView mPageNumView;
 
-    private ViewGroup     mControlsView;
+    private ViewGroup mControlsView;
 
-    private PlayerState   mPlayerState;
+    private PlayerState mPlayerState;
 
 }

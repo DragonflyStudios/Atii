@@ -4,8 +4,9 @@
     <string name="title_activity_main">MainActivity</string>
 
     <!-- modes -->
+    <string name="mode">Play Back or Play Out</string>
     <string name="playback">Play Back</string>
-    <string name="playup">Play Up</string>
+    <string name="playout">Play Out</string>
 
     <!-- buttons -->
     <string name="add_before">Add Before</string>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:dragonfly="http://schemas.android.com/apk/res/ca.dragonflystudios.atii">
+
+    <item android:drawable="@drawable/button_mode_grey_80" android:state_pressed="true"/> <!-- pressed -->
+    <item android:drawable="@drawable/button_mode_playback_80" dragonfly:state_saw="true"/> <!-- saw -->
+    <item android:drawable="@drawable/button_mode_playout_80" dragonfly:state_saw="false"/> <!-- see -->
+    <item android:drawable="@drawable/button_mode_grey_80"/> <!-- default -->
+
+</selector>
