@@ -8,6 +8,10 @@
     <string name="playup">Play Up</string>
 
     <!-- buttons -->
+    <string name="add_before">Add Before</string>
+    <string name="add_after">Add After</string>
+    <string name="capture">Capture</string>
+    <string name="delete">Delete</string>
     <string name="first">Goto First Page</string>
     <string name="last">Goto Last Page</string>
     <string name="pause">Pause</string>

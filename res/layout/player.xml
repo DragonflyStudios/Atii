@@ -10,97 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <ImageButton
-        android:id="@+id/play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/play"
-        android:src="@drawable/button_play" />
-
-    <ImageButton
-        android:id="@+id/pause"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/pause"
-        android:src="@drawable/button_pause" />
-
-    <ImageButton
-        android:id="@+id/repeat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/repeat"
-        android:src="@drawable/button_repeat" />
-
-    <ImageButton
-        android:id="@+id/record"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/record"
-        android:src="@drawable/button_record" />
-
-    <ImageButton
-        android:id="@+id/stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/stop"
-        android:src="@drawable/button_stop" />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="15dp" >
-
-        <ImageButton
-            android:id="@+id/goto_first"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left|center_vertical"
-            android:layout_marginLeft="10dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/first"
-            android:src="@drawable/button_first" />
-
-        <TextView
-            android:id="@+id/page_num"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@drawable/rounded_rect"
-            android:paddingBottom="5dp"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:paddingTop="5dp"
-            android:textColor="@android:color/white" />
-
-        <ImageButton
-            android:id="@+id/goto_last"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|center_vertical"
-            android:layout_marginRight="10dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/last"
-            android:src="@drawable/button_last" />
-    </FrameLayout>
+    <!-- Mode Switcher Begin -->
 
     <RadioGroup
-        android:background="#33333333"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|right"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp"
+        android:background="#33333333"
         android:orientation="vertical" >
 
         <RadioButton
@@ -119,5 +37,171 @@
             android:drawableLeft="@drawable/playup_orange_32"
             android:onClick="onRadioButtonClicked" />
     </RadioGroup>
+
+    <!-- Mode Switcher End -->
+
+
+    <!-- Story Slider Begin -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:padding="5dp" >
+
+        <ImageButton
+            android:id="@+id/goto_first"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/first"
+            android:src="@drawable/button_first"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/page_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/rounded_rect"
+            android:padding="5dp"
+            android:textColor="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/goto_last"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/last"
+            android:src="@drawable/button_last"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+    <!-- Story Slider End -->
+
+
+    <!-- Center Buttons Begin -->
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" >
+
+        <!-- Play Begin -->
+
+        <ImageButton
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/play"
+            android:src="@drawable/button_play" />
+
+        <ImageButton
+            android:id="@+id/pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/pause"
+            android:src="@drawable/button_pause" />
+
+        <ImageButton
+            android:id="@+id/repeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/repeat"
+            android:src="@drawable/button_repeat" />
+        <!-- Play End -->
+
+
+        <!-- Record Begin -->
+
+        <ImageButton
+            android:id="@+id/record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="25dp"
+            android:layout_toLeftOf="@id/play"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/record"
+            android:src="@drawable/button_record" />
+
+        <ImageButton
+            android:id="@+id/stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:layout_marginRight="25dp"
+            android:layout_toLeftOf="@id/play"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/stop"
+            android:src="@drawable/button_stop" />
+
+        <!-- Record End -->
+
+
+        <!-- Capture Begin -->
+
+        <ImageButton
+            android:id="@+id/capture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="25dp"
+            android:layout_toRightOf="@id/play"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/capture"
+            android:src="@drawable/button_capture" />
+
+        <!-- Capture End -->
+
+    </RelativeLayout>
+
+    <!-- Center Buttons End -->
+
+
+    <!-- Page Editing Begin -->
+
+    <ImageButton
+        android:id="@+id/add_before"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:layout_marginLeft="5dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/add_before"
+        android:src="@drawable/button_add_before" />
+
+    <ImageButton
+        android:id="@+id/add_after"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginRight="5dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/add_after"
+        android:src="@drawable/button_add_after" />
+
+    <ImageButton
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/delete"
+        android:src="@drawable/button_delete" />
+
+    <!-- Page Editing End -->
 
 </FrameLayout>
