@@ -69,31 +69,34 @@ Story Player UI:
  *
  * The following defines the Christmas version 
  *
- * [ ] Differentiate Playback and Play UIs
- *     [ ] A single switch/teeter-totter, visible on both sets of UIs, for quickly switching between the two sets of UIs
+ * [ ] No ActionBar
+ * [ ] Differentiate Playback and Playout UIs
+ *     [ ] For now, hard code the difference; in the future ... could introduce "group" property for "command buttons"
+ *     [ ] A single "seesaw", visible on both sets of UIs, for quickly switching between the two sets of UIs
  *     [ ] Playback
- *         [ ] Mode switch at top right corner (where Settings would be)
- *         [ ] A "playback group" (Play, Pause, Repeat) at center
+ *         [ ] "Seesaw" at top right corner (where Settings would be)
+ *             [ ] Use radio buttons for now
+ *         [ ] "Playback group" (Play, Pause, Repeat) at center
  *         [ ] A progress bar at bottom
- *     [ ] Play
- *         [ ] Mode switch (same as above)
+ *     [ ] Playout; on top of the above; show
  *         [ ] Middle row, left to right
  *             [ ] Add page (at left edge): add a page before the current page
- *                 [ ] When story is empty automatically create a blank page
- *         [ ] Center group, left to right
- *             [ ] Record (microphone button)
- *             [ ] "Playback" group
- *             [ ] Capture (camera button)
- *         [ ] Bottom
- *             [ ] Progress bar
- *             [ ] Page deletion button
- *         Future: [ ] Hide all buttons
- *                 [ ] Superimpose equalizer/volume feedback
- *                 [ ] During recording, single tap anywhere to zoom in (x2) and in zoom in tap anywhere to dismiss
- *                     [ ] Play back will be timed to these gestures ...
+ *             [ ] Add page (at right edge): add a page after the current page
+ *             [ ] When story is empty automatically create a blank page
+ *         [ ] Center group
+ *             [ ] Record (microphone button): on left of the "Playback group"
+ *             [ ] Capture (camera button): on right of the "Playback group"
+ *         [ ] Bottom: lower right corner: Page deletion button
+ *         Future: When recording --
+ *             [ ] Hide all buttons
+ *             [ ] Superimpose transparent equalizer/volume feedback
+ *             [ ] During recording, single tap anywhere to zoom in (x2) and in zoom-in tap anywhere to zoom out
+ *                 [ ] When play back, such transformations will be timed to the audio ...
+ *             [ ] Double tap to stop recording
  * [ ] Replace page image with photo       0.5-day
  *     [ ] Show preview
  *         Future: [ ] Exposure adjustment (up and down a notch or two)
+ *         Future: [ ] Capturing while recording
  *     [ ] Show capture button in the middle
  *     [ ] Replace page image
  * [ ] Page operations
@@ -105,6 +108,7 @@ Story Player UI:
  *     [ ] Show draggable progress bar.
  *         [ ] For audio?
  *         [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
+ *     [ ] Mode switching button: two layers of images, top one is colored; tapping it push the top down and bring bottom up
  *     [ ] Make buttons translucent & pretty
  * [ ] Google Drive integration -- This starts starts the sharing business
  * 
