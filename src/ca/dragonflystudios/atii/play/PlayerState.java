@@ -147,7 +147,6 @@ public class PlayerState {
     public void stopRecording() {
         if (isRecording(mCurrentPageNum)) {
             mCurrentPageFragment.stopRecording();
-            switchMode(PlayerMode.PLAYBACK);
         }
     }
 

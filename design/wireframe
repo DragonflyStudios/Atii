@@ -81,7 +81,6 @@ Story Player UI:
  *         [x] Middle row, left to right
  *             [x] Add page (at left edge): add a page before the current page
  *             [x] Add page (at right edge): add a page after the current page
- *             [ ] When story is empty automatically create a blank page
  *         [x] Center group
  *             [x] Record (microphone button): on left of the "Playback group"
  *             [x] Capture (camera button): on right of the "Playback group"
@@ -99,6 +98,7 @@ Story Player UI:
  *     [ ] Show capture button in the middle
  *     [ ] Replace page image
  * [ ] Page operations
+ *     [ ] When story is empty automatically create a blank page
  *     [ ] Add page after
  *     [ ] Add page before
  *     [ ] Delete page
@@ -110,7 +110,7 @@ Story Player UI:
  *     [ ] Mode switching button: two layers of images, top one is colored; tapping it push the top down and bring bottom up
  *     [ ] Make buttons translucent & pretty
  * [ ] Google Drive integration -- This starts starts the sharing business
- * [ ] GridView showing icons and titles of Stories for StoryListActivity
+ * [ ] GridView showing previews and titles of Stories for StoryListActivity
  *
  * Optional: [ ] PDF as source of page image
  *

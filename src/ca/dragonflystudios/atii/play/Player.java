@@ -1,17 +1,29 @@
 package ca.dragonflystudios.atii.play;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import android.content.Context;
+import android.hardware.Camera;
+import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import ca.dragonflystudios.android.media.CameraPreview;
 import ca.dragonflystudios.android.view.SeesawButton;
 import ca.dragonflystudios.atii.BookListActivity;
 import ca.dragonflystudios.atii.R;
@@ -45,6 +57,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mAdapter.setPlayerState(mPlayerState);
 
         setContentView(R.layout.player);
+        mPlayerMainView = (ViewGroup) findViewById(R.id.player_main);
+
         mPager = (AtiiViewPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
         mPager.setOnPageChangeListener(mAdapter);
@@ -86,13 +100,10 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mRecordButton = (ImageButton) mControlsView.findViewById(R.id.record);
         mRecordButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                toggleAllControls();
+                mControlsToggleAllowed = false;
                 mPlayerState.startRecording();
-            }
-        });
-        mStopButton = (ImageButton) mControlsView.findViewById(R.id.stop);
-        mStopButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                mPlayerState.stopRecording();
+                mStopButton.setVisibility(View.VISIBLE);
             }
         });
 
@@ -100,6 +111,18 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mCaptureButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mPlayerState.stopRecording();
+                // Create an instance of Camera
+                mCamera = getCameraInstance();
+
+                // Create our Preview view and set it as the content of our
+                // activity.
+                mPreview = new CameraPreview(Player.this, mCamera);
+                mPlayerMainView.addView(mPreview, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT));
+
+                mSnapButton = new SnapButton(Player.this);
+                mPlayerMainView.addView(mSnapButton, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
             }
         });
 
@@ -127,8 +150,30 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mCurrentRecordButton = mRecordButton;
         mPageNumView = (TextView) mControlsView.findViewById(R.id.page_num);
 
-        setPlayoutControlsVisibility(View.INVISIBLE, false);
+        mStopButton = (ImageButton) findViewById(R.id.stop);
+        mStopButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                mStopButton.setVisibility(View.INVISIBLE);
+                mPlayerState.stopRecording();
+                mControlsToggleAllowed = true;
+                toggleAllControls();
+            }
+        });
+        mStopButton.setVisibility(View.INVISIBLE);
+
+        setPlayoutControlsVisibility(View.INVISIBLE);
         hideAllControls();
+        mControlsToggleAllowed = true;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mCamera != null) {
+            mCamera.release();
+            mCamera = null;
+        }
     }
 
     public String getStoryTitle() {
@@ -155,7 +200,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     @Override
     // implementation for ReaderGestureListener
     public void onSingleTap(float x, float y) {
-        toggleAllControls();
+        if (mControlsToggleAllowed)
+            toggleAllControls();
     }
 
     @Override
@@ -200,10 +246,10 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     public void onModeChanged(PlayerMode newMode) {
         switch (newMode) {
         case PLAYBACK:
-            setPlayoutControlsVisibility(View.INVISIBLE, true);
+            setPlayoutControlsVisibility(View.INVISIBLE);
             break;
         case PLAYOUT:
-            setPlayoutControlsVisibility(View.VISIBLE, true);
+            setPlayoutControlsVisibility(View.VISIBLE);
             break;
         default:
             break;
@@ -237,13 +283,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         toggleViewVisibility(mControlsView);
     }
 
-    private void setPlayoutControlsVisibility(int visibility, boolean currentOnly) {
-        if (currentOnly)
-            mCurrentRecordButton.setVisibility(visibility);
-        else {
-            mRecordButton.setVisibility(visibility);
-            mStopButton.setVisibility(visibility);
-        }
+    private void setPlayoutControlsVisibility(int visibility) {
+        mRecordButton.setVisibility(visibility);
         mCaptureButton.setVisibility(visibility);
         mAddBeforeButton.setVisibility(visibility);
         mAddAfterButton.setVisibility(visibility);
@@ -257,6 +298,97 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
             v.setVisibility(View.VISIBLE);
     }
 
+    // TODO: refactor!
+    /** A safe way to get an instance of the Camera object. */
+    public static Camera getCameraInstance() {
+        Camera c = null;
+        try {
+            c = Camera.open(); // attempt to get a Camera instance
+        } catch (Exception e) {
+            // Camera is not available (in use or does not exist)
+        }
+        return c; // returns null if camera is unavailable
+    }
+
+    class SnapButton extends Button {
+        OnClickListener clicker = new OnClickListener() {
+            public void onClick(View v) {
+                mCamera.takePicture(null, null, mPicture);
+                mPlayerMainView.removeView(mPreview);
+                mPlayerMainView.removeView(mSnapButton);
+                mPreview = null;
+                mSnapButton = null;
+                if (mCamera != null) {
+                    mCamera.release();
+                    mCamera = null;
+                }
+            }
+        };
+
+        public SnapButton(Context ctx) {
+            super(ctx);
+            setText("!!!");
+            setOnClickListener(clicker);
+        }
+    }
+
+    private PictureCallback mPicture = new PictureCallback() {
+
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+
+            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+            if (pictureFile == null) {
+                Log.d("Talkie", "Error creating media file. Check storage permissions.");
+                return;
+            }
+
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                fos.write(data);
+                fos.close();
+            } catch (FileNotFoundException e) {
+                Log.d("Talkie", "File not found: " + e.getMessage());
+            } catch (IOException e) {
+                Log.d("Talkie", "Error accessing file: " + e.getMessage());
+            }
+        }
+    };
+
+    public static final int MEDIA_TYPE_IMAGE = 1;
+    public static final int MEDIA_TYPE_VIDEO = 2;
+
+    /** Create a File for saving an image or video */
+    private static File getOutputMediaFile(int type) {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Talkie");
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("MyCameraApp", "failed to create directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
+        } else if (type == MEDIA_TYPE_VIDEO) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_" + timeStamp + ".mp4");
+        } else {
+            return null;
+        }
+
+        return mediaFile;
+    }
+
     private String mStoryPath;
     private String mStoryTitle;
     private PlayerAdapter mAdapter;
@@ -268,8 +400,15 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     private ImageButton mAddBeforeButton, mAddAfterButton, mDeleteButton;
     private TextView mPageNumView;
 
+    private boolean mControlsToggleAllowed;
+
     private ViewGroup mControlsView;
+    private ViewGroup mPlayerMainView;
 
     private PlayerState mPlayerState;
+
+    private SnapButton mSnapButton = null;
+    private Camera mCamera = null;
+    private CameraPreview mPreview = null;
 
 }
