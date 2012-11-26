@@ -3,6 +3,9 @@
     <string name="app_name">Atii</string>
     <string name="title_activity_main">MainActivity</string>
 
+    <!-- page -->
+    <string name="page_image_view">Page Image View</string>
+
     <!-- modes -->
     <string name="mode">Play Back or Play Out</string>
     <string name="playback">Play Back</string>

@@ -73,6 +73,7 @@ Story Player UI:
  * [x] Differentiate Playback and Playout UIs
  *     [x] For now, hard code the difference; in the future ... could introduce "group" property for "command buttons"
  *     [x] A single "seesaw", visible on both sets of UIs, for quickly switching between the two sets of UIs
+ *         [x] Mode switching button: two layers of images, top one is colored; tapping it push the top down and bring bottom up
  *     [x] Playback
  *         [x] "Seesaw" at top right corner (where Settings would be)
  *         [x] "Playback group" (Play, Pause, Repeat) at center
@@ -91,28 +92,37 @@ Story Player UI:
  *             [ ] During recording, single tap anywhere to zoom in (x2) and in zoom-in tap anywhere to zoom out
  *                 [ ] When play back, such transformations will be timed to the audio ...
  *             [ ] Double tap to stop recording
+ * [ ] Refactor Player, PlayerState, PageFragment, PlayerAdapter stuff ...
  * [ ] Replace page image with photo       0.5-day
  *     [ ] Show preview
  *         Future: [ ] Exposure adjustment (up and down a notch or two)
  *         Future: [ ] Capturing while recording
  *     [ ] Show capture button in the middle
  *     [ ] Replace page image
+ *
+ * ......
+ *
  * [ ] Page operations
  *     [ ] When story is empty automatically create a blank page
  *     [ ] Add page after
  *     [ ] Add page before
  *     [ ] Delete page
+ *
+ * ......
+ *
+ * [ ] GridView showing previews and titles of Stories for StoryListActivity
+ *
+ * ......
+ *
  * [ ] Usability features
- *     [ ] Fading: during playback, disappears after a certain delay (e.g. 5 seconds); otherwise stays
+ *     [ ] Fading: during playback, controls disappear after a certain delay (e.g. 5 seconds); otherwise stays
  *     [ ] Show draggable progress bar.
  *         [ ] For audio?
  *         [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
- *     [ ] Mode switching button: two layers of images, top one is colored; tapping it push the top down and bring bottom up
  *     [ ] Make buttons translucent & pretty
  * [ ] Google Drive integration -- This starts starts the sharing business
- * [ ] GridView showing previews and titles of Stories for StoryListActivity
  *
- * Optional: [ ] PDF as source of page image
+ * [ ] PDF as source of page image
  *
  * ~~ The following opens up page image source to alternatives ~~
  * [ ] Playback a series of PDF pages      1-day

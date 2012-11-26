@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="4dip" >
 
-    <ca.dragonflystudios.atii.play.AtiiViewPager
+    <ca.dragonflystudios.atii.play.AtiiPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

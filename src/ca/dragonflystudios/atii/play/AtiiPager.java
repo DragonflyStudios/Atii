@@ -9,30 +9,39 @@ import android.view.MotionEvent;
 import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
 
-public class AtiiViewPager extends ViewPager implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
-    public AtiiViewPager(Context context) {
+public class AtiiPager extends ViewPager implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+    public AtiiPager(Context context) {
         super(context);
         init();
     }
 
-    public AtiiViewPager(Context context, AttributeSet attributes) {
+    public AtiiPager(Context context, AttributeSet attributes) {
         super(context, attributes);
         init();
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-       return super.onInterceptTouchEvent(ev);
+        return super.onInterceptTouchEvent(ev);
     }
 
     private void init() {
         mGestureDetector = new GestureDetector(getContext(), this);
         mGestureDetector.setIsLongpressEnabled(true);
         mGestureDetector.setOnDoubleTapListener(this);
+        mPageChangeEnabled = true;
     }
 
     public void setReaderGestureListener(ReaderGestureListener listener) {
         mListener = listener;
+    }
+
+    public boolean getPageChangeEnabled() {
+        return mPageChangeEnabled;
+    }
+
+    public void setPageChangeEnabled(boolean enabled) {
+        mPageChangeEnabled = enabled;
     }
 
     //
@@ -122,10 +131,11 @@ public class AtiiViewPager extends ViewPager implements GestureDetector.OnGestur
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!mGestureDetector.onTouchEvent(event))
+        if (!mGestureDetector.onTouchEvent(event) && mPageChangeEnabled)
             return super.onTouchEvent(event);
 
-        return true;
+        return false;
     }
 
+    private boolean mPageChangeEnabled;
 }

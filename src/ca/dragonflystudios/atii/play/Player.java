@@ -14,29 +14,49 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import ca.dragonflystudios.android.media.CameraPreview;
 import ca.dragonflystudios.android.view.SeesawButton;
 import ca.dragonflystudios.atii.BookListActivity;
 import ca.dragonflystudios.atii.R;
-import ca.dragonflystudios.atii.play.PlayerState.OnModeChangeListener;
-import ca.dragonflystudios.atii.play.PlayerState.OnPageChangeListener;
-import ca.dragonflystudios.atii.play.PlayerState.OnReplayChangeListener;
-import ca.dragonflystudios.atii.play.PlayerState.PlayerMode;
-import ca.dragonflystudios.atii.play.PlayerState.ReplayState;
+import ca.dragonflystudios.atii.play.Page.ReplayState;
+import ca.dragonflystudios.atii.play.PlayManager.OnModeChangeListener;
+import ca.dragonflystudios.atii.play.PlayManager.OnPageChangeListener;
+import ca.dragonflystudios.atii.play.PlayManager.OnReplayChangeListener;
+import ca.dragonflystudios.atii.play.PlayManager.PlayerMode;
 import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
-import ca.dragonflystudios.utilities.Pathname;
 
 public class Player extends FragmentActivity implements ReaderGestureListener, OnModeChangeListener, OnReplayChangeListener,
         OnPageChangeListener {
+
+    public interface PlayCommandHandler {
+
+        public void startAudioReplay();
+
+        public void pauseAudioReplay();
+
+        public void stopAudioReplay();
+
+        public void togglePlayMode();
+
+        public void startAudioRecording();
+
+        public void stopAudioRecording();
+
+        public void capturePhoto();
+
+        public void addPageBefore();
+
+        public void addPageAfter();
+
+        public void deletePage();
+    }
 
     // TODO: hide Playback buttons when there is no audio
 
@@ -45,53 +65,51 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        mStoryPath = getIntent().getExtras().getString(BookListActivity.STORY_EXTRA_KEY);
-        File storyDir = new File(mStoryPath);
-        mStoryTitle = Pathname.extractStem(storyDir.getName());
+        String storyPath = getIntent().getExtras().getString(BookListActivity.STORY_EXTRA_KEY);
 
-        // TODO: get the directory from intent and use that to initialize
-        // PlayerAdapter ...
-        mAdapter = new PlayerAdapter(getSupportFragmentManager(), storyDir);
-        mPlayerState = new PlayerState(mAdapter.getCount(), this, this, this);
-        mPlayerState.setAutoReplay(true);
-        mAdapter.setPlayerState(mPlayerState);
+        mPlayManager = new PlayManager(storyPath, this, this, this);
+        mPlayManager.setAutoReplay(true);
+
+        mAdapter = new AtiiPagerAdapter(getSupportFragmentManager(), mPlayManager);
 
         setContentView(R.layout.player);
         mPlayerMainView = (ViewGroup) findViewById(R.id.player_main);
 
-        mPager = (AtiiViewPager) findViewById(R.id.pager);
+        mPager = (AtiiPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
-        mPager.setOnPageChangeListener(mAdapter);
+        mPager.setOnPageChangeListener(mPlayManager);
         mPager.setReaderGestureListener(this);
+        mPager.setCurrentItem(mPlayManager.getInitialPage());
 
         mControlsView = (ViewGroup) findViewById(R.id.controls);
 
         mModeButton = (SeesawButton) mControlsView.findViewById(R.id.mode);
+        mModeButton.setSaw(mPlayManager.getCurrentMode() == PlayerMode.PLAYBACK);
         mModeButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mModeButton.seesaw();
-                mPlayerState.toggleMode();
+                mPlayManager.togglePlayMode();
             }
         });
 
         mPlayButton = (ImageButton) mControlsView.findViewById(R.id.play);
         mPlayButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPlayerState.startPlaying();
+                mPlayManager.startAudioReplay();
             }
         });
 
         mPauseButton = (ImageButton) mControlsView.findViewById(R.id.pause);
         mPauseButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPlayerState.pausePlaying();
+                mPlayManager.pauseAudioReplay();
             }
         });
 
         mRepeatButton = (ImageButton) mControlsView.findViewById(R.id.repeat);
         mRepeatButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPlayerState.startPlaying();
+                mPlayManager.startAudioReplay();
             }
         });
 
@@ -102,7 +120,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
             public void onClick(View v) {
                 toggleAllControls();
                 mControlsToggleAllowed = false;
-                mPlayerState.startRecording();
+                mPlayManager.startAudioRecording();
                 mStopButton.setVisibility(View.VISIBLE);
             }
         });
@@ -110,7 +128,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mCaptureButton = (ImageButton) mControlsView.findViewById(R.id.capture);
         mCaptureButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPlayerState.stopRecording();
+                mPlayManager.stopAudioRecording();
                 // Create an instance of Camera
                 mCamera = getCameraInstance();
 
@@ -129,21 +147,21 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mAddBeforeButton = (ImageButton) mControlsView.findViewById(R.id.add_before);
         mAddBeforeButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPlayerState.stopRecording();
+                mPlayManager.addPageBefore();
             }
         });
 
         mAddAfterButton = (ImageButton) mControlsView.findViewById(R.id.add_after);
         mAddAfterButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPlayerState.stopRecording();
+                mPlayManager.addPageAfter();
             }
         });
 
         mDeleteButton = (ImageButton) mControlsView.findViewById(R.id.delete);
         mDeleteButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPlayerState.stopRecording();
+                mPlayManager.deletePage();
             }
         });
 
@@ -154,7 +172,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mStopButton.setVisibility(View.INVISIBLE);
-                mPlayerState.stopRecording();
+                mPlayManager.stopAudioRecording();
                 mControlsToggleAllowed = true;
                 toggleAllControls();
             }
@@ -170,20 +188,13 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     public void onPause() {
         super.onPause();
 
+        mPlayManager.stopAudioReplay();
+        mPlayManager.stopAudioRecording();
+
         if (mCamera != null) {
             mCamera.release();
             mCamera = null;
         }
-    }
-
-    public String getStoryTitle() {
-        return mStoryTitle;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.player, menu);
-        return true;
     }
 
     @Override
@@ -194,7 +205,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     @Override
     // implementation for ReaderGestureListener
     public void onScaling(float scaling, float focusX, float focusY) {
-
     }
 
     @Override
@@ -209,6 +219,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     public void onReplayStateChanged(ReplayState newState) {
         switch (newState) {
         case NOT_STARTED:
+            mPager.setEnabled(true);
             switchPlaybackButton(mPlayButton);
             break;
         case PLAYING:
@@ -221,6 +232,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
             switchPlaybackButton(mRepeatButton);
             break;
         case RECORDING:
+            mPager.setEnabled(false);
             switchRecordButton(mStopButton);
         default:
             break;
@@ -235,7 +247,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         for (int i = 0; i < newPage; i++)
             sb.append(" ¥ ");
         sb.append(newPage + 1);
-        for (int i = newPage + 1; i < mPlayerState.getNumPages(); i++)
+        for (int i = newPage + 1; i < mPlayManager.getNumPages(); i++)
             sb.append(" ¥ ");
 
         mPageNumView.setText(sb);
@@ -262,7 +274,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
             mCurrentPlaybackButton = button;
         }
 
-        if (mPlayerState.hasAudioOnCurrentPage())
+        if (mPlayManager.hasAudioOnCurrentPage())
             mCurrentPlaybackButton.setVisibility(View.VISIBLE);
     }
 
@@ -389,10 +401,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         return mediaFile;
     }
 
-    private String mStoryPath;
-    private String mStoryTitle;
-    private PlayerAdapter mAdapter;
-    private AtiiViewPager mPager;
+    private AtiiPagerAdapter mAdapter;
+    private AtiiPager mPager;
     private SeesawButton mModeButton;
     private ImageButton mCurrentPlaybackButton, mPlayButton, mPauseButton, mRepeatButton;
     private ImageButton mCurrentRecordButton, mRecordButton, mStopButton;
@@ -405,7 +415,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     private ViewGroup mControlsView;
     private ViewGroup mPlayerMainView;
 
-    private PlayerState mPlayerState;
+    private PlayManager mPlayManager;
 
     private SnapButton mSnapButton = null;
     private Camera mCamera = null;
