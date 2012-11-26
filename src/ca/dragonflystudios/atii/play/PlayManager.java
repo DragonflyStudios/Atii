@@ -51,7 +51,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         mOnReplayChangeListener = rcl;
         mOnPageChangeListener = pcl;
 
-        mCurrentPageNum = getInitialPage();
+        setCurrentPageNum(getInitialPage());
     }
 
     public static String getDefaultPageImagePath() {

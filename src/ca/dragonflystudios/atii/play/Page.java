@@ -12,6 +12,9 @@ public class Page {
         INVALID, UNINITIALIZED, NO_AUDIO, NOT_STARTED, PLAYING, PAUSED, FINISHED, RECORDING
     }
 
+    // TODO: hide STATE so as to do appropriate lazy initialization!!!
+    //       SHOULD NOT expose UNITITIALIZED! Should use a boolean instead!
+    
     public ReplayState state;
 
     public Page(File imageFile) {

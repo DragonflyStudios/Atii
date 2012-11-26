@@ -167,6 +167,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
 
         mCurrentRecordButton = mRecordButton;
         mPageNumView = (TextView) mControlsView.findViewById(R.id.page_num);
+        updatePageNumView(mPlayManager.getInitialPage());
 
         mStopButton = (ImageButton) findViewById(R.id.stop);
         mStopButton.setOnClickListener(new OnClickListener() {
@@ -218,7 +219,11 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     // implementation for OnReplayChangeListener
     public void onReplayStateChanged(ReplayState newState) {
         switch (newState) {
+        case NO_AUDIO:
+            mCurrentPlaybackButton.setVisibility(View.INVISIBLE);
+            break;
         case NOT_STARTED:
+            // the following line is for switching back from recording
             mPager.setEnabled(true);
             switchPlaybackButton(mPlayButton);
             break;
@@ -242,6 +247,10 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     @Override
     // implementation for OnPageChangeListener
     public void onPageChanged(int newPage) {
+        updatePageNumView(newPage);
+    }
+
+    private void updatePageNumView(int newPage) {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < newPage; i++)
