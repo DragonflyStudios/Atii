@@ -178,6 +178,14 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        if (mPlayManager.isAutoReplay())
+            mPlayManager.startAudioReplay();
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
 
@@ -244,6 +252,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     }
 
     private void updateControls() {
+        mPager.setPageChangeEnabled(true);
+
         switch (mPlayManager.getPlayMode()) {
         case PLAYBACK:
             mModeButton.setSaw(true);
@@ -271,6 +281,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
                 updateAudioPlaybackButtons();
                 break;
             case RECORDING_AUDIO:
+                mPager.setPageChangeEnabled(false);
                 setPlayoutControlsVisibility(View.INVISIBLE);
                 mStopButton.setVisibility(View.VISIBLE);
                 break;
