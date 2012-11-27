@@ -22,7 +22,10 @@ public class AtiiPager extends ViewPager implements GestureDetector.OnGestureLis
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return super.onInterceptTouchEvent(ev);
+        if (mPageChangeEnabled)
+            return super.onInterceptTouchEvent(ev);
+
+        return false;
     }
 
     private void init() {

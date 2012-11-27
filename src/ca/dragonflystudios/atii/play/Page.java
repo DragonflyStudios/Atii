@@ -8,20 +8,30 @@ import ca.dragonflystudios.utilities.Pathname;
 
 public class Page {
 
-    public enum ReplayState {
-        INVALID, UNINITIALIZED, NO_AUDIO, NOT_STARTED, PLAYING, PAUSED, FINISHED, RECORDING
+    public enum AudioPlaybackState {
+        INVALID, NO_AUDIO, NOT_STARTED, PLAYING, PAUSED, FINISHED
     }
 
     // TODO: hide STATE so as to do appropriate lazy initialization!!!
-    //       SHOULD NOT expose UNITITIALIZED! Should use a boolean instead!
-    
-    public ReplayState state;
+    // SHOULD NOT expose UNITITIALIZED! Should use a boolean instead!
 
     public Page(File imageFile) {
         mImage = imageFile;
         mAudio = null;
         // uses lazy initialization
-        state = ReplayState.UNINITIALIZED;
+        mInitialized = false;
+        mState = AudioPlaybackState.INVALID;
+    }
+
+    public AudioPlaybackState getAudioPlaybackState() {
+        if (!mInitialized)
+            initializeAudioFile();
+
+        return mState;
+    }
+
+    public void setAudioPlaybackState(AudioPlaybackState s) {
+        mState = s;
     }
 
     public File getImage() {
@@ -35,7 +45,7 @@ public class Page {
     }
 
     public File getAudio() {
-        if (ReplayState.UNINITIALIZED == state)
+        if (!mInitialized)
             initializeAudioFile();
 
         return mAudio;
@@ -45,18 +55,18 @@ public class Page {
         mAudio = newAudio;
 
         if (null == mAudio)
-            state = ReplayState.UNINITIALIZED;
+            mInitialized = false;
         else if (mAudio.exists())
-            state = ReplayState.NOT_STARTED;
+            mState = AudioPlaybackState.NOT_STARTED;
         else
-            state = ReplayState.NO_AUDIO;
+            mState = AudioPlaybackState.NO_AUDIO;
     }
 
     public boolean hasAudio() {
-        if (ReplayState.UNINITIALIZED == state)
+        if (!mInitialized)
             initializeAudioFile();
 
-        return (ReplayState.NO_AUDIO != state);
+        return (AudioPlaybackState.NO_AUDIO != mState);
     }
 
     private void initializeAudioFile() {
@@ -64,11 +74,15 @@ public class Page {
         mAudio = new File(mImage.getParent(), nameStem + ".3gp");
 
         if (mAudio.exists())
-            state = ReplayState.NOT_STARTED;
+            mState = AudioPlaybackState.NOT_STARTED;
         else
-            state = ReplayState.NO_AUDIO;
+            mState = AudioPlaybackState.NO_AUDIO;
+
+        mInitialized = true;
     }
 
-    File mImage;
-    File mAudio;
+    private AudioPlaybackState mState;
+    private File mImage;
+    private File mAudio;
+    private boolean mInitialized;
 }

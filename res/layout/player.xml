@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:padding="4dip" >
+    android:padding="0dip" >
 
     <ca.dragonflystudios.atii.play.AtiiPager
         android:id="@+id/pager"
@@ -14,7 +14,7 @@
     <RelativeLayout
         android:id="@+id/controls"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:padding="5dp" >
 
@@ -93,6 +93,15 @@
             android:contentDescription="@string/record"
             android:src="@drawable/button_record" />
 
+        <ImageButton
+            android:id="@+id/stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/stop"
+            android:src="@drawable/button_stop" />
+
         <!-- Record End -->
 
 
@@ -147,14 +156,5 @@
         <!-- Page Editing End -->
 
     </RelativeLayout>
-
-    <ImageButton
-        android:id="@+id/stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/stop"
-        android:src="@drawable/button_stop" />
 
 </FrameLayout>

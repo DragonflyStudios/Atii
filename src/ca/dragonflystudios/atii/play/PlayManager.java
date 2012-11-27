@@ -12,7 +12,7 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import ca.dragonflystudios.atii.play.Page.ReplayState;
+import ca.dragonflystudios.atii.play.Page.AudioPlaybackState;
 import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
@@ -20,24 +20,47 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
     // TODO: auto (page) advance ...
 
-    public interface OnModeChangeListener {
-        public void onModeChanged(PlayerMode newMode);
-    }
+    public interface PlayChangeListener {
+        public void onModeChanged(PlayMode newMode);
 
-    public interface OnReplayChangeListener {
+        public void onPlayStateChanged(PlayState newState);
+
         // does not differentiate cross- vs. within-page state changes
-        public void onReplayStateChanged(ReplayState newState);
-    }
+        public void onAudioPlaybackStateChanged(AudioPlaybackState newState);
 
-    public interface OnPageChangeListener {
         public void onPageChanged(int newPage);
     }
 
-    public enum PlayerMode {
-        INVALID, PLAYBACK, PLAYOUT, RECORD, CAPTURE
+    public enum PlayMode {
+        INVALID, PLAYBACK, PLAYOUT
     }
 
-    public PlayManager(String storyPath, OnModeChangeListener mcl, OnReplayChangeListener rcl, OnPageChangeListener pcl) {
+    public enum PlayState {
+        IDLE, PLAYING_BACK_AUDIO, RECORDING_AUDIO, CAPTURING_PHOTO
+    }
+
+    public PlayMode getPlayMode() {
+        return mPlayMode;
+    }
+
+    public PlayState getPlayState() {
+        return mPlayState;
+    }
+
+    private void setPlayState(PlayState newState) {
+        if (mPlayState != newState) {
+            mPlayState = newState;
+
+            if (null != mPlayChangeListener)
+                mPlayChangeListener.onPlayStateChanged(newState);
+        }
+    }
+
+    public AudioPlaybackState getAudioPlaybackState() {
+        return mCurrentPage.getAudioPlaybackState();
+    }
+
+    public PlayManager(String storyPath, PlayChangeListener pcl) {
 
         File storyDir = new File(storyPath);
         mStoryPath = storyDir.getAbsolutePath();
@@ -46,12 +69,13 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         mPages = listPages(storyDir);
         mNumPages = mPages.size();
 
-        mCurrentMode = PlayerMode.PLAYBACK;
-        mOnModeChangeListener = mcl;
-        mOnReplayChangeListener = rcl;
-        mOnPageChangeListener = pcl;
+        mPlayMode = PlayMode.PLAYBACK;
+        mPlayState = PlayState.IDLE;
 
-        setCurrentPageNum(getInitialPage());
+        mPlayChangeListener = pcl;
+
+        mCurrentPageNum = 0;
+        mCurrentPage = mPages.get(mCurrentPageNum);
     }
 
     public static String getDefaultPageImagePath() {
@@ -76,7 +100,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public boolean isAutoReplay() {
-        return mAutoReplay && (mCurrentMode == PlayerMode.PLAYBACK);
+        return mAutoReplay && (mPlayMode == PlayMode.PLAYBACK);
     }
 
     public void setAutoReplay(boolean auto) {
@@ -92,74 +116,70 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public boolean hasAudioOnCurrentPage() {
-        return mPages.get(mCurrentPageNum).hasAudio();
+        return mCurrentPage.hasAudio();
     }
 
     public int getCurrentPageNum() {
         return mCurrentPageNum;
     }
 
-    public void setCurrentPageNum(int newPage) {
-        if (mCurrentPageNum != newPage) {
-            ReplayState oldState = (mCurrentPageNum >= 0) ? getState(mCurrentPageNum) : ReplayState.INVALID;
-            ReplayState newState = getState(newPage);
-            mCurrentPageNum = newPage;
+    private void setCurrentPage(int newPageNum) {
+        if (mCurrentPageNum != newPageNum) {
+            AudioPlaybackState oldState = getAudioPlaybackState(mCurrentPageNum);
+            AudioPlaybackState newState = getAudioPlaybackState(newPageNum);
+            mCurrentPageNum = newPageNum;
+            mCurrentPage = mPages.get(newPageNum);
 
-            if (null != mOnPageChangeListener)
-                mOnPageChangeListener.onPageChanged(newPage);
+            if (null != mPlayChangeListener)
+                mPlayChangeListener.onPageChanged(newPageNum);
 
-            if (oldState != newState && null != mOnReplayChangeListener)
-                mOnReplayChangeListener.onReplayStateChanged(newState);
+            if (oldState != newState && null != mPlayChangeListener)
+                mPlayChangeListener.onAudioPlaybackStateChanged(newState);
         }
     }
 
-    public ReplayState getState(int pageNum) {
-        return mPages.get(pageNum).state;
+    public AudioPlaybackState getAudioPlaybackState(int pageNum) {
+        return mPages.get(pageNum).getAudioPlaybackState();
     }
 
-    public void setState(int pageNum, ReplayState state) {
-        ReplayState oldState = getState(pageNum);
+    public void setAudioPlaybackState(int pageNum, AudioPlaybackState state) {
+        AudioPlaybackState oldState = getAudioPlaybackState(pageNum);
         if (oldState != state) {
-            mPages.get(pageNum).state = state;
-            if (mCurrentPageNum == pageNum && null != mOnReplayChangeListener)
-                mOnReplayChangeListener.onReplayStateChanged(state);
+            mPages.get(pageNum).setAudioPlaybackState(state);
+            if (mCurrentPageNum == pageNum && null != mPlayChangeListener)
+                mPlayChangeListener.onAudioPlaybackStateChanged(state);
         }
     }
 
-    public boolean isReplayNotStarted(int pageNum) {
-        return getState(pageNum) == ReplayState.NOT_STARTED;
+    private boolean isReplayNotStarted() {
+        return mCurrentPage.getAudioPlaybackState() == AudioPlaybackState.NOT_STARTED;
     }
 
-    public boolean isPlaying(int pageNum) {
-        return getState(pageNum) == ReplayState.PLAYING;
+    private boolean isPlaying() {
+        return mCurrentPage.getAudioPlaybackState() == AudioPlaybackState.PLAYING;
     }
 
-    public boolean isPaused(int pageNum) {
-        return getState(pageNum) == ReplayState.PAUSED;
+    private boolean isPaused() {
+        return mCurrentPage.getAudioPlaybackState() == AudioPlaybackState.PAUSED;
     }
 
-    public boolean isFinished(int pageNum) {
-        return getState(pageNum) == ReplayState.FINISHED;
+    private boolean isFinished() {
+        return mCurrentPage.getAudioPlaybackState() == AudioPlaybackState.FINISHED;
     }
 
-    public boolean isRecording(int pageNum) {
-        return getState(pageNum) == ReplayState.RECORDING;
-    }
-
-    public boolean hasAudio(int pageNum) {
-        return mPages.get(pageNum).hasAudio();
+    private boolean hasAudio() {
+        return mCurrentPage.hasAudio();
     }
 
     @Override
     // implementation for PlayCommandHandler
     public void startAudioReplay() {
-        if (hasAudio(mCurrentPageNum)
-                && (isReplayNotStarted(mCurrentPageNum) || isPaused(mCurrentPageNum) || isFinished(mCurrentPageNum))) {
+        if (hasAudio() && (isReplayNotStarted() || isPaused() || isFinished())) {
             if (null == mMediaPlayer) {
                 try {
                     mMediaPlayer = new MediaPlayer();
                     mMediaPlayer.setOnCompletionListener(this);
-                    mMediaPlayer.setDataSource(mPages.get(mCurrentPageNum).getAudio().getPath());
+                    mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
                     mMediaPlayer.prepare();
                 } catch (IOException e) {
                     Log.e(getClass().getName(), "prepare() failed with IOException");
@@ -168,56 +188,56 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
             }
 
             mMediaPlayer.start();
-            setState(mCurrentPageNum, ReplayState.PLAYING);
+            setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.PLAYING);
         }
     }
 
     @Override
     // implementation for PlayCommandHandler
     public void pauseAudioReplay() {
-        if (hasAudio(mCurrentPageNum) && (isPlaying(mCurrentPageNum)))
+        if (hasAudio() && (isPlaying()))
             if (null != mMediaPlayer) {
                 mMediaPlayer.pause();
-                setState(mCurrentPageNum, ReplayState.PAUSED);
+                setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.PAUSED);
             }
     }
 
     @Override
     // implementation for PlayCommandHandler
     public void stopAudioReplay() {
-        if (hasAudio(mCurrentPageNum) && isPlaying(mCurrentPageNum))
+        if (hasAudio() && (isPlaying() || isPaused()))
             if (null != mMediaPlayer) {
                 mMediaPlayer.release();
                 mMediaPlayer = null;
 
-                setState(mCurrentPageNum, ReplayState.FINISHED);
+                setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.FINISHED);
             }
     }
 
     @Override
     // implementation for PlayCommandHandler
     public void togglePlayMode() {
-        if (mCurrentMode != PlayerMode.PLAYBACK)
-            switchMode(PlayerMode.PLAYBACK);
+        if (mPlayMode != PlayMode.PLAYBACK)
+            switchPlayMode(PlayMode.PLAYBACK);
         else
-            switchMode(PlayerMode.PLAYOUT);
+            switchPlayMode(PlayMode.PLAYOUT);
     }
 
-    public void switchMode(PlayerMode newMode) {
+    public void switchPlayMode(PlayMode newMode) {
         switch (newMode) {
         case PLAYOUT:
-            if (PlayerMode.PLAYBACK == mCurrentMode) {
+            if (PlayMode.PLAYBACK == mPlayMode) {
                 stopAudioReplay();
-                mCurrentMode = newMode;
-                if (null != mOnModeChangeListener)
-                    mOnModeChangeListener.onModeChanged(newMode);
+                mPlayMode = newMode;
+                if (null != mPlayChangeListener)
+                    mPlayChangeListener.onModeChanged(newMode);
             }
             break;
         case PLAYBACK:
-            if (PlayerMode.PLAYOUT == mCurrentMode) {
-                mCurrentMode = newMode;
-                if (null != mOnModeChangeListener)
-                    mOnModeChangeListener.onModeChanged(newMode);
+            if (PlayMode.PLAYOUT == mPlayMode) {
+                mPlayMode = newMode;
+                if (null != mPlayChangeListener)
+                    mPlayChangeListener.onModeChanged(newMode);
             }
         default:
             break;
@@ -234,7 +254,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
                 mMediaRecorder = new MediaRecorder();
                 mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                 mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                mMediaRecorder.setOutputFile(mPages.get(mCurrentPageNum).getAudio().getPath());
+                mMediaRecorder.setOutputFile(mCurrentPage.getAudio().getPath());
                 mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
                 mMediaRecorder.prepare();
@@ -243,20 +263,21 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
             }
         }
 
+        setPlayState(PlayState.RECORDING_AUDIO);
         mMediaRecorder.start();
-        setState(mCurrentPageNum, ReplayState.RECORDING);
     }
 
     @Override
     // implementation for PlayCommandHandler
     public void stopAudioRecording() {
-        if (isRecording(mCurrentPageNum)) {
+        if (mPlayState == PlayState.RECORDING_AUDIO) {
             if (null != mMediaRecorder) {
                 mMediaRecorder.stop();
                 mMediaRecorder.release();
                 mMediaRecorder = null;
 
-                setState(mCurrentPageNum, ReplayState.NOT_STARTED);
+                setPlayState(PlayState.IDLE);
+                setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.NOT_STARTED);
             }
         }
     }
@@ -281,10 +302,6 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     public void deletePage() {
     }
 
-    public PlayerMode getCurrentMode() {
-        return mCurrentMode;
-    }
-
     @Override
     // implementation for MediaPlayer.OnCompletionListener
     public void onCompletion(MediaPlayer mp) {
@@ -303,7 +320,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         if (mCurrentPageNum != position) {
             stopAudioReplay();
 
-            setCurrentPageNum(position);
+            setCurrentPage(position);
 
             if (isAutoReplay())
                 startAudioReplay();
@@ -357,12 +374,12 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     private boolean mAutoReplay;
 
     private int mCurrentPageNum;
+    private Page mCurrentPage;
 
-    private PlayerMode mCurrentMode;
+    private PlayMode mPlayMode;
+    private PlayState mPlayState;
 
-    private OnModeChangeListener mOnModeChangeListener;
-    private OnReplayChangeListener mOnReplayChangeListener;
-    private OnPageChangeListener mOnPageChangeListener;
+    private PlayChangeListener mPlayChangeListener;
 
     private MediaPlayer mMediaPlayer;
     private MediaRecorder mMediaRecorder;

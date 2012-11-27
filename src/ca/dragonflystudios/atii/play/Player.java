@@ -23,17 +23,17 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import ca.dragonflystudios.android.media.CameraPreview;
 import ca.dragonflystudios.android.view.SeesawButton;
-import ca.dragonflystudios.atii.BookListActivity;
+import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.R;
-import ca.dragonflystudios.atii.play.Page.ReplayState;
-import ca.dragonflystudios.atii.play.PlayManager.OnModeChangeListener;
-import ca.dragonflystudios.atii.play.PlayManager.OnPageChangeListener;
-import ca.dragonflystudios.atii.play.PlayManager.OnReplayChangeListener;
-import ca.dragonflystudios.atii.play.PlayManager.PlayerMode;
+import ca.dragonflystudios.atii.play.Page.AudioPlaybackState;
+import ca.dragonflystudios.atii.play.PlayManager.PlayChangeListener;
+import ca.dragonflystudios.atii.play.PlayManager.PlayMode;
+import ca.dragonflystudios.atii.play.PlayManager.PlayState;
 import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
 
-public class Player extends FragmentActivity implements ReaderGestureListener, OnModeChangeListener, OnReplayChangeListener,
-        OnPageChangeListener {
+public class Player extends FragmentActivity implements ReaderGestureListener, PlayChangeListener {
+
+    public static final String STORY_EXTRA_KEY = "STORY_FOLDER_NAME";
 
     public interface PlayCommandHandler {
 
@@ -65,9 +65,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        String storyPath = getIntent().getExtras().getString(BookListActivity.STORY_EXTRA_KEY);
+        String storyPath = getIntent().getExtras().getString(STORY_EXTRA_KEY);
 
-        mPlayManager = new PlayManager(storyPath, this, this, this);
+        mPlayManager = new PlayManager(storyPath, this);
         mPlayManager.setAutoReplay(true);
 
         mAdapter = new AtiiPagerAdapter(getSupportFragmentManager(), mPlayManager);
@@ -84,7 +84,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mControlsView = (ViewGroup) findViewById(R.id.controls);
 
         mModeButton = (SeesawButton) mControlsView.findViewById(R.id.mode);
-        mModeButton.setSaw(mPlayManager.getCurrentMode() == PlayerMode.PLAYBACK);
+        mModeButton.setSaw(mPlayManager.getPlayMode() == PlayMode.PLAYBACK);
         mModeButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mModeButton.seesaw();
@@ -113,15 +113,11 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
             }
         });
 
-        mCurrentPlaybackButton = mPlayButton;
-
         mRecordButton = (ImageButton) mControlsView.findViewById(R.id.record);
         mRecordButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                toggleAllControls();
                 mControlsToggleAllowed = false;
                 mPlayManager.startAudioRecording();
-                mStopButton.setVisibility(View.VISIBLE);
             }
         });
 
@@ -165,24 +161,20 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
             }
         });
 
-        mCurrentRecordButton = mRecordButton;
         mPageNumView = (TextView) mControlsView.findViewById(R.id.page_num);
         updatePageNumView(mPlayManager.getInitialPage());
 
         mStopButton = (ImageButton) findViewById(R.id.stop);
         mStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mStopButton.setVisibility(View.INVISIBLE);
                 mPlayManager.stopAudioRecording();
                 mControlsToggleAllowed = true;
-                toggleAllControls();
             }
         });
-        mStopButton.setVisibility(View.INVISIBLE);
 
-        setPlayoutControlsVisibility(View.INVISIBLE);
-        hideAllControls();
+        updateControls();
         mControlsToggleAllowed = true;
+        hideAllControls();
     }
 
     @Override
@@ -216,36 +208,13 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     }
 
     @Override
-    // implementation for OnReplayChangeListener
-    public void onReplayStateChanged(ReplayState newState) {
-        switch (newState) {
-        case NO_AUDIO:
-            mCurrentPlaybackButton.setVisibility(View.INVISIBLE);
-            break;
-        case NOT_STARTED:
-            // the following line is for switching back from recording
-            mPager.setEnabled(true);
-            switchPlaybackButton(mPlayButton);
-            break;
-        case PLAYING:
-            switchPlaybackButton(mPauseButton);
-            break;
-        case PAUSED:
-            switchPlaybackButton(mPlayButton);
-            break;
-        case FINISHED:
-            switchPlaybackButton(mRepeatButton);
-            break;
-        case RECORDING:
-            mPager.setEnabled(false);
-            switchRecordButton(mStopButton);
-        default:
-            break;
-        }
+    // implementation for PlayChangeListener
+    public void onAudioPlaybackStateChanged(AudioPlaybackState newState) {
+        updateControls();
     }
 
     @Override
-    // implementation for OnPageChangeListener
+    // implementation for PlayChangeListener
     public void onPageChanged(int newPage) {
         updatePageNumView(newPage);
     }
@@ -263,45 +232,89 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
     }
 
     @Override
-    // implementation for OnModeChangeListener
-    public void onModeChanged(PlayerMode newMode) {
-        switch (newMode) {
+    // implementation for PlayChangeListener
+    public void onModeChanged(PlayMode newMode) {
+        updateControls();
+    }
+
+    @Override
+    // implementation for PlayChangeListener
+    public void onPlayStateChanged(PlayState newState) {
+        updateControls();
+    }
+
+    private void updateControls() {
+        switch (mPlayManager.getPlayMode()) {
         case PLAYBACK:
+            mModeButton.setSaw(true);
             setPlayoutControlsVisibility(View.INVISIBLE);
+            mStopButton.setVisibility(View.INVISIBLE);
+            switch (mPlayManager.getPlayState()) {
+            case IDLE:
+            case PLAYING_BACK_AUDIO:
+                updateAudioPlaybackButtons();
+                break;
+            default:
+                if (BuildConfig.DEBUG)
+                    throw new IllegalStateException("illegal play state in playback mode");
+                else
+                    return;
+            }
             break;
         case PLAYOUT:
-            setPlayoutControlsVisibility(View.VISIBLE);
+            mModeButton.setSaw(false);
+            switch (mPlayManager.getPlayState()) {
+            case IDLE:
+            case PLAYING_BACK_AUDIO:
+                setPlayoutControlsVisibility(View.VISIBLE);
+                mStopButton.setVisibility(View.INVISIBLE);
+                updateAudioPlaybackButtons();
+                break;
+            case RECORDING_AUDIO:
+                setPlayoutControlsVisibility(View.INVISIBLE);
+                mStopButton.setVisibility(View.VISIBLE);
+                break;
+            case CAPTURING_PHOTO:
+                break;
+            }
             break;
         default:
             break;
         }
     }
 
+    private void updateAudioPlaybackButtons() {
+        switch (mPlayManager.getAudioPlaybackState()) {
+        case NO_AUDIO:
+            switchPlaybackButton(null);
+            break;
+        case NOT_STARTED:
+            switchPlaybackButton(mPlayButton);
+            break;
+        case PLAYING:
+            switchPlaybackButton(mPauseButton);
+            break;
+        case PAUSED:
+            switchPlaybackButton(mPlayButton);
+            break;
+        case FINISHED:
+            switchPlaybackButton(mRepeatButton);
+            break;
+        default:
+            if (BuildConfig.DEBUG)
+                throw new IllegalStateException("invalid audio playback state");
+            else
+                return;
+        }
+    }
+
     private void switchPlaybackButton(ImageButton button) {
-        if (mCurrentPlaybackButton != button) {
-            mCurrentPlaybackButton.setVisibility(View.INVISIBLE);
-            mCurrentPlaybackButton = button;
-        }
+        mPlayButton.setVisibility(View.INVISIBLE);
+        mPauseButton.setVisibility(View.INVISIBLE);
+        mRepeatButton.setVisibility(View.INVISIBLE);
 
-        if (mPlayManager.hasAudioOnCurrentPage())
-            mCurrentPlaybackButton.setVisibility(View.VISIBLE);
-    }
-
-    private void switchRecordButton(ImageButton button) {
-        if (mCurrentRecordButton != button) {
-            mCurrentRecordButton.setVisibility(View.INVISIBLE);
-            mCurrentRecordButton = button;
-        }
-
-        mCurrentRecordButton.setVisibility(View.VISIBLE);
-    }
-
-    private void hideAllControls() {
-        mControlsView.setVisibility(View.INVISIBLE);
-    }
-
-    private void toggleAllControls() {
-        toggleViewVisibility(mControlsView);
+        if (null != button)
+            button.setVisibility(View.VISIBLE);
     }
 
     private void setPlayoutControlsVisibility(int visibility) {
@@ -310,6 +323,14 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         mAddBeforeButton.setVisibility(visibility);
         mAddAfterButton.setVisibility(visibility);
         mDeleteButton.setVisibility(visibility);
+    }
+
+    private void hideAllControls() {
+        mControlsView.setVisibility(View.INVISIBLE);
+    }
+
+    private void toggleAllControls() {
+        toggleViewVisibility(mControlsView);
     }
 
     private void toggleViewVisibility(View v) {
@@ -410,21 +431,20 @@ public class Player extends FragmentActivity implements ReaderGestureListener, O
         return mediaFile;
     }
 
+    private PlayManager mPlayManager;
     private AtiiPagerAdapter mAdapter;
     private AtiiPager mPager;
+    private ViewGroup mPlayerMainView;
+
+    private ViewGroup mControlsView;
     private SeesawButton mModeButton;
-    private ImageButton mCurrentPlaybackButton, mPlayButton, mPauseButton, mRepeatButton;
-    private ImageButton mCurrentRecordButton, mRecordButton, mStopButton;
+    private ImageButton mPlayButton, mPauseButton, mRepeatButton;
+    private ImageButton mRecordButton, mStopButton;
     private ImageButton mCaptureButton;
     private ImageButton mAddBeforeButton, mAddAfterButton, mDeleteButton;
     private TextView mPageNumView;
 
     private boolean mControlsToggleAllowed;
-
-    private ViewGroup mControlsView;
-    private ViewGroup mPlayerMainView;
-
-    private PlayManager mPlayManager;
 
     private SnapButton mSnapButton = null;
     private Camera mCamera = null;

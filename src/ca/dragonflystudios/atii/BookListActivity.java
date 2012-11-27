@@ -36,7 +36,6 @@ import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 public class BookListActivity extends Activity
 {
-    public static final String  STORY_EXTRA_KEY = "STORY_FOLDER_NAME";
     private static final String SETTINGS        = "atii_settings";
     private static final String FIRST_LAUNCH    = "first_launch";
 
@@ -75,13 +74,12 @@ public class BookListActivity extends Activity
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
                 Intent playIntent = new Intent(BookListActivity.this, Player.class);
-                playIntent.putExtra(STORY_EXTRA_KEY, mBookDirs.get(position).getAbsolutePath());
+                playIntent.putExtra(Player.STORY_EXTRA_KEY, mBookDirs.get(position).getAbsolutePath());
                 startActivity(playIntent);
             }
         });
 
         setContentView(mBookListView);
-        mActionBar = getActionBar();
     }
 
     private static class BookListAdapter extends ArrayAdapter<File>
@@ -147,7 +145,6 @@ public class BookListActivity extends Activity
     private ArrayList<File> mBookDirs;
     private ListView        mBookListView;
     private BookListAdapter mBookListAdapter;
-    private ActionBar       mActionBar;
 
     private static Context  sAppContext;
 }
