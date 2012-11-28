@@ -92,9 +92,11 @@ Story Player UI:
  *     [x] Snap & Done buttons
  *     [x] Replace page image
  *     [x] Use temp file, which is only copied to replace page image upon "Done"
- *     [ ] Replace "Snap" with "Retake" after first "snap" & reactivate preview
+ *     [x] Replace "Snap" with "Retake" after first "snap" & reactivate preview
  *     [x] Cancel button & function
+ *     [ ] Fix crashing on Nexus 7
  *     [ ] Auto-focus
+ *     [ ] Aspect ratio
  *     [ ] Exposure adjustment (up and down a notch or two)
  *         [x] '+' and '-' above and below 'Snap' button
  *     [ ] Device rotation  & orientation handling
@@ -121,6 +123,8 @@ Story Player UI:
  *
  * ......
  *
+ * [ ] Should seriously consider using other apps for photo capture
+ * [ ] Should seriously consider using other apps for audio recording
  * [ ] Add UI for using any image on device (copy over) -- allow panning, zooming & cropping.
  * [ ] Add UI for using any audio on device (copy over) -- is this a good idea?
  *

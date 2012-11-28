@@ -21,10 +21,6 @@ import ca.dragonflystudios.utilities.Files;
 
 public class PhotoSnapper implements PictureCallback {
 
-    // TODO: retake logic -- take one, show one for a few seconds; then allow
-    // taking another one -- show "Retake" button; one is happy enough then
-    // press "Done"
-
     public interface OnCompletionListener {
         public void onPhotoSnapperCompletion(File photoFile, boolean success);
     }
@@ -52,12 +48,23 @@ public class PhotoSnapper implements PictureCallback {
             public void onClick(View v) {
             }
         });
-        mSnapButton = (Button) mButtonsView.findViewById(R.id.snap_button);
-        mSnapButton.setOnClickListener(new OnClickListener() {
+        
+        mSnapListener = new OnClickListener() {
             public void onClick(View v) {
                 mCamera.takePicture(null, null, PhotoSnapper.this);
+                mSnapButton.setText(mHostView.getContext().getResources().getText(R.string.retake));
+                mSnapButton.setOnClickListener(mRetakeListener);
             }
-        });
+        };
+        mRetakeListener = new OnClickListener() {
+            public void onClick(View v) {
+                mCamera.startPreview();
+                mSnapButton.setText(mHostView.getContext().getResources().getText(R.string.snap));
+                mSnapButton.setOnClickListener(mSnapListener);
+            }
+        };
+        mSnapButton = (Button) mButtonsView.findViewById(R.id.snap_button);
+        mSnapButton.setOnClickListener(mSnapListener);
         mExposureMinusButton = (Button) mButtonsView.findViewById(R.id.exposure_minus_button);
         mExposureMinusButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -164,6 +171,7 @@ public class PhotoSnapper implements PictureCallback {
     private String mPhotoFilePath;
     private CameraPreview mPreview;
     private Button mDoneButton, mCancelButton, mExposurePlusButton, mSnapButton, mExposureMinusButton;
+    private OnClickListener mSnapListener, mRetakeListener;
     private Camera mCamera;
 
     private OnCompletionListener mPSL;
