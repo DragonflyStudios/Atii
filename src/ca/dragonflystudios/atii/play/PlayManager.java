@@ -2,15 +2,11 @@ package ca.dragonflystudios.atii.play;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import android.hardware.Camera;
-import android.hardware.Camera.PictureCallback;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -23,7 +19,7 @@ import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener,
-        PictureCallback {
+        PhotoSnapper.OnCompletionListener {
 
     // TODO: auto (page) advance ...
 
@@ -294,7 +290,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     @Override
     // implementation for PlayCommandHandler
     public void capturePhoto(ViewGroup hostView) {
-        mPhotoSnapper = new PhotoSnapper(hostView, this);
+        new PhotoSnapper(hostView, mCurrentPage.getImagePath(), this);
     }
 
     @Override
@@ -348,22 +344,10 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     public void onPageScrollStateChanged(int state) {
     }
 
-    // TODO: put this callback into PhotoSnapper and use a temp file ...
-    //       copy the temp file over when "Done"
     @Override
-    // implementation for PictureCallback
-    public void onPictureTaken(byte[] data, Camera camera) {
-        try {
-            FileOutputStream fos = new FileOutputStream(mCurrentPage.getImage());
-            fos.write(data);
-            fos.close();
-        } catch (FileNotFoundException e) {
-            Log.d(getClass().getName(), "File not found: " + e.getMessage());
-        } catch (IOException e) {
-            Log.d(getClass().getName(), "Error accessing file: " + e.getMessage());
-        }
-
-        if (null != mPlayChangeListener) {
+    // implementation for PhotoSnapper.OnCompletionListener
+    public void onPhotoSnapperCompletion(File photoFile, boolean success) {
+        if (success && null != mPlayChangeListener) {
             mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
         }
     }
@@ -419,5 +403,4 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
     private MediaPlayer mMediaPlayer;
     private MediaRecorder mMediaRecorder;
-    private PhotoSnapper mPhotoSnapper;
 }

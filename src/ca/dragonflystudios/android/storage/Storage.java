@@ -5,27 +5,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.util.Log;
 import ca.dragonflystudios.utilities.Streams;
+import ca.dragonflystudios.utilities.Time;
 
-public class Storage
-{
+public class Storage {
 
-    public static boolean isExternalStorageAvailable()
-    {
+    public static boolean isExternalStorageAvailable() {
         String state = Environment.getExternalStorageState();
         return (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state));
     }
 
-    public static boolean isExternalStorageWriteable()
-    {
+    public static boolean isExternalStorageWriteable() {
         return (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()));
     }
 
-    public static void copyAssets(AssetManager assetManager, String srcPath, String dstPath)
-    {
+    public static void copyAssets(AssetManager assetManager, String srcPath, String dstPath) {
         String assets[] = null;
         try {
             assets = assetManager.list(srcPath);
@@ -47,4 +45,15 @@ public class Storage
         }
     }
 
+    public static File getTempFile(Context context) {
+        File cacheDir = context.getExternalCacheDir();
+
+        if (null == cacheDir)
+            cacheDir = context.getCacheDir();
+
+        if (null != cacheDir)
+            return new File(cacheDir, "_dragons_do_not_fly_" + Time.getTimeStamp() + ".tmp");
+    
+        return null;
+    }
 }

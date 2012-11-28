@@ -91,11 +91,12 @@ Story Player UI:
  *     [x] Show preview
  *     [x] Snap & Done buttons
  *     [x] Replace page image
- *     [ ] Use temp file, which is only copied to replace page image upon "Done"
- *     [ ] Cancel button & function
+ *     [x] Use temp file, which is only copied to replace page image upon "Done"
+ *     [ ] Replace "Snap" with "Retake" after first "snap" & reactivate preview
+ *     [x] Cancel button & function
  *     [ ] Auto-focus
  *     [ ] Exposure adjustment (up and down a notch or two)
- *         [ ] '+' and '-' above and below 'Snap' button
+ *         [x] '+' and '-' above and below 'Snap' button
  *     [ ] Device rotation  & orientation handling
  *
  * ......
@@ -105,7 +106,7 @@ Story Player UI:
  *     [ ] Add page after
  *     [ ] Add page before
  *     [ ] Delete page
- * [ ] Will need a bit of "file format"
+ * [ ] Need a bit of "file format"
  *     - Use an XML file for list of pages, with each item in the list pointing to a file
  *     - Still honors the one-image-one-audio policy.
  *
