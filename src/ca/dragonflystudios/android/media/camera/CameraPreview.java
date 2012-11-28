@@ -1,4 +1,4 @@
-package ca.dragonflystudios.android.media;
+package ca.dragonflystudios.android.media.camera;
 
 import java.io.IOException;
 

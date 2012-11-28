@@ -81,6 +81,10 @@ public class Page {
         mInitialized = true;
     }
 
+    public String getImagePath() {
+        return mImage.getAbsolutePath();
+    }
+
     private AudioPlaybackState mState;
     private File mImage;
     private File mAudio;

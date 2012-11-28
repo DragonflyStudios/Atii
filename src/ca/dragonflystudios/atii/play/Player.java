@@ -1,27 +1,13 @@
 package ca.dragonflystudios.atii.play;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import android.content.Context;
-import android.hardware.Camera;
-import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import ca.dragonflystudios.android.media.CameraPreview;
 import ca.dragonflystudios.android.view.SeesawButton;
 import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.R;
@@ -49,7 +35,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
         public void stopAudioRecording();
 
-        public void capturePhoto();
+        public void capturePhoto(ViewGroup hostView);
+
+        public void stopPhotoCapture();
 
         public void addPageBefore();
 
@@ -124,19 +112,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mCaptureButton = (ImageButton) mControlsView.findViewById(R.id.capture);
         mCaptureButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPlayManager.stopAudioRecording();
-                // Create an instance of Camera
-                mCamera = getCameraInstance();
-
-                // Create our Preview view and set it as the content of our
-                // activity.
-                mPreview = new CameraPreview(Player.this, mCamera);
-                mPlayerMainView.addView(mPreview, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT));
-
-                mSnapButton = new SnapButton(Player.this);
-                mPlayerMainView.addView(mSnapButton, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                mPlayManager.capturePhoto(mPlayerMainView);
             }
         });
 
@@ -191,11 +167,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
         mPlayManager.stopAudioReplay();
         mPlayManager.stopAudioRecording();
-
-        if (mCamera != null) {
-            mCamera.release();
-            mCamera = null;
-        }
+        mPlayManager.stopPhotoCapture();
     }
 
     @Override
@@ -249,6 +221,16 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     // implementation for PlayChangeListener
     public void onPlayStateChanged(PlayState newState) {
         updateControls();
+    }
+
+    @Override
+    // implementation for PlayChangeListener
+    public void onPageImageChanged(int pageNum) {
+        mPager.setAdapter(mAdapter);
+        mPager.setCurrentItem(pageNum);
+
+        // the following line doesn't work!
+        // mAdapter.notifyDataSetChanged();
     }
 
     private void updateControls() {
@@ -351,97 +333,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             v.setVisibility(View.VISIBLE);
     }
 
-    // TODO: refactor!
-    /** A safe way to get an instance of the Camera object. */
-    public static Camera getCameraInstance() {
-        Camera c = null;
-        try {
-            c = Camera.open(); // attempt to get a Camera instance
-        } catch (Exception e) {
-            // Camera is not available (in use or does not exist)
-        }
-        return c; // returns null if camera is unavailable
-    }
-
-    class SnapButton extends Button {
-        OnClickListener clicker = new OnClickListener() {
-            public void onClick(View v) {
-                mCamera.takePicture(null, null, mPicture);
-                mPlayerMainView.removeView(mPreview);
-                mPlayerMainView.removeView(mSnapButton);
-                mPreview = null;
-                mSnapButton = null;
-                if (mCamera != null) {
-                    mCamera.release();
-                    mCamera = null;
-                }
-            }
-        };
-
-        public SnapButton(Context ctx) {
-            super(ctx);
-            setText("!!!");
-            setOnClickListener(clicker);
-        }
-    }
-
-    private PictureCallback mPicture = new PictureCallback() {
-
-        @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
-
-            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            if (pictureFile == null) {
-                Log.d("Talkie", "Error creating media file. Check storage permissions.");
-                return;
-            }
-
-            try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
-                fos.close();
-            } catch (FileNotFoundException e) {
-                Log.d("Talkie", "File not found: " + e.getMessage());
-            } catch (IOException e) {
-                Log.d("Talkie", "Error accessing file: " + e.getMessage());
-            }
-        }
-    };
-
-    public static final int MEDIA_TYPE_IMAGE = 1;
-    public static final int MEDIA_TYPE_VIDEO = 2;
-
-    /** Create a File for saving an image or video */
-    private static File getOutputMediaFile(int type) {
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Talkie");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
-        } else if (type == MEDIA_TYPE_VIDEO) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator + "VID_" + timeStamp + ".mp4");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
-    }
-
     private PlayManager mPlayManager;
     private AtiiPagerAdapter mAdapter;
     private AtiiPager mPager;
@@ -456,9 +347,5 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     private TextView mPageNumView;
 
     private boolean mControlsToggleAllowed;
-
-    private SnapButton mSnapButton = null;
-    private Camera mCamera = null;
-    private CameraPreview mPreview = null;
 
 }

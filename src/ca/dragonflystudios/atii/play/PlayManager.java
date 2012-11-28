@@ -2,21 +2,28 @@ package ca.dragonflystudios.atii.play;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import android.hardware.Camera;
+import android.hardware.Camera.PictureCallback;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.ViewGroup;
+import ca.dragonflystudios.android.media.camera.PhotoSnapper;
 import ca.dragonflystudios.atii.play.Page.AudioPlaybackState;
 import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
-public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener {
+public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener,
+        PictureCallback {
 
     // TODO: auto (page) advance ...
 
@@ -29,6 +36,8 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         public void onAudioPlaybackStateChanged(AudioPlaybackState newState);
 
         public void onPageChanged(int newPage);
+
+        public void onPageImageChanged(int pageNum);
     }
 
     public enum PlayMode {
@@ -284,7 +293,14 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
     @Override
     // implementation for PlayCommandHandler
-    public void capturePhoto() {
+    public void capturePhoto(ViewGroup hostView) {
+        mPhotoSnapper = new PhotoSnapper(hostView, this);
+    }
+
+    @Override
+    // implementation for PlayCommandHandler
+    public void stopPhotoCapture() {
+
     }
 
     @Override
@@ -330,6 +346,26 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     @Override
     // implementation for OnPageChangeListener
     public void onPageScrollStateChanged(int state) {
+    }
+
+    // TODO: put this callback into PhotoSnapper and use a temp file ...
+    //       copy the temp file over when "Done"
+    @Override
+    // implementation for PictureCallback
+    public void onPictureTaken(byte[] data, Camera camera) {
+        try {
+            FileOutputStream fos = new FileOutputStream(mCurrentPage.getImage());
+            fos.write(data);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            Log.d(getClass().getName(), "File not found: " + e.getMessage());
+        } catch (IOException e) {
+            Log.d(getClass().getName(), "Error accessing file: " + e.getMessage());
+        }
+
+        if (null != mPlayChangeListener) {
+            mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
+        }
     }
 
     private ArrayList<Page> listPages(File storyDir) {
@@ -383,4 +419,5 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
     private MediaPlayer mMediaPlayer;
     private MediaRecorder mMediaRecorder;
+    private PhotoSnapper mPhotoSnapper;
 }

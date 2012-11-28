@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import ca.dragonflystudios.android.media.camera.CameraPreview;
+
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;

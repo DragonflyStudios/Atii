@@ -86,14 +86,8 @@ Story Player UI:
  *             [x] Record (microphone button): on left of the "Playback group"
  *             [x] Capture (camera button): on right of the "Playback group"
  *         [x] Bottom: lower right corner: Page deletion button
- *         Future: When recording --
- *             [ ] Hide all buttons
- *             [ ] Superimpose transparent equalizer/volume feedback
- *             [ ] During recording, single tap anywhere to zoom in (x2) and in zoom-in tap anywhere to zoom out
- *                 [ ] When play back, such transformations will be timed to the audio ...
- *             [ ] Double tap to stop recording
- * [ ] Refactor Player, PlayerState, PageFragment, PlayerAdapter stuff ...
- * [ ] Replace page image with photo       0.5-day
+ * [x] Refactor Player, PlayerState, PageFragment, PlayerAdapter stuff ...
+ * [ ] Replace page image with photo       1-day
  *     [ ] Show preview
  *         Future: [ ] Exposure adjustment (up and down a notch or two)
  *         Future: [ ] Capturing while recording
@@ -107,10 +101,22 @@ Story Player UI:
  *     [ ] Add page after
  *     [ ] Add page before
  *     [ ] Delete page
+ * [ ] Will need a bit of "file format"
+ *     - Still honors the one-image-one-audio policy.
  *
  * ......
  *
+ * [ ] HTML5 starts
+ * [ ] Generate time-lapse videos
+ *
+ * ......
+ * 
  * [ ] GridView showing previews and titles of Stories for StoryListActivity
+ *
+ * ......
+ *
+ * [ ] Add UI for using any image on device (copy over)
+ * [ ] Add UI for using any audio on device (copy over)
  *
  * ......
  *
@@ -120,15 +126,27 @@ Story Player UI:
  *         [ ] For audio?
  *         [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
  *     [ ] Make buttons translucent & pretty
- * [ ] Google Drive integration -- This starts starts the sharing business
+ *         [ ] Needs a designer
+ *     [ ] When recording --
+ *         [ ] Hide all buttons (currently shows a Stop button)
+ *         [ ] Superimpose translucent equalizer/volume feedback
+ *             - See: https://groups.google.com/forum/?fromgroups=#!topic/android-developers/QVqlE--SkoA
+ *             -      http://developer.samsung.com/android/technical-docs/Displaying-Sound-Volume-in-Real-Time-While-Recording
+ *         [ ] Double tap to stop recording
+ *     Future Consideration:
+ *         [ ] During recording, single tap anywhere to zoom in (x2) and in zoom-in tap anywhere to zoom out
+ *             [ ] When play back, such transformations will be timed to the audio ...
+ *
+ * ......
+ *
+ * [ ] Google Drive integration -- This starts the sharing business
+ *
+ * ......
  *
  * [ ] PDF as source of page image
+ *     - THINK: how easy it would be for people to make a narrated presentation.
  *
- * ~~ The following opens up page image source to alternatives ~~
- * [ ] Playback a series of PDF pages      1-day
- * 
  * ~~ The following breaks 1-audio-per-page correspondence ~~
- * [ ] Audio for zoomed-in state           1-day
  * 
  */
 
