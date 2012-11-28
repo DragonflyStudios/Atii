@@ -46,6 +46,12 @@ public class PhotoSnapper implements PictureCallback {
         mExposurePlusButton = (Button) mButtonsView.findViewById(R.id.exposure_plus_button);
         mExposurePlusButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                Camera.Parameters params = mCamera.getParameters();
+                int ec = params.getExposureCompensation();
+                if (ec < mMaxExposureCompensation) {
+                    params.setExposureCompensation(ec + 1);
+                    mCamera.setParameters(params);
+                }
             }
         });
         
@@ -68,6 +74,12 @@ public class PhotoSnapper implements PictureCallback {
         mExposureMinusButton = (Button) mButtonsView.findViewById(R.id.exposure_minus_button);
         mExposureMinusButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
+                Camera.Parameters params = mCamera.getParameters();
+                int ec = params.getExposureCompensation();
+                if (ec > mMinExposureCompensation) {
+                    params.setExposureCompensation(ec - 1);
+                    mCamera.setParameters(params);
+                }
             }
         });
 
@@ -121,6 +133,14 @@ public class PhotoSnapper implements PictureCallback {
             }
         });
 
+        Camera.Parameters params = mCamera.getParameters();
+        mMinExposureCompensation = params.getMinExposureCompensation();
+        mMaxExposureCompensation = params.getMaxExposureCompensation();
+        if (mMinExposureCompensation == 0 && mMaxExposureCompensation == 0) {
+            mExposurePlusButton.setVisibility(View.INVISIBLE);
+            mExposureMinusButton.setVisibility(View.INVISIBLE);
+        }
+
         // it seems that to successfully remove mButtonsView, it can't be added directly through inflate(, root) ...
         mHostView.addView(mButtonsView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
@@ -173,6 +193,7 @@ public class PhotoSnapper implements PictureCallback {
     private Button mDoneButton, mCancelButton, mExposurePlusButton, mSnapButton, mExposureMinusButton;
     private OnClickListener mSnapListener, mRetakeListener;
     private Camera mCamera;
+    private int mMinExposureCompensation, mMaxExposureCompensation;
 
     private OnCompletionListener mPSL;
     private File mTempFile;

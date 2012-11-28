@@ -87,18 +87,18 @@ Story Player UI:
  *             [x] Capture (camera button): on right of the "Playback group"
  *         [x] Bottom: lower right corner: Page deletion button
  * [x] Refactor Player, PlayerState, PageFragment, PlayerAdapter stuff ...
- * [ ] Replace page image with photo       1-day
+ * [x] Replace page image with photo       1-day
  *     [x] Show preview
  *     [x] Snap & Done buttons
  *     [x] Replace page image
  *     [x] Use temp file, which is only copied to replace page image upon "Done"
  *     [x] Replace "Snap" with "Retake" after first "snap" & reactivate preview
  *     [x] Cancel button & function
- *     [ ] Fix crashing on Nexus 7
- *     [ ] Auto-focus
- *     [ ] Aspect ratio
- *     [ ] Exposure adjustment (up and down a notch or two)
+ *     [x] Auto-focus
+ *     [x] Aspect ratio
+ *     [x] Exposure adjustment (up and down a notch or two)
  *         [x] '+' and '-' above and below 'Snap' button
+ *     [ ] Fix crashing on Nexus 7
  *     [ ] Device rotation  & orientation handling
  *
  * ......
@@ -124,6 +124,7 @@ Story Player UI:
  * ......
  *
  * [ ] Should seriously consider using other apps for photo capture
+ *     [ ] Or maybe adapt from the built-in Camera app? 
  * [ ] Should seriously consider using other apps for audio recording
  * [ ] Add UI for using any image on device (copy over) -- allow panning, zooming & cropping.
  * [ ] Add UI for using any audio on device (copy over) -- is this a good idea?
@@ -131,6 +132,11 @@ Story Player UI:
  * ......
  *
  * [ ] Google Drive integration -- This starts the sharing business
+ *
+ * ......
+ *
+ * [ ] Gingerbread support
+ * [ ] Kindle Fire test
  *
  * ......
  *
