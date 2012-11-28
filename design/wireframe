@@ -88,11 +88,15 @@ Story Player UI:
  *         [x] Bottom: lower right corner: Page deletion button
  * [x] Refactor Player, PlayerState, PageFragment, PlayerAdapter stuff ...
  * [ ] Replace page image with photo       1-day
- *     [ ] Show preview
- *         Future: [ ] Exposure adjustment (up and down a notch or two)
- *         Future: [ ] Capturing while recording
- *     [ ] Show capture button in the middle
- *     [ ] Replace page image
+ *     [x] Show preview
+ *     [x] Snap & Done buttons
+ *     [x] Replace page image
+ *     [ ] Use temp file, which is only copied to replace page image upon "Done"
+ *     [ ] Cancel button & function
+ *     [ ] Auto-focus
+ *     [ ] Exposure adjustment (up and down a notch or two)
+ *         [ ] '+' and '-' above and below 'Snap' button
+ *     [ ] Device rotation  & orientation handling
  *
  * ......
  *
@@ -102,6 +106,7 @@ Story Player UI:
  *     [ ] Add page before
  *     [ ] Delete page
  * [ ] Will need a bit of "file format"
+ *     - Use an XML file for list of pages, with each item in the list pointing to a file
  *     - Still honors the one-image-one-audio policy.
  *
  * ......
@@ -115,8 +120,12 @@ Story Player UI:
  *
  * ......
  *
- * [ ] Add UI for using any image on device (copy over)
- * [ ] Add UI for using any audio on device (copy over)
+ * [ ] Add UI for using any image on device (copy over) -- allow panning, zooming & cropping.
+ * [ ] Add UI for using any audio on device (copy over) -- is this a good idea?
+ *
+ * ......
+ *
+ * [ ] Google Drive integration -- This starts the sharing business
  *
  * ......
  *
@@ -136,17 +145,14 @@ Story Player UI:
  *     Future Consideration:
  *         [ ] During recording, single tap anywhere to zoom in (x2) and in zoom-in tap anywhere to zoom out
  *             [ ] When play back, such transformations will be timed to the audio ...
- *
- * ......
- *
- * [ ] Google Drive integration -- This starts the sharing business
+ *             - Note that this breaks the one-page-one-audio correspondence; or at least could break it.
  *
  * ......
  *
  * [ ] PDF as source of page image
  *     - THINK: how easy it would be for people to make a narrated presentation.
  *
- * ~~ The following breaks 1-audio-per-page correspondence ~~
+ * Future: [ ] Capturing while recording audio?
  * 
  */
 
