@@ -114,7 +114,7 @@ Story Player UI:
  * ......
  *
  * [ ] Playback automatically advances page
- * [ ] Make buttons translucent & pretty
+ * [x] Make buttons translucent
  * [ ] Create two demos that are always ready to play ...
  *
  * ......
@@ -130,7 +130,7 @@ Story Player UI:
  *
  * ......
  *
- * [x] Should seriously consider using other apps for photo capture
+ * [x] Use other apps for photo capture
  * [ ] Should seriously consider using other apps for audio recording
  * [ ] Add UI for using any image on device (copy over) -- allow panning, zooming & cropping.
  * [ ] Add UI for using any audio on device (copy over) -- is this a good idea?
@@ -146,6 +146,8 @@ Story Player UI:
  *
  * ......
  *
+ * [ ] Make UI pretty
+ *     [ ] Find a designer
  * [ ] Usability features
  *     [ ] Fading: during playback, controls disappear after a certain delay (e.g. 5 seconds); otherwise stays
  *     [ ] Show draggable progress bar.

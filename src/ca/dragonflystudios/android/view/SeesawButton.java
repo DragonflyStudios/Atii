@@ -31,7 +31,7 @@ public class SeesawButton extends ImageButton {
 
     @Override
     public int[] onCreateDrawableState(int extraSpace) {
-        final int[] drawableState = super.onCreateDrawableState(extraSpace + 2);
+        final int[] drawableState = super.onCreateDrawableState(extraSpace + 1);
 
         if (mIsSaw) {
             mergeDrawableStates(drawableState, STATE_SAW);
