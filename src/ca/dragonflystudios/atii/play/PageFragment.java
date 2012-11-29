@@ -1,13 +1,13 @@
 package ca.dragonflystudios.atii.play;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import ca.dragonflystudios.android.media.Image;
 import ca.dragonflystudios.atii.R;
 
 public class PageFragment extends Fragment {
@@ -33,7 +33,7 @@ public class PageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.page, container, false);
         ImageView iv = (ImageView) v.findViewById(R.id.page_image);
-        Bitmap mBitmap = BitmapFactory.decodeFile(mPageImagePath);
+        Bitmap mBitmap = Image.decodeBitmapFileSampled(mPageImagePath, container.getWidth(), container.getHeight());
         iv.setImageBitmap(mBitmap);
 
         return v;

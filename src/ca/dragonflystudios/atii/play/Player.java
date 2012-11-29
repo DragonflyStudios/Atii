@@ -1,5 +1,8 @@
 package ca.dragonflystudios.atii.play;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -21,6 +24,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
     public static final String STORY_EXTRA_KEY = "STORY_FOLDER_NAME";
 
+    protected final static int CAPTURE_PHOTO = 0;
+
     public interface PlayCommandHandler {
 
         public void startAudioReplay();
@@ -36,6 +41,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         public void stopAudioRecording();
 
         public void capturePhoto(ViewGroup hostView);
+
+        public void capturePhoto(Activity requestingActivity);
 
         public void stopPhotoCapture();
 
@@ -112,7 +119,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mCaptureButton = (ImageButton) mControlsView.findViewById(R.id.capture);
         mCaptureButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPlayManager.capturePhoto(mPlayerMainView);
+                mPlayManager.capturePhoto(Player.this);
             }
         });
 
@@ -168,6 +175,19 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mPlayManager.stopAudioReplay();
         mPlayManager.stopAudioRecording();
         mPlayManager.stopPhotoCapture();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+
+        case CAPTURE_PHOTO:
+            if (resultCode == RESULT_OK) {
+                onPageImageChanged(mPlayManager.getCurrentPageNum());
+            }
+        }
     }
 
     @Override

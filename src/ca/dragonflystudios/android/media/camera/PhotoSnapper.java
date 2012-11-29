@@ -19,6 +19,12 @@ import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.R;
 import ca.dragonflystudios.utilities.Files;
 
+// TODOs:
+// [ ] This should really be an activity
+// [ ] Fix crashing on Nexus 7, which has to do with the device's not having a camera on the back
+//     because Camera.open() returns null when there's no back-facing camera.
+// [ ] Device rotation  & orientation handling; see the CameraPreview sample in ApiDemos
+
 public class PhotoSnapper implements PictureCallback {
 
     public interface OnCompletionListener {

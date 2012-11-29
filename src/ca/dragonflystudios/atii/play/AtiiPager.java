@@ -10,6 +10,8 @@ import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
 
 public class AtiiPager extends ViewPager implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+    private static final boolean VERBOSE = false;
+
     public AtiiPager(Context context) {
         super(context);
         init();
@@ -50,7 +52,7 @@ public class AtiiPager extends ViewPager implements GestureDetector.OnGestureLis
 
     @Override
     public boolean onDown(MotionEvent arg0) {
-        if (BuildConfig.DEBUG)
+        if (VERBOSE && BuildConfig.DEBUG)
             Log.d(getClass().getName(), "onDown -- (" + arg0.getX() + ", " + arg0.getY() + ")");
 
         return false;
@@ -58,7 +60,7 @@ public class AtiiPager extends ViewPager implements GestureDetector.OnGestureLis
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        if (BuildConfig.DEBUG)
+        if (VERBOSE && BuildConfig.DEBUG)
             Log.d(getClass().getName(), "onFling -- " + "e1: (" + e1.getX() + ", " + e1.getY() + ")\t\t" + "e2: (" + e2.getX()
                     + ", " + e2.getY() + ")\t\t" + "velocity: <" + velocityX + ", " + velocityY + ">");
 
@@ -67,13 +69,13 @@ public class AtiiPager extends ViewPager implements GestureDetector.OnGestureLis
 
     @Override
     public void onLongPress(MotionEvent e) {
-        if (BuildConfig.DEBUG)
+        if (VERBOSE && BuildConfig.DEBUG)
             Log.d(getClass().getName(), "onLongPress -- (" + e.getX() + ", " + e.getY() + ")");
     }
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        if (BuildConfig.DEBUG)
+        if (VERBOSE && BuildConfig.DEBUG)
             Log.d(getClass().getName(), "onScroll -- " + "e1: (" + e1.getX() + ", " + e1.getY() + ")\t\t" + "e2: (" + e2.getX()
                     + ", " + e2.getY() + ")\t\t" + "distance: <" + distanceX + ", " + distanceY + ">");
 
@@ -84,13 +86,13 @@ public class AtiiPager extends ViewPager implements GestureDetector.OnGestureLis
 
     @Override
     public void onShowPress(MotionEvent e) {
-        if (BuildConfig.DEBUG)
+        if (VERBOSE && BuildConfig.DEBUG)
             Log.d(getClass().getName(), "onShowPress -- (" + e.getX() + ", " + e.getY() + ")");
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
-        if (BuildConfig.DEBUG)
+        if (VERBOSE && BuildConfig.DEBUG)
             Log.d(getClass().getName(), "onSingleTapUp -- (" + e.getX() + ", " + e.getY() + ")");
 
         return false;
@@ -101,7 +103,7 @@ public class AtiiPager extends ViewPager implements GestureDetector.OnGestureLis
     //
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-        if (BuildConfig.DEBUG)
+        if (VERBOSE && BuildConfig.DEBUG)
             Log.d(getClass().getName(), "onDouleTap -- (" + e.getX() + ", " + e.getY() + ")");
 
         return true;
@@ -109,7 +111,7 @@ public class AtiiPager extends ViewPager implements GestureDetector.OnGestureLis
 
     @Override
     public boolean onDoubleTapEvent(MotionEvent e) {
-        if (BuildConfig.DEBUG)
+        if (VERBOSE && BuildConfig.DEBUG)
             Log.d(getClass().getName(), "onDoubleTapEvent -- (" + e.getX() + ", " + e.getY() + ")");
 
         return true;
@@ -117,7 +119,7 @@ public class AtiiPager extends ViewPager implements GestureDetector.OnGestureLis
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
-        if (BuildConfig.DEBUG)
+        if (VERBOSE && BuildConfig.DEBUG)
             Log.d(getClass().getName(), "onSingleTapConfirmed -- (" + e.getX() + ", " + e.getY() + ")");
 
         if (null != mListener)

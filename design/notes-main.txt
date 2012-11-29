@@ -59,7 +59,6 @@ Story Player UI:
  *          [x] Action bar
  *              [x] Title: title of the book + "2 / 23"
  *              [x] Options Menu: Audio Record, Photo Capture, Share, Add Page, Settings
- *      See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
  * [x] Replace audio with recording        0.5-day
  *     [x] Buttons: Record & Stop
  *     [x] Button switching when tapping Microphone icon
@@ -98,13 +97,13 @@ Story Player UI:
  *     [x] Aspect ratio
  *     [x] Exposure adjustment (up and down a notch or two)
  *         [x] '+' and '-' above and below 'Snap' button
- *     [ ] Fix crashing on Nexus 7
- *     [ ] Device rotation  & orientation handling
+ *     [x] Implement a separate interface for getting photos from photo providers
  *
  * ......
  *
  * [ ] Page operations
  *     [ ] When story is empty automatically create a blank page
+ *         [ ] Create a default image and put it in asset? Or at least a drawable?
  *     [ ] Add page after
  *     [ ] Add page before
  *     [ ] Delete page
@@ -114,17 +113,24 @@ Story Player UI:
  *
  * ......
  *
+ * [ ] Playback automatically advances page
+ * [ ] Make buttons translucent & pretty
+ * [ ] Create two demos that are always ready to play ...
+ *
+ * ......
+ *
+ * [ ] GridView showing previews and titles of Stories for StoryListActivity
+ *     - See: http://stackoverflow.com/questions/3680357/how-to-query-android-mediastore-content-provider-avoiding-orphaned-images
+ *
+ * ~~~ The above by End of Monday ~~~
+ *
  * [ ] HTML5 starts
+ *     - See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
  * [ ] Generate time-lapse videos
  *
  * ......
- * 
- * [ ] GridView showing previews and titles of Stories for StoryListActivity
  *
- * ......
- *
- * [ ] Should seriously consider using other apps for photo capture
- *     [ ] Or maybe adapt from the built-in Camera app? 
+ * [x] Should seriously consider using other apps for photo capture
  * [ ] Should seriously consider using other apps for audio recording
  * [ ] Add UI for using any image on device (copy over) -- allow panning, zooming & cropping.
  * [ ] Add UI for using any audio on device (copy over) -- is this a good idea?
@@ -145,25 +151,26 @@ Story Player UI:
  *     [ ] Show draggable progress bar.
  *         [ ] For audio?
  *         [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
- *     [ ] Make buttons translucent & pretty
- *         [ ] Needs a designer
  *     [ ] When recording --
  *         [ ] Hide all buttons (currently shows a Stop button)
  *         [ ] Superimpose translucent equalizer/volume feedback
  *             - See: https://groups.google.com/forum/?fromgroups=#!topic/android-developers/QVqlE--SkoA
  *             -      http://developer.samsung.com/android/technical-docs/Displaying-Sound-Volume-in-Real-Time-While-Recording
  *         [ ] Double tap to stop recording
- *     Future Consideration:
- *         [ ] During recording, single tap anywhere to zoom in (x2) and in zoom-in tap anywhere to zoom out
- *             [ ] When play back, such transformations will be timed to the audio ...
- *             - Note that this breaks the one-page-one-audio correspondence; or at least could break it.
- *
+ * [ ] Image cropping
+ *     - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
  * ......
  *
  * [ ] PDF as source of page image
  *     - THINK: how easy it would be for people to make a narrated presentation.
  *
- * Future: [ ] Capturing while recording audio?
+ * ......
+ *
+ * Future Consideration:
+ * [ ] During recording, single tap anywhere to zoom in (x2) and in zoom-in tap anywhere to zoom out
+ *     [ ] When play back, such transformations will be timed to the audio ...
+ *         - Note that this breaks the one-page-one-audio correspondence; or at least could break it.
+ * [ ] Capturing while recording audio?
  * 
  */
 

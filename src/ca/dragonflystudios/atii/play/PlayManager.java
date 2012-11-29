@@ -7,9 +7,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -291,6 +296,21 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     // implementation for PlayCommandHandler
     public void capturePhoto(ViewGroup hostView) {
         new PhotoSnapper(hostView, mCurrentPage.getImagePath(), this);
+    }
+
+    @Override
+    // implementation for PlayCommandHandler
+    public void capturePhoto(Activity requestingActivity) {
+
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+
+        Uri imageFileUri = Uri.fromFile(mCurrentPage.getImage());
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+        requestingActivity.startActivityForResult(intent, Player.CAPTURE_PHOTO);
     }
 
     @Override
