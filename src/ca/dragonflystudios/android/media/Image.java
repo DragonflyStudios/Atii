@@ -5,7 +5,8 @@ import android.graphics.BitmapFactory;
 
 public class Image {
 
-    // adapted from: http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
+    // adapted from:
+    // http://developer.android.com/training/displaying-bitmaps/load-bitmap.html
     public static Bitmap decodeBitmapFileSampled(String path, int reqWidth, int reqHeight) {
 
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -23,7 +24,12 @@ public class Image {
         final int width = options.outWidth;
         int inSampleSize = 1;
 
-        if (height > reqHeight || width > reqWidth) {
+        if (0 == reqWidth || 0 == reqHeight) {
+            if (width > 2000 || height > 2000)
+                inSampleSize = Math.max(Math.round((float) width / 1000f), Math.round((float) width / 1000f));
+            else
+                inSampleSize = 1;
+        } else if (height > reqHeight || width > reqWidth) {
             if (width > height) {
                 inSampleSize = Math.round((float) height / (float) reqHeight);
             } else {
