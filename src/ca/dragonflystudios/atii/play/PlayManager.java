@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -369,8 +371,14 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
             setCurrentPage(position);
 
-            if (isAutoReplay())
-                startAudioReplay();
+            if (isAutoReplay()) {
+                new Timer().schedule(new TimerTask() {          
+                    @Override
+                    public void run() {
+                        startAudioReplay();
+                    }
+                }, 1000);
+            }
         }
     }
 

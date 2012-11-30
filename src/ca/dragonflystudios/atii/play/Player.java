@@ -203,19 +203,31 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     // implementation for ReaderGestureListener
     public void onSingleTap(float x, float y) {
         if (mControlsToggleAllowed)
-            toggleAllControls();
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    toggleAllControls();
+                }
+            });
     }
 
     @Override
     // implementation for PlayChangeListener
     public void onAudioPlaybackStateChanged(AudioPlaybackState newState) {
-        updateControls();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                updateControls();
+            }
+        });
     }
 
     @Override
     // implementation for PlayChangeListener
-    public void onPageChanged(int newPage) {
-        updatePageNumView(newPage);
+    public void onPageChanged(final int newPage) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                updatePageNumView(newPage);
+            }
+        });
     }
 
     private void updatePageNumView(int newPage) {
@@ -233,13 +245,21 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     @Override
     // implementation for PlayChangeListener
     public void onModeChanged(PlayMode newMode) {
-        updateControls();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                updateControls();
+            }
+        });
     }
 
     @Override
     // implementation for PlayChangeListener
     public void onPlayStateChanged(PlayState newState) {
-        updateControls();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                updateControls();
+            }
+        });
     }
 
     @Override

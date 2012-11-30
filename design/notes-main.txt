@@ -113,7 +113,7 @@ Story Player UI:
  *
  * ......
  *
- * [ ] Playback automatically advances page
+ * [x] Playback automatically advances page
  * [x] Make buttons translucent
  * [ ] Create two demos that are always ready to play ...
  *
@@ -159,6 +159,8 @@ Story Player UI:
  *             - See: https://groups.google.com/forum/?fromgroups=#!topic/android-developers/QVqlE--SkoA
  *             -      http://developer.samsung.com/android/technical-docs/Displaying-Sound-Volume-in-Real-Time-While-Recording
  *         [ ] Double tap to stop recording
+ *     [ ] In auto page advance ... appropriately time page turn in relation to audio stop and starting
+ *         - currently there is a 1s delay before audio starts on a new page
  * [ ] Image cropping
  *     - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
  * ......
