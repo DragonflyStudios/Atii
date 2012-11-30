@@ -2,7 +2,6 @@ package ca.dragonflystudios.atii.play;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -64,11 +63,11 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
         mPlayManager = new PlayManager(storyPath, this);
         mPlayManager.setAutoReplay(true);
+        mPlayManager.setAutoAdvance(true);
 
         mAdapter = new AtiiPagerAdapter(getSupportFragmentManager(), mPlayManager);
 
         setContentView(R.layout.player);
-        mPlayerMainView = (ViewGroup) findViewById(R.id.player_main);
 
         mPager = (AtiiPager) findViewById(R.id.pager);
         mPager.setAdapter(mAdapter);
@@ -253,6 +252,12 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         // mAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    // implementation for PlayChangeListener
+    public void requestPageChange(int newPage) {
+        mPager.setCurrentItem(newPage);
+    }
+
     private void updateControls() {
         mPager.setPageChangeEnabled(true);
 
@@ -356,7 +361,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     private PlayManager mPlayManager;
     private AtiiPagerAdapter mAdapter;
     private AtiiPager mPager;
-    private ViewGroup mPlayerMainView;
 
     private ViewGroup mControlsView;
     private SeesawButton mModeButton;

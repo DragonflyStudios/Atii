@@ -39,6 +39,9 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         public void onPageChanged(int newPage);
 
         public void onPageImageChanged(int pageNum);
+
+        // this is a hack that breaks the integrity of "PlayChangeListener". TAI!
+        public void requestPageChange(int newPage);
     }
 
     public enum PlayMode {
@@ -110,11 +113,19 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public boolean isAutoReplay() {
-        return mAutoReplay && (mPlayMode == PlayMode.PLAYBACK);
+        return mAutoReplay;
     }
 
     public void setAutoReplay(boolean auto) {
         mAutoReplay = auto;
+    }
+
+    public boolean isAutoAdvance() {
+        return mAutoAdvance;
+    }
+
+    public void setAutoAdvance(boolean auto) {
+        mAutoAdvance = auto;
     }
 
     public int getNumPages() {
@@ -337,8 +348,12 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     @Override
     // implementation for MediaPlayer.OnCompletionListener
     public void onCompletion(MediaPlayer mp) {
-        if (mMediaPlayer == mp)
+        if (mMediaPlayer == mp) {
             stopAudioReplay();
+            
+            if (null != mPlayChangeListener && isAutoAdvance() && mCurrentPageNum < mNumPages - 1)
+                mPlayChangeListener.requestPageChange(mCurrentPageNum + 1);
+        }
     }
 
     @Override
@@ -412,6 +427,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     private int mNumPages;
 
     private boolean mAutoReplay;
+    private boolean mAutoAdvance;
 
     private int mCurrentPageNum;
     private Page mCurrentPage;
