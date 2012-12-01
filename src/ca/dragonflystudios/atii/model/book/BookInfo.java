@@ -1,4 +1,4 @@
-package ca.dragonflystudios.atii.model.story;
+package ca.dragonflystudios.atii.model.book;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,47 +11,41 @@ import org.xmlpull.v1.XmlSerializer;
 import ca.dragonflystudios.atii.model.Entity;
 import ca.dragonflystudios.atii.model.Parser;
 
-public class Story extends Entity {
-    public Story(File storyFolder) {
-        mStoryFolder = storyFolder;
-        mStoryFolderPath = storyFolder.getAbsolutePath();
+public class BookInfo extends Entity {
 
-        File storyFile = new File(storyFolder, "story.xml");
+    public BookInfo(File bookXmlFile) {
+        mTitle = null;
+        mAuthorNames = new ArrayList<String>();
+
         Parser parser = new Parser();
         try {
-            parser.parseXmlFileForEntity(storyFile, this, "story");
+            parser.parseXmlFileForEntity(bookXmlFile, this, "book");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public File getStoryFolder() {
-        return mStoryFolder;
+    public String getTitle() {
+        return mTitle;
     }
 
-    public String getStoryFolderPath() {
-        return mStoryFolderPath;
-    }
-
-    public ArrayList<Clip> getClips() {
-        return mClips;
+    public ArrayList<String> getAuthorNames() {
+        return mAuthorNames;
     }
 
     @Override
     public void loadFromXml(XmlPullParser parser) throws XmlPullParserException, IOException {
-        mClips = new ArrayList<Clip>();
-
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             String name = parser.getName();
-            if (name.equals("clip")) {
-                Clip clip = new Clip();
-                clip.loadFromXml(parser);
-                mClips.add(clip);
-            } else {
-                Parser.skip(parser);
+            if (name.equals("title")) {
+                mTitle = Parser.readTextFromXml(parser);
+                parser.require(XmlPullParser.END_TAG, ns, "title");
+            } else if (name.equals("author")) {
+                mAuthorNames.add(Parser.readTextFromXml(parser));
+                parser.require(XmlPullParser.END_TAG, ns, "author");
             }
         }
     }
@@ -59,11 +53,9 @@ public class Story extends Entity {
     @Override
     public void saveToXml(XmlSerializer serializer) throws IOException, IllegalArgumentException, IllegalStateException {
         // TODO Auto-generated method stub
-        
+
     }
 
-    private File mStoryFolder;
-    private String mStoryFolderPath;
-    private ArrayList<Clip> mClips;
-
+    private String mTitle;
+    private ArrayList<String> mAuthorNames;
 }

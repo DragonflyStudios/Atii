@@ -5,11 +5,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-
-import ca.dragonflystudios.atii.model.story.Story;
 
 import android.graphics.Rect;
 import android.util.Xml;
@@ -17,7 +16,8 @@ import android.util.Xml;
 // modeled after: http://developer.android.com/training/basics/network-ops/xml.html
 public class Parser {
 
-    public void parse(File storyFile, Story story) throws XmlPullParserException, IOException {
+    public void parseXmlFileForEntity(File storyFile, Entity entity, String entityTypeName) throws XmlPullParserException,
+            IOException {
         InputStream in = null;
 
         try {
@@ -27,8 +27,8 @@ public class Parser {
             parser.setInput(in, null);
             parser.nextTag();
 
-            parser.require(XmlPullParser.START_TAG, Story.ns, "story");
-            story.loadFromXml(parser);
+            parser.require(XmlPullParser.START_TAG, Entity.ns, entityTypeName);
+            entity.loadFromXml(parser);
         } finally {
             if (in != null)
                 in.close();
@@ -54,7 +54,7 @@ public class Parser {
 
     public static Rect readRectFromXml(XmlPullParser parser) throws IOException, XmlPullParserException {
         int l = 0, t = 0, r = 0, b = 0;
-        
+
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
@@ -106,4 +106,5 @@ public class Parser {
         }
         return l;
     }
+
 }

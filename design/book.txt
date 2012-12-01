@@ -1,0 +1,71 @@
+
+Each book corresponds to a folder, which may or may not contain the following:
+
+(1) a file named "book.xml"
+    - if the file is present and non-empty, then the content of this file is used
+    - if the file is not present or is empty, then the following is used as the default content
+      -- and "book.xml" will be rewritten with this content
+
+~~~ The following is an illustration of the format of book.xml ~~~
+
+<!-- a book has a title and zero or more authors -->
+
+<book>
+    <title>This book has no title</title>
+    <author>Dr. Seuss</author>
+    <author>Dr. Strangelove</author>
+</book>
+
+
+(2) a file named "preview.png"
+    - if the file is present, it is then used as the preview image for the book
+    - if the file is not present, a preview will be generated from the image for the first page of the book
+    - if there is no page image available, a default "empty book" preview is used
+
+
+(3) a "pages.xml" file that contains a list of pairs of page image files and audio files
+
+~~~ The following is an illustration of the format of pages.xml ~~~
+
+<!-- a book contains zero or more pages -->
+<pages>
+    <!-- each page may contain zero or one image and zero or one audio -->
+    <page>
+        <image>p1.jpg</image>
+        <audio>a1.3gp</audio>
+    </page>
+    <page>
+        <audio>blahblahblah.3gp</audio>
+    </page>
+    <page></page>
+    <page>
+        <image>page.jpg</image>
+    <page>
+</pages>
+
+~~~ end of illustration ~~~
+
+NOTE:
+
+- for now the # of pages will be induced from counting the number of pages.
+- When displaying the pages, any page that misses image will be substituted by a default "empty page" image
+- When playing the audios, pages that do not have audio will show a no-audio icon, at least in "authoring" mode
+
+(4) a folder named "images" under which the page images are stored
+
+(5) a folder named "audios" under which the default/stock/"authoritative" audios are stored
+
+
+=== Future ==>
+
+[ ] Allow more than one "players" or "readers" ... each of whom could have a dedicated audio folder
+    - we can use a "readers.xml" file to track these readers and their corresponding audio folder
+    - and have a UI to switch among them ...
+[ ] NOTE also: we could allow zero or more illustrations/images per page ...
+    - We could do two things symmetrically: text and image
+      - we could also run "atii writing" competition, where given illustrations, people come up with text
+      - we could also run "atii illustrating" competition, where given text, people come up with illustrations/images
+    - Where we have both text and image
+      - we could run "atii reading" competition, where given a book, people compete in performing well
+
+

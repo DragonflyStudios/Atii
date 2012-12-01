@@ -161,6 +161,7 @@ Story Player UI:
  *         [ ] Double tap to stop recording
  *     [ ] In auto page advance ... appropriately time page turn in relation to audio stop and starting
  *         - currently there is a 1s delay before audio starts on a new page
+ *     [ ] Give visual feedback that playing back is going on ...
  * [ ] Image cropping
  *     - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
  * ......

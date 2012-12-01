@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlSerializer;
 
 public abstract class Entity {
     protected static final String ns = null; // we don't use name space
@@ -12,5 +13,6 @@ public abstract class Entity {
     // of static methods in interfaces. That way, each subclass of Entity could
     // define their own factory-from-xlm method.
     public abstract void loadFromXml(XmlPullParser parser) throws XmlPullParserException, IOException;
+    public abstract void saveToXml(XmlSerializer serializer) throws IOException, IllegalArgumentException, IllegalStateException;
 
 }

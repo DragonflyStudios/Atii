@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlSerializer;
 
 import ca.dragonflystudios.atii.model.Entity;
 import ca.dragonflystudios.atii.model.Parser;
@@ -32,6 +33,12 @@ public class Clip extends Entity {
                 Parser.skip(parser);
             }
         }
+    }
+
+    @Override
+    public void saveToXml(XmlSerializer serializer) throws IOException, IllegalArgumentException, IllegalStateException {
+        // TODO Auto-generated method stub
+        
     }
 
     public Look getLook() {

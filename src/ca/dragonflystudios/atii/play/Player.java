@@ -13,7 +13,7 @@ import android.widget.TextView;
 import ca.dragonflystudios.android.view.SeesawButton;
 import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.R;
-import ca.dragonflystudios.atii.play.Page.AudioPlaybackState;
+import ca.dragonflystudios.atii.model.book.Page.AudioPlaybackState;
 import ca.dragonflystudios.atii.play.PlayManager.PlayChangeListener;
 import ca.dragonflystudios.atii.play.PlayManager.PlayMode;
 import ca.dragonflystudios.atii.play.PlayManager.PlayState;

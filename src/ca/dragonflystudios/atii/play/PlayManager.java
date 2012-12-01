@@ -21,7 +21,8 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ViewGroup;
 import ca.dragonflystudios.android.media.camera.PhotoSnapper;
-import ca.dragonflystudios.atii.play.Page.AudioPlaybackState;
+import ca.dragonflystudios.atii.model.book.Page;
+import ca.dragonflystudios.atii.model.book.Page.AudioPlaybackState;
 import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
