@@ -16,7 +16,7 @@ public class Book extends Entity {
     public Book(File bookFolder) {
         mFolder = bookFolder;
 
-        mInfo = new BookInfo(new File(bookFolder, "book.xml"));
+        mInfo = new BookInfo(bookFolder);
         mPreviewFile = new File(bookFolder, "preview.png");
 
         // the following is slightly contrived; could introduce either a Pages
@@ -38,12 +38,28 @@ public class Book extends Entity {
         return mPages.size();
     }
 
+    public ArrayList<Page> getPages() {
+        return mPages;
+    }
+
+    public boolean hasPages() {
+        return mPages.size() > 0;
+    }
+
+    public Page getPage(int pageNum) {
+        return mPages.get(pageNum);
+    }
+
     public String getTitle() {
         return mInfo.getTitle();
     }
 
     public File getPreviewFile() {
         return mPreviewFile;
+    }
+
+    public boolean hasPreview() {
+        return mPreviewFile.exists();
     }
 
     @Override
@@ -54,7 +70,7 @@ public class Book extends Entity {
             }
             String name = parser.getName();
             if (name.equals("page")) {
-                Page page = new Page(new File(mFolder, "images"), new File(mFolder, "audios"));
+                Page page = new Page(mImageFolder, mAudioFolder);
                 page.loadFromXml(parser);
                 mPages.add(page);
             } else {
@@ -67,7 +83,7 @@ public class Book extends Entity {
     public void saveToXml(XmlSerializer serializer) throws IOException, IllegalArgumentException, IllegalStateException {
     }
 
-    private File mFolder;
+    private File mFolder, mImageFolder, mAudioFolder;
     ArrayList<Page> mPages;
     private File mPreviewFile;
 

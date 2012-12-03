@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ca.dragonflystudios.atii.BookItemView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal" >
+    android:layout_height="match_parent"
+    android:background="@android:color/white" >
+
+    <ImageView
+        android:id="@+id/book_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@string/book_preview"
+        android:scaleType="fitCenter" />
 
     <TextView
-        android:id="@+id/book_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:id="@+id/book_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:padding="8dp"
-        android:textSize="20sp" />
+        android:textColor="@android:color/white"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:background="@drawable/book_title_background" />
 
-</LinearLayout>
+</ca.dragonflystudios.atii.BookItemView>

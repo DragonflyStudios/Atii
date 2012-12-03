@@ -3,6 +3,9 @@
     <string name="app_name">Atii</string>
     <string name="title_activity_main">MainActivity</string>
 
+    <!-- book list -->
+    <string name="book_preview">Book Preview</string>
+
     <!-- page -->
     <string name="page_image_view">Page Image View</string>
 

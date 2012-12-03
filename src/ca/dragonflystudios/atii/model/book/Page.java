@@ -19,24 +19,10 @@ public class Page extends Entity {
         INVALID, NO_AUDIO, NOT_STARTED, PLAYING, PAUSED, FINISHED
     }
 
-    // TODO: hide STATE so as to do appropriate lazy initialization!!!
-    // SHOULD NOT expose UNITITIALIZED! Should use a boolean instead!
-
     public Page(File imageFolder, File audioFolder) {
         mImageFolder = imageFolder;
         mAudioFolder = audioFolder;
-        mImageFileName = null;
-        mAudioFileName = null;
 
-        // uses lazy initialization
-        mInitialized = false;
-        mState = AudioPlaybackState.INVALID;
-    }
-
-    // TODO: delete me!
-    public Page(File imageFile) {
-        mImage = imageFile;
-        mAudio = null;
         // uses lazy initialization
         mInitialized = false;
         mState = AudioPlaybackState.INVALID;
@@ -88,10 +74,9 @@ public class Page extends Entity {
         return (AudioPlaybackState.NO_AUDIO != mState);
     }
 
-    // TODO: change me!
     private void initializeAudioFile() {
-        String nameStem = Pathname.extractStem(mImage.getName());
-        mAudio = new File(mImage.getParent(), nameStem + ".3gp");
+        if (mInitialized)
+            return;
 
         if (mAudio.exists())
             mState = AudioPlaybackState.NOT_STARTED;
@@ -107,8 +92,8 @@ public class Page extends Entity {
 
     @Override
     public void loadFromXml(XmlPullParser parser) throws XmlPullParserException, IOException {
-        mImageFileName = null;
-        mAudioFileName = null;
+        String imageFileName = null;
+        String audioFileName = null;
         mImage = null;
         mAudio = null;
 
@@ -118,19 +103,22 @@ public class Page extends Entity {
             }
             String name = parser.getName();
             if (name.equals("image")) {
-                mImageFileName = Parser.readTextFromXml(parser);
+                imageFileName = Parser.readTextFromXml(parser);
                 parser.require(XmlPullParser.END_TAG, ns, "image");
             } else if (name.equals("audio")) {
-                mAudioFileName = Parser.readTextFromXml(parser);
+                audioFileName = Parser.readTextFromXml(parser);
                 parser.require(XmlPullParser.END_TAG, ns, "audio");
             }
         }
 
-        if (null != mImageFileName)
-            mImage = new File(mImageFolder, mImageFileName);
+        if (null == imageFileName)
+            imageFileName = Pathname.createUniqueFileName(mImageFolder, "jpg");
+
+        if (null == audioFileName)
+            audioFileName = Pathname.createUniqueFileName(mAudioFolder, "3gp");
         
-        if (null != mAudioFileName)
-            mAudio = new File(mAudioFolder, mAudioFileName);
+        mImage = new File(mImageFolder, imageFileName);
+        mAudio = new File(mAudioFolder, audioFileName);
 
         // uses lazy initialization
         mInitialized = false;
@@ -143,6 +131,5 @@ public class Page extends Entity {
 
     private AudioPlaybackState mState;
     private File mImageFolder, mAudioFolder, mImage, mAudio;
-    private String mImageFileName, mAudioFileName;
     private boolean mInitialized;
 }

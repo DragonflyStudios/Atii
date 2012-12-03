@@ -1,11 +1,7 @@
 package ca.dragonflystudios.atii.play;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,10 +17,10 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ViewGroup;
 import ca.dragonflystudios.android.media.camera.PhotoSnapper;
+import ca.dragonflystudios.atii.model.book.Book;
 import ca.dragonflystudios.atii.model.book.Page;
 import ca.dragonflystudios.atii.model.book.Page.AudioPlaybackState;
 import ca.dragonflystudios.utilities.Pathname;
-import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener,
         PhotoSnapper.OnCompletionListener {
@@ -80,18 +76,23 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
         File storyDir = new File(storyPath);
         mStoryPath = storyDir.getAbsolutePath();
+        
         mStoryTitle = Pathname.extractStem(storyDir.getName());
 
-        mPages = listPages(storyDir);
-        mNumPages = mPages.size();
+        mBook = new Book(storyDir);
 
         mPlayMode = PlayMode.PLAYBACK;
         mPlayState = PlayState.IDLE;
 
         mPlayChangeListener = pcl;
 
-        mCurrentPageNum = 0;
-        mCurrentPage = mPages.get(mCurrentPageNum);
+        if (mBook.hasPages()) {
+            mCurrentPageNum = 0;
+            mCurrentPage = mBook.getPage(mCurrentPageNum);
+        } else {
+            mCurrentPageNum = -1;
+            mCurrentPage = null;
+        }
     }
 
     public static String getDefaultPageImagePath() {
@@ -99,7 +100,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public String getImagePathForPage(int pageNum) {
-        return mPages.get(pageNum).getImage().getAbsolutePath();
+        return mBook.getPage(pageNum).getImage().getAbsolutePath();
     }
 
     public String getStoryPath() {
@@ -132,11 +133,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public int getNumPages() {
-        return mNumPages;
-    }
-
-    public void setNumPages(int numPages) {
-        mNumPages = numPages;
+        return mBook.getNumPages();
     }
 
     public boolean hasAudioOnCurrentPage() {
@@ -152,7 +149,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
             AudioPlaybackState oldState = getAudioPlaybackState(mCurrentPageNum);
             AudioPlaybackState newState = getAudioPlaybackState(newPageNum);
             mCurrentPageNum = newPageNum;
-            mCurrentPage = mPages.get(newPageNum);
+            mCurrentPage = mBook.getPage(newPageNum);
 
             if (null != mPlayChangeListener)
                 mPlayChangeListener.onPageChanged(newPageNum);
@@ -163,13 +160,13 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public AudioPlaybackState getAudioPlaybackState(int pageNum) {
-        return mPages.get(pageNum).getAudioPlaybackState();
+        return mBook.getPage(pageNum).getAudioPlaybackState();
     }
 
     public void setAudioPlaybackState(int pageNum, AudioPlaybackState state) {
         AudioPlaybackState oldState = getAudioPlaybackState(pageNum);
         if (oldState != state) {
-            mPages.get(pageNum).setAudioPlaybackState(state);
+            mBook.getPage(pageNum).setAudioPlaybackState(state);
             if (mCurrentPageNum == pageNum && null != mPlayChangeListener)
                 mPlayChangeListener.onAudioPlaybackStateChanged(state);
         }
@@ -354,7 +351,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         if (mMediaPlayer == mp) {
             stopAudioReplay();
             
-            if (null != mPlayChangeListener && isAutoAdvance() && mCurrentPageNum < mNumPages - 1)
+            if (null != mPlayChangeListener && isAutoAdvance() && mCurrentPageNum < getNumPages() - 1)
                 mPlayChangeListener.requestPageChange(mCurrentPageNum + 1);
         }
     }
@@ -396,44 +393,10 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         }
     }
 
-    private ArrayList<Page> listPages(File storyDir) {
-        FileFilter filter = new FileFilter() {
-            @Override
-            public boolean accept(File path) {
-                String name = path.getName();
-                return path.exists() && !path.isDirectory() && "jpg".equalsIgnoreCase(Pathname.extractExtension(name))
-                        && !"front".equals(Pathname.extractStem(name)) && !"back".equals(Pathname.extractStem(name));
-            }
-        };
-
-        File[] pageList = storyDir.listFiles(filter);
-        ArrayList<File> pageFiles = new ArrayList<File>();
-
-        if (pageList != null) {
-            pageFiles.addAll(Arrays.asList(pageList));
-            Collections.sort(pageFiles, new FileNameComparator());
-        }
-
-        File frontCover = new File(storyDir, "front.jpg");
-        if (frontCover.exists())
-            pageFiles.add(0, frontCover);
-
-        File backCover = new File(storyDir, "back.jpg");
-        if (backCover.exists())
-            pageFiles.add(backCover);
-
-        ArrayList<Page> pages = new ArrayList<Page>(pageFiles.size());
-        for (File pageFile : pageFiles)
-            pages.add(new Page(pageFile));
-
-        return pages;
-    }
-
     private String mStoryPath;
     private String mStoryTitle;
 
-    private ArrayList<Page> mPages;
-    private int mNumPages;
+    private Book mBook;
 
     private boolean mAutoReplay;
     private boolean mAutoAdvance;

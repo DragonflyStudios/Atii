@@ -101,6 +101,10 @@ Story Player UI:
  *
  * ......
  *
+ * [x] GridView showing previews and titles of books for BookListActivity
+ *
+ * ......
+ *
  * [ ] Page operations
  *     [ ] When story is empty automatically create a blank page
  *         [ ] Create a default image and put it in asset? Or at least a drawable?
@@ -117,16 +121,17 @@ Story Player UI:
  * [x] Make buttons translucent
  * [ ] Create two demos that are always ready to play ...
  *
- * ......
- *
- * [ ] GridView showing previews and titles of Stories for StoryListActivity
- *     - See: http://stackoverflow.com/questions/3680357/how-to-query-android-mediastore-content-provider-avoiding-orphaned-images
- *
  * ~~~ The above by End of Monday ~~~
  *
  * [ ] HTML5 starts
  *     - See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
  * [ ] Generate time-lapse videos
+ * [ ] Auto-generation of book preview
+ *
+ * ......
+ *
+ * [ ] PDF as source of page image
+ *     - THINK: how easy it would be for people to make a narrated presentation.
  *
  * ......
  *
@@ -164,10 +169,6 @@ Story Player UI:
  *     [ ] Give visual feedback that playing back is going on ...
  * [ ] Image cropping
  *     - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
- * ......
- *
- * [ ] PDF as source of page image
- *     - THINK: how easy it would be for people to make a narrated presentation.
  *
  * ......
  *

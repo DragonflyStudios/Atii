@@ -14,8 +14,8 @@ Each book corresponds to a folder, which may or may not contain the following:
     <title>This book has no title</title>
     <author>Dr. Seuss</author>
     <author>Dr. Strangelove</author>
+    <illustrator>Master Wugui</illustrator>
 </book>
-
 
 (2) a file named "preview.png"
     - if the file is present, it is then used as the preview image for the book

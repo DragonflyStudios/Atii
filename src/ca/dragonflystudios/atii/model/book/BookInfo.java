@@ -10,19 +10,32 @@ import org.xmlpull.v1.XmlSerializer;
 
 import ca.dragonflystudios.atii.model.Entity;
 import ca.dragonflystudios.atii.model.Parser;
+import ca.dragonflystudios.utilities.Pathname;
 
 public class BookInfo extends Entity {
 
-    public BookInfo(File bookXmlFile) {
+    public BookInfo(File bookFolder) {
+        mBookFolder = bookFolder;
+
+        File bookXmlFile = new File(bookFolder, "book.xml");
         mTitle = null;
         mAuthorNames = new ArrayList<String>();
+        mIllustratorNames = new ArrayList<String>();
 
-        Parser parser = new Parser();
-        try {
-            parser.parseXmlFileForEntity(bookXmlFile, this, "book");
-        } catch (Exception e) {
-            e.printStackTrace();
+        initializeWithDefaults(bookFolder);
+
+        if (bookXmlFile.exists()) {
+            Parser parser = new Parser();
+            try {
+                parser.parseXmlFileForEntity(bookXmlFile, this, "book");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    public String getBookPath() {
+        return mBookFolder.getAbsolutePath();
     }
 
     public String getTitle() {
@@ -31,6 +44,14 @@ public class BookInfo extends Entity {
 
     public ArrayList<String> getAuthorNames() {
         return mAuthorNames;
+    }
+
+    public File getPreviewFile() {
+        return new File(mBookFolder, "preview.png");
+    }
+
+    private void initializeWithDefaults(File bookFolder) {
+        mTitle = Pathname.extractStem(bookFolder.getName());
     }
 
     @Override
@@ -46,6 +67,9 @@ public class BookInfo extends Entity {
             } else if (name.equals("author")) {
                 mAuthorNames.add(Parser.readTextFromXml(parser));
                 parser.require(XmlPullParser.END_TAG, ns, "author");
+            } else if (name.equals("illustrator")) {
+                mIllustratorNames.add(Parser.readTextFromXml(parser));
+                parser.require(XmlPullParser.END_TAG, ns, "illustrator");
             }
         }
     }
@@ -56,6 +80,8 @@ public class BookInfo extends Entity {
 
     }
 
+    private File mBookFolder;
     private String mTitle;
     private ArrayList<String> mAuthorNames;
+    private ArrayList<String> mIllustratorNames;
 }
