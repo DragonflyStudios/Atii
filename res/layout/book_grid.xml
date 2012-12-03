@@ -3,7 +3,7 @@
     android:id="@+id/book_grid"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@android:color/black"
+    android:background="@color/book_grid_view_background"
     android:columnWidth="120dp"
     android:gravity="center"
     android:horizontalSpacing="8dp"

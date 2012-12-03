@@ -102,6 +102,9 @@ public class BookGridActivity extends Activity {
             TextView bookNameView = (TextView) convertView.findViewById(R.id.book_title);
             bookNameView.setText(book.getTitle());
 
+            // Apparently no need to show title, coz it's already on the cover!
+            bookNameView.setVisibility(View.INVISIBLE);
+
             ImageView bookPreviewView = (ImageView) convertView.findViewById(R.id.book_preview);
             File previewFile = book.getPreviewFile();
 
@@ -133,7 +136,7 @@ public class BookGridActivity extends Activity {
         Collections.sort(mBookInfos, new Comparator<BookInfo>() {
             @Override
             public int compare(BookInfo b1, BookInfo b2) {
-                  return b1.getTitle().compareToIgnoreCase(b2.getTitle());
+                return b1.getTitle().compareToIgnoreCase(b2.getTitle());
             }
         });
     }
