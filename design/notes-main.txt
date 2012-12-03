@@ -105,15 +105,24 @@ Story Player UI:
  *
  * ......
  *
+ * [x] Need a bit of "file format" => See "book.txt" under design.
+ *     - Use an XML file for list of pages, with each item in the list pointing to a file
+ *     - Still honors the one-image-one-audio policy.
+ *
  * [ ] Page operations
+ *     [ ] Handle the following special cases
+ *         [ ] When there is no "book.xml"
+ *         [ ] When there is no "pages.xml"
+ *         [ ] When there is no "images" folder
+ *         [ ] When there is no "audio" folder
  *     [ ] When story is empty automatically create a blank page
  *         [ ] Create a default image and put it in asset? Or at least a drawable?
+ *     [ ] Handle the following special cases
+ *         [ ] When there is a page but no page image
+ *         [ ] When there is a page but no page audio
  *     [ ] Add page after
  *     [ ] Add page before
  *     [ ] Delete page
- * [ ] Need a bit of "file format"
- *     - Use an XML file for list of pages, with each item in the list pointing to a file
- *     - Still honors the one-image-one-audio policy.
  *
  * ......
  *
@@ -127,6 +136,10 @@ Story Player UI:
  *     - See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
  * [ ] Generate time-lapse videos
  * [ ] Auto-generation of book preview
+ *
+ * ......
+ *
+ * [ ] Create new book
  *
  * ......
  *
