@@ -130,7 +130,7 @@ Story Player UI:
  *
  * [x] Playback automatically advances page
  * [x] Make buttons translucent
- * [ ] Create two demos that are always ready to play ...
+ * [x] Create two demos
  *
  * ~~~ The above by End of Tuesday ~~~
  *

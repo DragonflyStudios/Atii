@@ -1,6 +1,9 @@
 <pages>
     <!-- each page may contain zero or one image and zero or one audio -->
     <page>
+        <image>front.jpg</image>
+    </page>
+    <page>
         <image>guess00h.jpg</image>
     </page>
     <page>

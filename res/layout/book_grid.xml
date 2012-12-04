@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="@color/book_grid_view_background"
-    android:columnWidth="120dp"
+    android:columnWidth="@dimen/book_grid_column_width"
     android:gravity="center"
     android:horizontalSpacing="8dp"
     android:numColumns="auto_fit"
