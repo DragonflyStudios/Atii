@@ -123,7 +123,7 @@ Story Player UI:
  *     [x] Add page after
  *     [x] Add page before
  *     [x] Delete page
- *     [ ] Save to Xml
+ *     [x] Save to Xml
  *     [ ] Testing and debugging
  *
  * ......
@@ -132,19 +132,22 @@ Story Player UI:
  * [x] Make buttons translucent
  * [ ] Create two demos that are always ready to play ...
  *
- * ~~~ The above by End of Monday ~~~
- *
- * [ ] HTML5 starts
- *     - See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
- * [ ] Generate time-lapse videos
- * [ ] Auto-generation of book preview
- *
- * ......
+ * ~~~ The above by End of Tuesday ~~~
  *
  * [ ] Refactor 
  * [ ] Create new book
  *     [ ] Book title
  *     [ ] Book title editing
+ * [ ] Warning about page deletion
+ * [ ] Delete book
+ *     [ ] Warning about book deletion
+ *
+ * ......
+ *
+ * [ ] HTML5 starts
+ *     - See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
+ * [ ] Generate time-lapse videos
+ * [ ] Auto-generation of book preview
  *
  * ......
  *

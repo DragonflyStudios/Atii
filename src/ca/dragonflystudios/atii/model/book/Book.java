@@ -1,6 +1,7 @@
 package ca.dragonflystudios.atii.model.book;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -9,6 +10,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
 import android.util.Log;
+import android.util.Xml;
 
 import ca.dragonflystudios.atii.model.Entity;
 import ca.dragonflystudios.atii.model.Parser;
@@ -41,6 +43,19 @@ public class Book extends Entity {
 
         if (0 == mPages.size())
             mPages.add(new Page(mImageFolder, mAudioFolder));
+    }
+
+    public void save() {
+        mInfo.save();
+
+        if (mPages.size() > 1 || (mPages.size() == 1 && !mPages.get(0).isEmpty())) {
+            try {
+                saveToXml(Xml.newSerializer());
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public File getFolder() {
@@ -123,6 +138,31 @@ public class Book extends Entity {
 
     @Override
     public void saveToXml(XmlSerializer serializer) throws IOException, IllegalArgumentException, IllegalStateException {
+        FileOutputStream os = new FileOutputStream(mPagesXmlFile);
+        serializer.setOutput(os, null);
+        serializer.startDocument(null, true);
+        if (mPages.size() > 0) {
+            serializer.startTag("", "pages");
+            for (Page page : mPages) {
+                serializer.startTag("", "page");
+                File imageFile = page.getImage();
+                if (null != imageFile && imageFile.exists()) {
+                    serializer.startTag("", "image");
+                    serializer.text(imageFile.getName());
+                    serializer.endTag("", "image");
+                }
+                File audioFile = page.getAudio();
+                if (null != audioFile && audioFile.exists()) {
+                    serializer.startTag("", "audio");
+                    serializer.text(audioFile.getName());
+                    serializer.endTag("", "audio");
+                }
+                serializer.endTag("", "page");
+            }
+            serializer.endTag("", "pages");
+        }
+        serializer.endDocument();
+        os.close();
     }
 
     private File mFolder, mPagesXmlFile, mImageFolder, mAudioFolder;

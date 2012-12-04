@@ -56,6 +56,10 @@ public class Page extends Entity {
         mImage = newImage;
     }
 
+    public boolean isEmpty() {
+        return (null == mImage && null == mAudio);
+    }
+
     public File getAudio() {
         if (!mInitialized)
             initializeAudioFile();

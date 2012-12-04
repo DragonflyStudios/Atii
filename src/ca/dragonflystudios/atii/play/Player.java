@@ -174,6 +174,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mPlayManager.stopAudioReplay();
         mPlayManager.stopAudioRecording();
         mPlayManager.stopPhotoCapture();
+
+        mPlayManager.saveBook();
     }
 
     @Override

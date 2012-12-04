@@ -44,7 +44,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         public void requestPageChange(int newPage);
 
         public void requestPageChangeNotify(int newPage);
-}
+    }
 
     public enum PlayMode {
         INVALID, PLAYBACK, PLAYOUT
@@ -103,10 +103,10 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
     public String getImagePathForPage(int pageNum) {
         File imageFile = mBook.getPage(pageNum).getImage();
-        
+
         if (null == imageFile)
             return null;
-        
+
         return imageFile.getAbsolutePath();
     }
 
@@ -358,7 +358,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     // implementation for PlayCommandHandler
     public void addPageAfter() {
         int newPage = mCurrentPageNum + 1;
-        
+
         mBook.addPageAt(newPage);
         if (null != mPlayChangeListener)
             mPlayChangeListener.requestPageChangeNotify(newPage);
@@ -418,6 +418,10 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         if (success && null != mPlayChangeListener) {
             mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
         }
+    }
+
+    public void saveBook() {
+        mBook.save();
     }
 
     private String mStoryPath;
