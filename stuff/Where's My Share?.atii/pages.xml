@@ -1,0 +1,37 @@
+<pages>
+    <!-- each page may contain zero or one image and zero or one audio -->
+    <page>
+        <image>front.jpg</image>
+    </page>
+    <page>
+        <image>WhereMyShare01.jpg</image>
+    </page>
+    <page>
+        <image>WhereMyShare02.jpg</image>
+    </page>
+    <page>
+        <image>WhereMyShare03.jpg</image>
+    </page>
+    <page>
+        <image>WhereMyShare04.jpg</image>
+    </page>
+    <page>
+        <image>WhereMyShare05.jpg</image>
+    </page>
+    <page>
+        <image>WhereMyShare06.jpg</image>
+    </page>
+    <page>
+        <image>WhereMyShare07.jpg</image>
+    </page>
+    <page>
+        <image>WhereMyShare08.jpg</image>
+    </page>
+    <page>
+        <image>WhereMyShare09.jpg</image>
+    </page>
+    <page>
+        <image>WhereMyShare10.jpg</image>
+    </page>
+</pages>
+

@@ -1,0 +1,25 @@
+<pages>
+    <!-- each page may contain zero or one image and zero or one audio -->
+    <page>
+        <image>front.jpg</image>
+    </page>
+    <page>
+        <image>JR_Owls_001.jpg</image>
+    </page>
+    <page>
+        <image>JR_Owls_002.jpg</image>
+    </page>
+    <page>
+        <image>JR_Owls_003.jpg</image>
+    </page>
+    <page>
+        <image>JR_Owls_004.jpg</image>
+    </page>
+    <page>
+        <image>JR_Owls_005.jpg</image>
+    </page>
+    <page>
+        <image>JR_Owls_006.jpg</image>
+    </page>
+</pages>
+

@@ -63,7 +63,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
         mPlayManager = new PlayManager(storyPath, this);
         mPlayManager.setAutoReplay(true);
-        mPlayManager.setAutoAdvance(true);
+        mPlayManager.setAutoAdvance(false);
 
         mAdapter = new AtiiPagerAdapter(getSupportFragmentManager(), mPlayManager);
 

@@ -128,7 +128,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public boolean isAutoReplay() {
-        return mAutoReplay;
+        return (mPlayMode == PlayMode.PLAYBACK) && mAutoReplay;
     }
 
     public void setAutoReplay(boolean auto) {

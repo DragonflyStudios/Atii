@@ -1,0 +1,40 @@
+<pages>
+    <!-- each page may contain zero or one image and zero or one audio -->
+    <page>
+        <image>front.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar01.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar02.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar03.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar04.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar05.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar06.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar07.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar08.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar09.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar10.jpg</image>
+    </page>
+    <page>
+        <image>Caterpillar11.jpg</image>
+    </page>
+</pages>
+
