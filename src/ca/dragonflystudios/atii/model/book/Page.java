@@ -43,6 +43,13 @@ public class Page extends Entity {
         return mImage;
     }
 
+    public File getImageFileForWriting() {
+        if (null == mImage)
+            mImage = new File(mAudioFolder, Pathname.createUniqueFileName(mAudioFolder, "jpg"));
+
+        return mImage;
+    }
+
     // TODO: something tricky here w.r.t. name correspondence. May not need to
     // do anything special. TAI!
     public void setImage(File newImage) {
@@ -52,6 +59,13 @@ public class Page extends Entity {
     public File getAudio() {
         if (!mInitialized)
             initializeAudioFile();
+
+        return mAudio;
+    }
+
+    public File getAudioFileForWriting() {
+        if (null == mAudio)
+            mAudio = new File(mAudioFolder, Pathname.createUniqueFileName(mAudioFolder, "3gp"));
 
         return mAudio;
     }
@@ -74,11 +88,23 @@ public class Page extends Entity {
         return (AudioPlaybackState.NO_AUDIO != mState);
     }
 
-    private void initializeAudioFile() {
-        if (mInitialized)
-            return;
+    public void removePageFiles() {
+        if (null != mImage && mImage.exists()) {
+            mImage.delete();
+            mImage = null;
+        }
 
-        if (mAudio.exists())
+        if (null != mImage && mImage.exists()) {
+            mImage.delete();
+            mImage = null;
+        }
+
+        mInitialized = false;
+        mState = AudioPlaybackState.NO_AUDIO;
+    }
+
+    private void initializeAudioFile() {
+        if (null != mAudio && mAudio.exists())
             mState = AudioPlaybackState.NOT_STARTED;
         else
             mState = AudioPlaybackState.NO_AUDIO;
@@ -87,7 +113,17 @@ public class Page extends Entity {
     }
 
     public String getImagePath() {
+        if (null == mImage)
+            return null;
+
         return mImage.getAbsolutePath();
+    }
+
+    public String getAudioPath() {
+        if (null == mAudio)
+            return null;
+
+        return mAudio.getAbsolutePath();
     }
 
     @Override
@@ -116,7 +152,7 @@ public class Page extends Entity {
 
         if (null == audioFileName)
             audioFileName = Pathname.createUniqueFileName(mAudioFolder, "3gp");
-        
+
         mImage = new File(mImageFolder, imageFileName);
         mAudio = new File(mAudioFolder, audioFileName);
 

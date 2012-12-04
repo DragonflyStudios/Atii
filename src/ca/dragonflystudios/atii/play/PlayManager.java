@@ -39,9 +39,12 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
         public void onPageImageChanged(int pageNum);
 
-        // this is a hack that breaks the integrity of "PlayChangeListener". TAI!
+        // this is a hack that breaks the integrity of "PlayChangeListener".
+        // TAI!
         public void requestPageChange(int newPage);
-    }
+
+        public void requestPageChangeNotify(int newPage);
+}
 
     public enum PlayMode {
         INVALID, PLAYBACK, PLAYOUT
@@ -69,6 +72,9 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public AudioPlaybackState getAudioPlaybackState() {
+        if (null == mCurrentPage)
+            return AudioPlaybackState.NO_AUDIO;
+
         return mCurrentPage.getAudioPlaybackState();
     }
 
@@ -76,7 +82,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
         File storyDir = new File(storyPath);
         mStoryPath = storyDir.getAbsolutePath();
-        
+
         mStoryTitle = Pathname.extractStem(storyDir.getName());
 
         mBook = new Book(storyDir);
@@ -95,12 +101,13 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         }
     }
 
-    public static String getDefaultPageImagePath() {
-        return (new File(Environment.getExternalStorageDirectory(), "Atii/defaults/default_page_image.jpg")).getAbsolutePath();
-    }
-
     public String getImagePathForPage(int pageNum) {
-        return mBook.getPage(pageNum).getImage().getAbsolutePath();
+        File imageFile = mBook.getPage(pageNum).getImage();
+        
+        if (null == imageFile)
+            return null;
+        
+        return imageFile.getAbsolutePath();
     }
 
     public String getStoryPath() {
@@ -109,6 +116,10 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
     public String getStoryTitle() {
         return mStoryTitle;
+    }
+
+    public Page getPage(int pageNum) {
+        return mBook.getPage(pageNum);
     }
 
     public int getInitialPage() {
@@ -125,7 +136,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public boolean isAutoAdvance() {
-        return mAutoAdvance;
+        return (mPlayMode == PlayMode.PLAYBACK) && mAutoAdvance;
     }
 
     public void setAutoAdvance(boolean auto) {
@@ -189,6 +200,9 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     private boolean hasAudio() {
+        if (null == mCurrentPage)
+            return false;
+
         return mCurrentPage.hasAudio();
     }
 
@@ -275,7 +289,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
                 mMediaRecorder = new MediaRecorder();
                 mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                 mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                mMediaRecorder.setOutputFile(mCurrentPage.getAudio().getPath());
+                mMediaRecorder.setOutputFile(mCurrentPage.getAudioFileForWriting().getPath());
                 mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
                 mMediaRecorder.prepare();
@@ -318,7 +332,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         ContentValues values = new ContentValues();
         values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
 
-        Uri imageFileUri = Uri.fromFile(mCurrentPage.getImage());
+        Uri imageFileUri = Uri.fromFile(mCurrentPage.getImageFileForWriting());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
         intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
         requestingActivity.startActivityForResult(intent, Player.CAPTURE_PHOTO);
@@ -333,16 +347,29 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     @Override
     // implementation for PlayCommandHandler
     public void addPageBefore() {
+        int newPage = mCurrentPageNum;
+
+        mBook.addPageAt(newPage);
+        if (null != mPlayChangeListener)
+            mPlayChangeListener.requestPageChangeNotify(newPage);
     }
 
     @Override
     // implementation for PlayCommandHandler
     public void addPageAfter() {
+        int newPage = mCurrentPageNum + 1;
+        
+        mBook.addPageAt(newPage);
+        if (null != mPlayChangeListener)
+            mPlayChangeListener.requestPageChangeNotify(newPage);
     }
 
     @Override
     // implementation for PlayCommandHandler
     public void deletePage() {
+        int newPage = mBook.deletePageAt(mCurrentPageNum);
+        if (null != mPlayChangeListener && 0 <= newPage)
+            mPlayChangeListener.requestPageChangeNotify(newPage);
     }
 
     @Override
@@ -350,7 +377,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     public void onCompletion(MediaPlayer mp) {
         if (mMediaPlayer == mp) {
             stopAudioReplay();
-            
+
             if (null != mPlayChangeListener && isAutoAdvance() && mCurrentPageNum < getNumPages() - 1)
                 mPlayChangeListener.requestPageChange(mCurrentPageNum + 1);
         }
@@ -370,7 +397,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
             setCurrentPage(position);
 
             if (isAutoReplay()) {
-                new Timer().schedule(new TimerTask() {          
+                new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
                         startAudioReplay();

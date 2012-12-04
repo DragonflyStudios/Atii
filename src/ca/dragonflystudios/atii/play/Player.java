@@ -278,6 +278,14 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mPager.setCurrentItem(newPage);
     }
 
+    @Override
+    // implementation for PlayChangeListener
+    public void requestPageChangeNotify(int newPage) {
+        mPager.setAdapter(mAdapter);
+        mPager.setCurrentItem(newPage);
+        updatePageNumView(newPage);
+    }
+
     private void updateControls() {
         mPager.setPageChangeEnabled(true);
 

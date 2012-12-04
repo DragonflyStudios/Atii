@@ -110,19 +110,21 @@ Story Player UI:
  *     - Still honors the one-image-one-audio policy.
  *
  * [ ] Page operations
- *     [ ] Handle the following special cases
- *         [ ] When there is no "book.xml"
- *         [ ] When there is no "pages.xml"
- *         [ ] When there is no "images" folder
- *         [ ] When there is no "audio" folder
- *     [ ] When story is empty automatically create a blank page
- *         [ ] Create a default image and put it in asset? Or at least a drawable?
- *     [ ] Handle the following special cases
- *         [ ] When there is a page but no page image
- *         [ ] When there is a page but no page audio
- *     [ ] Add page after
- *     [ ] Add page before
- *     [ ] Delete page
+ *     [x] Handle the following special cases
+ *         [x] When there is no "book.xml"
+ *         [x] When there is no "pages.xml"
+ *         [x] When there is no "images" folder
+ *         [x] When there is no "audio" folder
+ *     [x] When story is empty automatically create a blank page
+ *         [x] Show text view to indicate the emptiness of page
+ *     [x] Handle the following special cases
+ *         [x] When there is a page but no page image
+ *         [x] When there is a page but no page audio
+ *     [x] Add page after
+ *     [x] Add page before
+ *     [x] Delete page
+ *     [ ] Save to Xml
+ *     [ ] Testing and debugging
  *
  * ......
  *
@@ -139,7 +141,10 @@ Story Player UI:
  *
  * ......
  *
+ * [ ] Refactor 
  * [ ] Create new book
+ *     [ ] Book title
+ *     [ ] Book title editing
  *
  * ......
  *

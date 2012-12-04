@@ -1,8 +1,11 @@
 package ca.dragonflystudios.atii.play;
 
+import java.io.File;
+
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,15 +29,25 @@ public class PageFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPageImagePath = (getArguments() != null ? getArguments().getString("pageImage") : PlayManager.getDefaultPageImagePath());
+        mPageImagePath = getArguments().getString("pageImage");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.page, container, false);
-        ImageView iv = (ImageView) v.findViewById(R.id.page_image);
-        Bitmap mBitmap = Image.decodeBitmapFileSampled(mPageImagePath, container.getWidth(), container.getHeight());
-        iv.setImageBitmap(mBitmap);
+        View v;
+
+        if ((null != mPageImagePath) && (new File(mPageImagePath).exists())) {
+            v = inflater.inflate(R.layout.page, container, false);
+            ImageView iv = (ImageView) v.findViewById(R.id.page_image);
+            
+            Bitmap mBitmap = Image.decodeBitmapFileSampled(mPageImagePath, container.getWidth(), container.getHeight());
+
+            if (null != mBitmap)
+                iv.setImageBitmap(mBitmap);
+            else
+                Log.i(getClass().getName(), "failed to decode page image file at " + mPageImagePath);
+        } else
+            v = inflater.inflate(R.layout.empty_page, container, false);
 
         return v;
     }

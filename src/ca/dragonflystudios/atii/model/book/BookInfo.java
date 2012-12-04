@@ -8,6 +8,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
+import android.util.Log;
 import ca.dragonflystudios.atii.model.Entity;
 import ca.dragonflystudios.atii.model.Parser;
 import ca.dragonflystudios.utilities.Pathname;
@@ -16,14 +17,12 @@ public class BookInfo extends Entity {
 
     public BookInfo(File bookFolder) {
         mBookFolder = bookFolder;
-
-        File bookXmlFile = new File(bookFolder, "book.xml");
-        mTitle = null;
         mAuthorNames = new ArrayList<String>();
         mIllustratorNames = new ArrayList<String>();
 
         initializeWithDefaults(bookFolder);
 
+        File bookXmlFile = new File(bookFolder, "book.xml");
         if (bookXmlFile.exists()) {
             Parser parser = new Parser();
             try {
@@ -31,7 +30,8 @@ public class BookInfo extends Entity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        } else
+            Log.i(getClass().getName(), "book specification file " + bookXmlFile.getAbsolutePath() + " does not exist.");
     }
 
     public String getBookPath() {
