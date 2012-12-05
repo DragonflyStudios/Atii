@@ -124,7 +124,6 @@ Story Player UI:
  *     [x] Add page before
  *     [x] Delete page
  *     [x] Save to Xml
- *     [ ] Testing and debugging
  *
  * ......
  *
@@ -132,13 +131,15 @@ Story Player UI:
  * [x] Make buttons translucent
  * [x] Create two demos
  *
- * ~~~ The above by End of Tuesday ~~~
+ * ......
  *
- * [ ] Refactor 
+ * [ ] Refactor page model & operations
+ *     [ ] Testing and debugging
+ * [ ] Warning about page deletion
+ * [ ] Animation for page addition
  * [ ] Create new book
  *     [ ] Book title
  *     [ ] Book title editing
- * [ ] Warning about page deletion
  * [ ] Delete book
  *     [ ] Warning about book deletion
  *
@@ -146,20 +147,26 @@ Story Player UI:
  *
  * [ ] HTML5 starts
  *     - See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
+ *
+ * ......
+ *
  * [ ] Generate time-lapse videos
+ *
+ * ......
+ *
  * [ ] Auto-generation of book preview
  *
  * ......
  *
- * [ ] PDF as source of page image
- *     - THINK: how easy it would be for people to make a narrated presentation.
+ * [x] Use other apps for photo capture
+ * [ ] Use any image on device (copy over? maybe not?)
+ * [ ] Page image editing: allow panning, zooming & cropping.
+ * [ ] Warn about replacing page image, if there is already one
  *
  * ......
  *
- * [x] Use other apps for photo capture
- * [ ] Should seriously consider using other apps for audio recording
- * [ ] Add UI for using any image on device (copy over) -- allow panning, zooming & cropping.
- * [ ] Add UI for using any audio on device (copy over) -- is this a good idea?
+ * [ ] Use other apps for audio recording?
+ * [ ] Use any audio on device (copy over? maybe not?) -- is this a good idea?
  *
  * ......
  *
@@ -169,6 +176,11 @@ Story Player UI:
  *
  * [ ] Gingerbread support
  * [ ] Kindle Fire test
+ *
+ * ......
+ *
+ * [ ] Support for multiple audio tracks
+ * [ ] Rethink UI modes ...
  *
  * ......
  *
@@ -187,9 +199,19 @@ Story Player UI:
  *         [ ] Double tap to stop recording
  *     [ ] In auto page advance ... appropriately time page turn in relation to audio stop and starting
  *         - currently there is a 1s delay before audio starts on a new page
- *     [ ] Give visual feedback that playing back is going on ...
+ *     [ ] Visual feedback when playback is going on ...
+ *     [ ] Page transition animation
  * [ ] Image cropping
  *     - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
+ *
+ * ......
+ *
+ * [ ] PDF as source of page image
+ *     - THINK: how easy it would be for people to make a narrated presentation.
+ *
+ * ......
+ *
+ * [ ] Page text: allow multiple languages ...
  *
  * ......
  *
