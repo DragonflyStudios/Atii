@@ -109,7 +109,7 @@ Story Player UI:
  *     - Use an XML file for list of pages, with each item in the list pointing to a file
  *     - Still honors the one-image-one-audio policy.
  *
- * [ ] Page operations
+ * [x] Page operations
  *     [x] Handle the following special cases
  *         [x] When there is no "book.xml"
  *         [x] When there is no "pages.xml"
@@ -133,40 +133,67 @@ Story Player UI:
  *
  * ......
  *
- * [ ] Refactor page model & operations
- *     [ ] Testing and debugging
- * [ ] Warning about page deletion
- * [ ] Animation for page addition
- * [ ] Create new book
- *     [ ] Book title
- *     [ ] Book title editing
- * [ ] Delete book
- *     [ ] Warning about book deletion
+ * [x] Use other apps for photo capture
  *
  * ......
  *
- * [ ] HTML5 starts
+ * - Redesign authoring
+ *
+ * [ ] Bring book editing into "Atii Library"
+ *     [ ] Long tap show options: edit, delete
+ *         - Delete
+ *           [ ] Warning about book deletion
+ *         - Edit
+ *           [ ] Allow open in "Edit Mode", if "Pro" is set
+ *               [ ] Turn on/off "Pro" mode in Settings
+ *           [ ] Dialog for Book Info editing
+ *               [ ] Title
+ *               [ ] Preview
+ *                   - default checkbox
+ *                   [ ] Use a dialog to pick an image
+ *           [ ] Tap an "edit pages" button to 
+ * [ ] Button from action menu to "Create", "Import"
+ * [ ] Create book
+ *     - Dialog for Book Info editing: same as above
+ *     [ ] Generate pages from a batch ... all images in a folder
+ *         [ ] With option for auto-generation of book preview
+ * [ ] Use any image on device for a book (copy over? yes)
+ *     [ ] Preview generation
+ *         [ ] Default checkbox ... uses first page of book.
+ * [ ] Import book
+ *     [ ] Copy a folder over
+ * [ ] Interactive editing
+ *     [ ] Warn about replacing page image, if there is already one
+ *         [ ] Animation for page image replacing
+ *     [ ] Warning about page deletion
+ *     [ ] Animation for page deletion
+ *     [ ] Animation for page addition
+ *
+ * ......
+ *
+ * [ ] Refactor page model & operations
+ *     [ ] Testing and debugging
+ * [ ] Support for multiple audio tracks
+ *     [ ] Use xml tag attributes
+ *         [ ] "default" track
+ *         [ ] named tracks
+ *     [ ] Tracks UI
+ *         [ ] Playback: a spinner above the playback button if there are more than one tracks
+ *         [ ] Playout: show spinner above the record button ...
+ *             [ ] New "narrator"?
+ *             [ ] Mark track as "irreplaceable"?
+ *
+ * ~~~ The Above by end of Monday, Dec 10 ~~~
+ *
+ * ......
+ *
+ * [ ] HTML5 starts => Matt
  *     - See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
  *
  * ......
  *
  * [ ] Generate time-lapse videos
- *
- * ......
- *
- * [ ] Auto-generation of book preview
- *
- * ......
- *
- * [x] Use other apps for photo capture
- * [ ] Use any image on device (copy over? maybe not?)
- * [ ] Page image editing: allow panning, zooming & cropping.
- * [ ] Warn about replacing page image, if there is already one
- *
- * ......
- *
- * [ ] Use other apps for audio recording?
- * [ ] Use any audio on device (copy over? maybe not?) -- is this a good idea?
+ * [ ] Upload to YouTube
  *
  * ......
  *
@@ -174,13 +201,10 @@ Story Player UI:
  *
  * ......
  *
- * [ ] Gingerbread support
- * [ ] Kindle Fire test
+ * [ ] Import PDF (copy over + extract basic info)
+ *     - PDF as source of page image
  *
- * ......
- *
- * [ ] Support for multiple audio tracks
- * [ ] Rethink UI modes ...
+ * ~~~ The Above by end of Monday, Dec 17 ~~~
  *
  * ......
  *
@@ -206,12 +230,13 @@ Story Player UI:
  *
  * ......
  *
- * [ ] PDF as source of page image
- *     - THINK: how easy it would be for people to make a narrated presentation.
+ * ~~~ Other possible core features ~~~
  *
- * ......
- *
+ * [ ] Page image editing: allow panning, zooming & cropping.
+ * [ ] Use other apps for audio recording?
+ * [ ] Use any audio on device (copy over? maybe not?) -- is this a good idea?
  * [ ] Page text: allow multiple languages ...
+ * [ ] Filter out background noise from recording
  *
  * ......
  *
@@ -220,6 +245,13 @@ Story Player UI:
  *     [ ] When play back, such transformations will be timed to the audio ...
  *         - Note that this breaks the one-page-one-audio correspondence; or at least could break it.
  * [ ] Capturing while recording audio?
- * 
+ *
+ * ......
+ *
+ * [ ] Gingerbread support
+ * [ ] Kindle Fire test
+ *
+ * ~~~ The Above by end of Thursday, Jan 17 ~~~
+ *
  */
 
