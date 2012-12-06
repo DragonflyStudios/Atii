@@ -151,7 +151,8 @@ Story Player UI:
  *               [ ] Preview
  *                   - default checkbox
  *                   [ ] Use a dialog to pick an image
- *           [ ] Tap an "edit pages" button to 
+ *           [ ] Tap an "edit pages" button to
+ *     [ ] Selection of multiple items
  * [ ] Button from action menu to "Create", "Import"
  * [ ] Create book
  *     - Dialog for Book Info editing: same as above

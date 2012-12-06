@@ -14,13 +14,18 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -72,6 +77,22 @@ public class BookGridActivity extends Activity {
                 Intent playIntent = new Intent(BookGridActivity.this, Player.class);
                 playIntent.putExtra(Player.STORY_EXTRA_KEY, mBookInfos.get(position).getBookPath());
                 startActivity(playIntent);
+            }
+        });
+
+        mBookGridView.setOnItemLongClickListener(new OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if (mActionMode != null) {
+                    return false;
+                }
+
+                // Start the CAB using the ActionMode.Callback defined above
+                mActionMode = BookGridActivity.this.startActionMode(mActionModeCallback);
+                view.setSelected(true);
+                mSelectedView = view;
+
+                return true;
             }
         });
 
@@ -147,9 +168,53 @@ public class BookGridActivity extends Activity {
         return true;
     }
 
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            // Inflate a menu resource providing context menu items
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.book_selected, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false; // Return false if nothing is done
+        }
+
+        // Called when the user selects a contextual menu item
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+            case R.id.menu_edit:
+                Log.d(getClass().getName(), "edit!");
+                mode.finish(); // Action picked, so close the CAB
+                return true;
+            case R.id.menu_delete:
+                Log.d(getClass().getName(), "delete!");
+                mode.finish(); // Action picked, so close the CAB
+                return true;
+            default:
+                return false;
+            }
+        }
+
+        // Called when the user exits the action mode
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mSelectedView.setSelected(false);
+            mSelectedView = null;
+            mActionMode = null;
+        }
+    };
+
     private ArrayList<BookInfo> mBookInfos;
     private GridView mBookGridView;
     private BookGridAdapter mBookGridAdapter;
+
+    private ActionMode mActionMode;
+    private View mSelectedView;
 
     private static Context sAppContext;
 }

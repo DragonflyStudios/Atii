@@ -40,6 +40,10 @@
     <!-- action items - book list -->
     <string name="menu_create">Create</string>
 
+    <!--  action mode - book selected -->
+    <string name="menu_edit">Edit</string>
+    <string name="menu_delete">Delete</string>
+
     <!-- action items - player -->
     <string name="menu_record_audio">Record Audio</string>
     <string name="menu_capture_photo">Capture Photo</string>
