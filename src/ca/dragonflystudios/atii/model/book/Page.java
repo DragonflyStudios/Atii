@@ -167,6 +167,20 @@ public class Page extends Entity {
 
     @Override
     public void saveToXml(XmlSerializer serializer) throws IOException, IllegalArgumentException, IllegalStateException {
+        serializer.startTag("", "page");
+        File imageFile = getImage();
+        if (null != imageFile && imageFile.exists()) {
+            serializer.startTag("", "image");
+            serializer.text(imageFile.getName());
+            serializer.endTag("", "image");
+        }
+        File audioFile = getAudio();
+        if (null != audioFile && audioFile.exists()) {
+            serializer.startTag("", "audio");
+            serializer.text(audioFile.getName());
+            serializer.endTag("", "audio");
+        }
+        serializer.endTag("", "page");
     }
 
     private AudioPlaybackState mState;

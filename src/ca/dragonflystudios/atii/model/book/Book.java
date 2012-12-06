@@ -143,22 +143,8 @@ public class Book extends Entity {
         serializer.startDocument(null, true);
         if (mPages.size() > 0) {
             serializer.startTag("", "pages");
-            for (Page page : mPages) {
-                serializer.startTag("", "page");
-                File imageFile = page.getImage();
-                if (null != imageFile && imageFile.exists()) {
-                    serializer.startTag("", "image");
-                    serializer.text(imageFile.getName());
-                    serializer.endTag("", "image");
-                }
-                File audioFile = page.getAudio();
-                if (null != audioFile && audioFile.exists()) {
-                    serializer.startTag("", "audio");
-                    serializer.text(audioFile.getName());
-                    serializer.endTag("", "audio");
-                }
-                serializer.endTag("", "page");
-            }
+            for (Page page : mPages)
+                page.saveToXml(serializer);
             serializer.endTag("", "pages");
         }
         serializer.endDocument();
