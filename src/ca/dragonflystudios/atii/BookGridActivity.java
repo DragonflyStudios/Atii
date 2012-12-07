@@ -110,21 +110,26 @@ public class BookGridActivity extends Activity {
 
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
                 if (checked && !mSelected.contains(position)) {
                     mSelected.add(position);
                     mBookGridAdapter.notifyDataSetChanged();
+                    int count = mSelected.size();
+                    mode.setTitle(count + " selected");
+                    if (2 == count)
+                        mode.invalidate();
                 } else if (!checked && mSelected.contains(position)) {
                     mSelected.remove(position);
                     mBookGridAdapter.notifyDataSetChanged();
+                    int count = mSelected.size();
+                    mode.setTitle(count + " selected");
+                    if (1 == count)
+                        mode.invalidate();
                 }
-
-                int total = mSelected.size();
-                mode.setTitle(total + " selected");
             }
 
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                // Inflate a menu resource providing context menu items
                 MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.book_selected, menu);
                 return true;
@@ -132,27 +137,30 @@ public class BookGridActivity extends Activity {
 
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false; // Return false if nothing is done
+                int count = mSelected.size();
+                if (count > 1)
+                    menu.findItem(R.id.menu_edit).setEnabled(false).setVisible(false);
+                else
+                    menu.findItem(R.id.menu_edit).setEnabled(true).setVisible(true);
+                return true;
             }
 
-            // Called when the user selects a contextual menu item
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch (item.getItemId()) {
                 case R.id.menu_edit:
                     Log.d(getClass().getName(), "edit!");
-                    mode.finish(); // Action picked, so close the CAB
+                    mode.finish();
                     return true;
                 case R.id.menu_delete:
                     Log.d(getClass().getName(), "delete!");
-                    mode.finish(); // Action picked, so close the CAB
+                    mode.finish();
                     return true;
                 default:
                     return false;
                 }
             }
 
-            // Called when the user exits the action mode
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 mSelected.clear();

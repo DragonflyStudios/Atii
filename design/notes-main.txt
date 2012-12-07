@@ -139,30 +139,28 @@ Story Player UI:
  *
  * - Redesign authoring
  *
- * [ ] Bring book editing into "Atii Library"
- *     [ ] Long tap show options: edit, delete
- *         - Delete
- *           [ ] Warning about book deletion
- *         - Edit
- *           [ ] Allow open in "Edit Mode", if "Pro" is set
- *               [ ] Turn on/off "Pro" mode in Settings
- *           [ ] Dialog for Book Info editing
- *               [ ] Title
- *               [ ] Preview
- *                   - default checkbox
- *                   [ ] Use a dialog to pick an image
- *           [ ] Tap an "edit pages" button to
- *     [ ] Selection of multiple items
- * [ ] Button from action menu to "Create", "Import"
- * [ ] Create book
- *     - Dialog for Book Info editing: same as above
- *     [ ] Generate pages from a batch ... all images in a folder
- *         [ ] With option for auto-generation of book preview
- * [ ] Use any image on device for a book (copy over? yes)
- *     [ ] Preview generation
- *         [ ] Default checkbox ... uses first page of book.
- * [ ] Import book
- *     [ ] Copy a folder over
+ * [ ] Book Editing
+ *     [x] Long tap show options: edit, delete
+ *     [x] Selection of multiple items
+ *     [x] Dynamic contextual menu
+ *         - Show "Edit" & "Delete" when only one book selected
+ *         - Show "Delete" when more than one book selected
+ *     [ ] Delete
+ *         [ ] Warning about book deletion
+ *     [ ] Edit
+ *         [ ] Dialog for Book Info editing
+ *             [ ] Title
+ *             [ ] Preview
+ *                 [ ] Default checkbox ... uses first page of book.
+ *                 [ ] Use a dialog to pick an image anywhere on the device and bring it over
+ *         [ ] Tap an "edit pages" button to
+ *         [ ] Allow open in "Edit Mode", if "Pro" is set
+ *             [ ] Turn on/off "Pro" mode in Settings
+ * [x] Action item in action menu for "Create"
+ * [ ] Create book dialog
+ *     - Same as Edit above: except "edit pages" is replaced with
+ *     [ ] Checkbox: generate pages from a batch ... all images in a folder
+ *         [ ] Folder browsing
  * [ ] Interactive editing
  *     [ ] Warn about replacing page image, if there is already one
  *         [ ] Animation for page image replacing
