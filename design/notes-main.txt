@@ -145,8 +145,8 @@ Story Player UI:
  *     [x] Dynamic contextual menu
  *         - Show "Edit" & "Delete" when only one book selected
  *         - Show "Delete" when more than one book selected
- *     [ ] Delete
- *         [ ] Warning about book deletion
+ *     [x] Delete
+ *         [x] Warning about book deletion
  *     [ ] Edit
  *         [ ] Dialog for Book Info editing
  *             [ ] Title

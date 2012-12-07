@@ -1,5 +1,6 @@
 package ca.dragonflystudios.utilities;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,6 +24,28 @@ public class Files {
         } finally {
             inStream.close();
             outStream.close();
+        }
+    }
+
+    public static boolean deleteRecursive(File fileOrDirectory) {
+        if (fileOrDirectory.isDirectory())
+            for (File child : fileOrDirectory.listFiles())
+                if (!deleteRecursive(child))
+                    return false;
+
+        return fileOrDirectory.delete();
+    }
+
+    public static void rm(String path) {
+        File file = new File(path);
+
+        if (file.exists()) {
+            String deleteCmd = "rm -r " + path;
+            Runtime runtime = Runtime.getRuntime();
+            try {
+                runtime.exec(deleteCmd);
+            } catch (IOException e) {
+            }
         }
     }
 }

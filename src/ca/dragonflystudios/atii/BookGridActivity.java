@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,6 +33,8 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import ca.dragonflystudios.android.dialog.DeleteDialogFragment;
+import ca.dragonflystudios.android.dialog.DeleteDialogFragment.DeleteDialogListener;
 import ca.dragonflystudios.android.storage.Storage;
 import ca.dragonflystudios.atii.model.book.BookInfo;
 import ca.dragonflystudios.atii.play.Player;
@@ -42,7 +45,7 @@ import ca.dragonflystudios.utilities.Pathname;
 
 // TODO: handle the case when no book was found & show empty view
 
-public class BookGridActivity extends Activity {
+public class BookGridActivity extends Activity implements DeleteDialogListener {
     private static final String SETTINGS = "atii_settings";
     private static final String FIRST_LAUNCH = "first_launch";
 
@@ -154,6 +157,10 @@ public class BookGridActivity extends Activity {
                     return true;
                 case R.id.menu_delete:
                     Log.d(getClass().getName(), "delete!");
+                    DialogFragment dialog = new DeleteDialogFragment();
+                    dialog.show(getFragmentManager(), "DeleteDialogFragment");
+                    mToBeOped = new HashSet<Integer>();
+                    mToBeOped.addAll(mSelected);
                     mode.finish();
                     return true;
                 default:
@@ -243,13 +250,42 @@ public class BookGridActivity extends Activity {
     }
 
     @Override
+    // implementation for DeleteDialogListener
+    public void onDeletePositive() {
+        deleteBooks(mToBeOped);
+        mToBeOped.clear();
+        mToBeOped = null;
+    }
+    
+    @Override
+    // implementation for DeleteDialogListener
+    public void onDeleteNegative() {
+        
+    }
+    
+    private void deleteBooks(Set<Integer> bookPositions) {
+        ArrayList<BookInfo> booksToDelete = new ArrayList<BookInfo>();
+
+        for (int position : bookPositions)
+            booksToDelete.add(mBookInfos.get(position));
+
+        mBookInfos.removeAll(booksToDelete);
+
+        // TODO: error handling by checking return value from info.delete()
+        for (BookInfo info : booksToDelete)
+            info.delete();
+
+        mBookGridAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.book_list, menu);
         return true;
     }
 
     private ArrayList<BookInfo> mBookInfos;
-    private Set<Integer> mSelected;
+    private Set<Integer> mSelected, mToBeOped;
     private GridView mBookGridView;
     private BookGridAdapter mBookGridAdapter;
 

@@ -44,6 +44,10 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_delete">Delete</string>
 
+    <!--  book deletion dialog -->
+    <string name="book_deletion_dialog_title">Book Deletion</string>
+    <string name="book_deletion_dialog_warning">This cannot be undone.</string>
+
     <!-- action items - player -->
     <string name="menu_record_audio">Record Audio</string>
     <string name="menu_capture_photo">Capture Photo</string>

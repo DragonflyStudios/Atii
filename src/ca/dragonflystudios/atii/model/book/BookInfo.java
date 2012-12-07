@@ -13,6 +13,7 @@ import android.util.Log;
 import android.util.Xml;
 import ca.dragonflystudios.atii.model.Entity;
 import ca.dragonflystudios.atii.model.Parser;
+import ca.dragonflystudios.utilities.Files;
 import ca.dragonflystudios.utilities.Pathname;
 
 public class BookInfo extends Entity {
@@ -121,6 +122,10 @@ public class BookInfo extends Entity {
         serializer.endTag("", "book");
         serializer.endDocument();
         os.close();
+    }
+
+    public boolean delete() {
+        return Files.deleteRecursive(mBookFolder);
     }
 
     private File mBookFolder, mBookXmlFile;
