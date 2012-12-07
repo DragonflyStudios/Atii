@@ -5,6 +5,8 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.app.Activity;
 import android.content.Context;
@@ -81,30 +83,43 @@ public class BookGridActivity extends Activity {
         });
 
         /*
-        mBookGridView.setOnItemLongClickListener(new OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (mActionMode != null) {
-                    return false;
-                }
+         * mBookGridView.setOnItemLongClickListener(new
+         * OnItemLongClickListener() {
+         * 
+         * @Override
+         * public boolean onItemLongClick(AdapterView<?> parent, View view, int
+         * position, long id) {
+         * if (mActionMode != null) {
+         * return false;
+         * }
+         * 
+         * // Start the CAB using the ActionMode.Callback defined above
+         * mActionMode =
+         * BookGridActivity.this.startActionMode(mActionModeCallback);
+         * view.setSelected(true);
+         * mSelectedView = view;
+         * 
+         * return true;
+         * }
+         * });
+         */
 
-                // Start the CAB using the ActionMode.Callback defined above
-                mActionMode = BookGridActivity.this.startActionMode(mActionModeCallback);
-                view.setSelected(true);
-                mSelectedView = view;
-
-                return true;
-            }
-        });
-*/
-        
+        mSelected = new HashSet<Integer>();
         mBookGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
         mBookGridView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
             @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position,
-                                                  long id, boolean checked) {
-                ((View)(mBookGridView.getItemAtPosition(position))).setSelected(true);
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                if (checked && !mSelected.contains(position)) {
+                    mSelected.add(position);
+                    mBookGridAdapter.notifyDataSetChanged();
+                } else if (!checked && mSelected.contains(position)) {
+                    mSelected.remove(position);
+                    mBookGridAdapter.notifyDataSetChanged();
+                }
+
+                int total = mSelected.size();
+                mode.setTitle(total + " selected");
             }
 
             @Override
@@ -140,13 +155,11 @@ public class BookGridActivity extends Activity {
             // Called when the user exits the action mode
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-                mSelectedView.setSelected(false);
-                mSelectedView = null;
-                mActionMode = null;
+                mSelected.clear();
             }
 
         });
-            
+
         setContentView(mBookGridView);
     }
 
@@ -187,6 +200,14 @@ public class BookGridActivity extends Activity {
                 bookPreviewView.setImageResource(R.drawable.default_book_preview);
             }
 
+            // somehow View.setSelected() does not work here: it does not force
+            // the use of the background selector.
+            // that's why we are using setBackgroundColor directly
+            if (mSelected.contains(position))
+                convertView.setBackgroundColor(BookGridActivity.this.getResources().getColor(android.R.color.holo_blue_bright));
+            else
+                convertView.setBackgroundColor(BookGridActivity.this.getResources().getColor(android.R.color.white));
+
             return convertView;
         }
     }
@@ -220,11 +241,9 @@ public class BookGridActivity extends Activity {
     }
 
     private ArrayList<BookInfo> mBookInfos;
+    private Set<Integer> mSelected;
     private GridView mBookGridView;
     private BookGridAdapter mBookGridAdapter;
-
-    private ActionMode mActionMode;
-    private View mSelectedView;
 
     private static Context sAppContext;
 }
