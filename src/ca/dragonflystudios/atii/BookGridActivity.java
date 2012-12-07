@@ -23,9 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -80,6 +80,7 @@ public class BookGridActivity extends Activity {
             }
         });
 
+        /*
         mBookGridView.setOnItemLongClickListener(new OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -95,7 +96,57 @@ public class BookGridActivity extends Activity {
                 return true;
             }
         });
+*/
+        
+        mBookGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
+        mBookGridView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position,
+                                                  long id, boolean checked) {
+                ((View)(mBookGridView.getItemAtPosition(position))).setSelected(true);
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                // Inflate a menu resource providing context menu items
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.book_selected, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false; // Return false if nothing is done
+            }
+
+            // Called when the user selects a contextual menu item
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                case R.id.menu_edit:
+                    Log.d(getClass().getName(), "edit!");
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                case R.id.menu_delete:
+                    Log.d(getClass().getName(), "delete!");
+                    mode.finish(); // Action picked, so close the CAB
+                    return true;
+                default:
+                    return false;
+                }
+            }
+
+            // Called when the user exits the action mode
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                mSelectedView.setSelected(false);
+                mSelectedView = null;
+                mActionMode = null;
+            }
+
+        });
+            
         setContentView(mBookGridView);
     }
 
@@ -167,47 +218,6 @@ public class BookGridActivity extends Activity {
         getMenuInflater().inflate(R.menu.book_list, menu);
         return true;
     }
-
-    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            // Inflate a menu resource providing context menu items
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.book_selected, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false; // Return false if nothing is done
-        }
-
-        // Called when the user selects a contextual menu item
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-            case R.id.menu_edit:
-                Log.d(getClass().getName(), "edit!");
-                mode.finish(); // Action picked, so close the CAB
-                return true;
-            case R.id.menu_delete:
-                Log.d(getClass().getName(), "delete!");
-                mode.finish(); // Action picked, so close the CAB
-                return true;
-            default:
-                return false;
-            }
-        }
-
-        // Called when the user exits the action mode
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            mSelectedView.setSelected(false);
-            mSelectedView = null;
-            mActionMode = null;
-        }
-    };
 
     private ArrayList<BookInfo> mBookInfos;
     private GridView mBookGridView;
