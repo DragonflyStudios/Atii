@@ -40,16 +40,18 @@ import ca.dragonflystudios.atii.model.book.BookInfo;
 import ca.dragonflystudios.atii.play.Player;
 import ca.dragonflystudios.utilities.Pathname;
 
-// TODO: 
-// [ ] Turn this into a GridView with Previews and Title     1 day
-
 // TODO: handle the case when no book was found & show empty view
 
-public class BookGridActivity extends Activity implements DeleteDialogListener {
+public class LibraryActivity extends Activity implements DeleteDialogListener {
     private static final String SETTINGS = "atii_settings";
     private static final String FIRST_LAUNCH = "first_launch";
+    private static final String BOOK_OPEN_MODE = "book_open_mode";
 
-    public BookGridActivity() {
+    public enum BookOpenMode {
+        READER, AUTHOR
+    }
+
+    public LibraryActivity() {
         mBookInfos = new ArrayList<BookInfo>();
     }
 
@@ -71,6 +73,9 @@ public class BookGridActivity extends Activity implements DeleteDialogListener {
             prefs.edit().putBoolean(FIRST_LAUNCH, false).commit();
         }
 
+        String bom = prefs.getString(BOOK_OPEN_MODE, BookOpenMode.READER.toString());
+        mBookOpenMode = BookOpenMode.valueOf(bom);
+
         mBookGridView = (GridView) getLayoutInflater().inflate(R.layout.book_grid, null);
 
         listBooks(storiesDir);
@@ -79,7 +84,7 @@ public class BookGridActivity extends Activity implements DeleteDialogListener {
         mBookGridView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent playIntent = new Intent(BookGridActivity.this, Player.class);
+                Intent playIntent = new Intent(LibraryActivity.this, Player.class);
                 playIntent.putExtra(Player.STORY_EXTRA_KEY, mBookInfos.get(position).getBookPath());
                 startActivity(playIntent);
             }
@@ -141,7 +146,8 @@ public class BookGridActivity extends Activity implements DeleteDialogListener {
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
                 int count = mSelected.size();
-                if (count > 1)
+                
+                if (count > 1 || mBookOpenMode == BookOpenMode.READER)
                     menu.findItem(R.id.menu_edit).setEnabled(false).setVisible(false);
                 else
                     menu.findItem(R.id.menu_edit).setEnabled(true).setVisible(true);
@@ -176,6 +182,14 @@ public class BookGridActivity extends Activity implements DeleteDialogListener {
         });
 
         setContentView(mBookGridView);
+    }
+
+    @Override
+    public void onPause() {
+        SharedPreferences prefs = getSharedPreferences(SETTINGS, MODE_PRIVATE);
+        prefs.edit().putString(BOOK_OPEN_MODE, mBookOpenMode.toString()).commit();
+
+        super.onPause();
     }
 
     private class BookGridAdapter extends BaseAdapter {
@@ -219,9 +233,9 @@ public class BookGridActivity extends Activity implements DeleteDialogListener {
             // the use of the background selector.
             // that's why we are using setBackgroundColor directly
             if (mSelected.contains(position))
-                convertView.setBackgroundColor(BookGridActivity.this.getResources().getColor(android.R.color.holo_blue_bright));
+                convertView.setBackgroundColor(LibraryActivity.this.getResources().getColor(android.R.color.holo_blue_bright));
             else
-                convertView.setBackgroundColor(BookGridActivity.this.getResources().getColor(android.R.color.white));
+                convertView.setBackgroundColor(LibraryActivity.this.getResources().getColor(android.R.color.white));
 
             return convertView;
         }
@@ -256,13 +270,13 @@ public class BookGridActivity extends Activity implements DeleteDialogListener {
         mToBeOped.clear();
         mToBeOped = null;
     }
-    
+
     @Override
     // implementation for DeleteDialogListener
     public void onDeleteNegative() {
-        
+
     }
-    
+
     private void deleteBooks(Set<Integer> bookPositions) {
         ArrayList<BookInfo> booksToDelete = new ArrayList<BookInfo>();
 
@@ -280,9 +294,46 @@ public class BookGridActivity extends Activity implements DeleteDialogListener {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.book_list, menu);
+        getMenuInflater().inflate(R.menu.library, menu);
         return true;
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        switch (mBookOpenMode) {
+        case READER:
+            menu.findItem(R.id.menu_create).setEnabled(false).setVisible(false);
+            menu.findItem(R.id.menu_switch_to_reader).setEnabled(false).setVisible(false);
+            menu.findItem(R.id.menu_switch_to_author).setEnabled(true).setVisible(true);
+            break;
+        case AUTHOR:
+            menu.findItem(R.id.menu_create).setEnabled(true).setVisible(true);
+            menu.findItem(R.id.menu_switch_to_reader).setEnabled(true).setVisible(true);
+            menu.findItem(R.id.menu_switch_to_author).setEnabled(false).setVisible(false);
+            break;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.menu_switch_to_reader:
+            mBookOpenMode = BookOpenMode.READER;
+            invalidateOptionsMenu();
+            return true;
+        case R.id.menu_switch_to_author:
+            mBookOpenMode = BookOpenMode.AUTHOR;
+            invalidateOptionsMenu();
+            return true;
+        case R.id.menu_create:
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private BookOpenMode mBookOpenMode;
 
     private ArrayList<BookInfo> mBookInfos;
     private Set<Integer> mSelected, mToBeOped;

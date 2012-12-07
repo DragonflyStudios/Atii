@@ -139,7 +139,7 @@ Story Player UI:
  *
  * - Redesign authoring
  *
- * [ ] Book Editing
+ * [ ] Book Management
  *     [x] Long tap show options: edit, delete
  *     [x] Selection of multiple items
  *     [x] Dynamic contextual menu
@@ -148,25 +148,26 @@ Story Player UI:
  *     [x] Delete
  *         [x] Warning about book deletion
  *     [ ] Edit
+ *         [x] "Edit" in action mode is shown only in Author mode
  *         [ ] Dialog for Book Info editing
  *             [ ] Title
  *             [ ] Preview
  *                 [ ] Default checkbox ... uses first page of book.
  *                 [ ] Use a dialog to pick an image anywhere on the device and bring it over
- *         [ ] Tap an "edit pages" button to
- *         [ ] Allow open in "Edit Mode", if "Pro" is set
- *             [ ] Turn on/off "Pro" mode in Settings
+ *         [ ] Tap an "edit pages" button to open book in "Edit Mode", if "Author" mode
  * [x] Action item in action menu for "Create"
  * [ ] Create book dialog
- *     - Same as Edit above: except "edit pages" is replaced with
- *     [ ] Checkbox: generate pages from a batch ... all images in a folder
+ *     - Same as Edit above: except "edit pages" is replaced by "create pages"
+ *     [ ] Checkbox: from folder
  *         [ ] Folder browsing
- * [ ] Interactive editing
+ * [ ] Author mode
  *     [ ] Warn about replacing page image, if there is already one
  *         [ ] Animation for page image replacing
  *     [ ] Warning about page deletion
  *     [ ] Animation for page deletion
  *     [ ] Animation for page addition
+ * [x] Switch between author and reader modes in Settings
+ * [ ] Separate "author" and "reader" modes so that there is no switching between them
  *
  * ......
  *
