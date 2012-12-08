@@ -47,7 +47,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public enum PlayMode {
-        INVALID, PLAYBACK, PLAYOUT
+        INVALID, READER, AUTHOR
     }
 
     public enum PlayState {
@@ -78,7 +78,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         return mCurrentPage.getAudioPlaybackState();
     }
 
-    public PlayManager(String storyPath, PlayChangeListener pcl) {
+    public PlayManager(String storyPath, PlayChangeListener pcl, PlayMode mode) {
 
         File storyDir = new File(storyPath);
         mStoryPath = storyDir.getAbsolutePath();
@@ -87,7 +87,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
         mBook = new Book(storyDir);
 
-        mPlayMode = PlayMode.PLAYBACK;
+        mPlayMode = mode;
         mPlayState = PlayState.IDLE;
 
         mPlayChangeListener = pcl;
@@ -128,7 +128,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public boolean isAutoReplay() {
-        return (mPlayMode == PlayMode.PLAYBACK) && mAutoReplay;
+        return (mPlayMode == PlayMode.READER) && mAutoReplay;
     }
 
     public void setAutoReplay(boolean auto) {
@@ -136,7 +136,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public boolean isAutoAdvance() {
-        return (mPlayMode == PlayMode.PLAYBACK) && mAutoAdvance;
+        return (mPlayMode == PlayMode.READER) && mAutoAdvance;
     }
 
     public void setAutoAdvance(boolean auto) {
@@ -252,24 +252,24 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     @Override
     // implementation for PlayCommandHandler
     public void togglePlayMode() {
-        if (mPlayMode != PlayMode.PLAYBACK)
-            switchPlayMode(PlayMode.PLAYBACK);
+        if (mPlayMode != PlayMode.READER)
+            switchPlayMode(PlayMode.READER);
         else
-            switchPlayMode(PlayMode.PLAYOUT);
+            switchPlayMode(PlayMode.AUTHOR);
     }
 
     public void switchPlayMode(PlayMode newMode) {
         switch (newMode) {
-        case PLAYOUT:
-            if (PlayMode.PLAYBACK == mPlayMode) {
+        case AUTHOR:
+            if (PlayMode.READER == mPlayMode) {
                 stopAudioReplay();
                 mPlayMode = newMode;
                 if (null != mPlayChangeListener)
                     mPlayChangeListener.onModeChanged(newMode);
             }
             break;
-        case PLAYBACK:
-            if (PlayMode.PLAYOUT == mPlayMode) {
+        case READER:
+            if (PlayMode.AUTHOR == mPlayMode) {
                 mPlayMode = newMode;
                 if (null != mPlayChangeListener)
                     mPlayChangeListener.onModeChanged(newMode);

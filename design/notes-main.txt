@@ -167,7 +167,7 @@ Story Player UI:
  *     [ ] Animation for page deletion
  *     [ ] Animation for page addition
  * [x] Switch between author and reader modes in Settings
- * [ ] Separate "author" and "reader" modes so that there is no switching between them
+ * [x] Separate "author" and "reader" modes so that there is no switching between them
  *
  * ......
  *
@@ -182,6 +182,7 @@ Story Player UI:
  *         [ ] Playout: show spinner above the record button ...
  *             [ ] New "narrator"?
  *             [ ] Mark track as "irreplaceable"?
+ * [ ] Adjust button positioning and show-hide logic
  *
  * ~~~ The Above by end of Monday, Dec 10 ~~~
  *

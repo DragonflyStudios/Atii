@@ -37,6 +37,7 @@ import ca.dragonflystudios.android.dialog.DeleteDialogFragment;
 import ca.dragonflystudios.android.dialog.DeleteDialogFragment.DeleteDialogListener;
 import ca.dragonflystudios.android.storage.Storage;
 import ca.dragonflystudios.atii.model.book.BookInfo;
+import ca.dragonflystudios.atii.play.PlayManager.PlayMode;
 import ca.dragonflystudios.atii.play.Player;
 import ca.dragonflystudios.utilities.Pathname;
 
@@ -46,10 +47,6 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
     private static final String SETTINGS = "atii_settings";
     private static final String FIRST_LAUNCH = "first_launch";
     private static final String BOOK_OPEN_MODE = "book_open_mode";
-
-    public enum BookOpenMode {
-        READER, AUTHOR
-    }
 
     public LibraryActivity() {
         mBookInfos = new ArrayList<BookInfo>();
@@ -73,8 +70,8 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
             prefs.edit().putBoolean(FIRST_LAUNCH, false).commit();
         }
 
-        String bom = prefs.getString(BOOK_OPEN_MODE, BookOpenMode.READER.toString());
-        mBookOpenMode = BookOpenMode.valueOf(bom);
+        String bom = prefs.getString(BOOK_OPEN_MODE, PlayMode.READER.toString());
+        mBookOpenMode = PlayMode.valueOf(bom);
 
         mBookGridView = (GridView) getLayoutInflater().inflate(R.layout.book_grid, null);
 
@@ -86,31 +83,10 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent playIntent = new Intent(LibraryActivity.this, Player.class);
                 playIntent.putExtra(Player.STORY_EXTRA_KEY, mBookInfos.get(position).getBookPath());
+                playIntent.putExtra(Player.PLAY_MODE_EXTRA_KEY, mBookOpenMode.toString());
                 startActivity(playIntent);
             }
         });
-
-        /*
-         * mBookGridView.setOnItemLongClickListener(new
-         * OnItemLongClickListener() {
-         * 
-         * @Override
-         * public boolean onItemLongClick(AdapterView<?> parent, View view, int
-         * position, long id) {
-         * if (mActionMode != null) {
-         * return false;
-         * }
-         * 
-         * // Start the CAB using the ActionMode.Callback defined above
-         * mActionMode =
-         * BookGridActivity.this.startActionMode(mActionModeCallback);
-         * view.setSelected(true);
-         * mSelectedView = view;
-         * 
-         * return true;
-         * }
-         * });
-         */
 
         mSelected = new HashSet<Integer>();
         mBookGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -147,7 +123,7 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
                 int count = mSelected.size();
                 
-                if (count > 1 || mBookOpenMode == BookOpenMode.READER)
+                if (count > 1 || mBookOpenMode == PlayMode.READER)
                     menu.findItem(R.id.menu_edit).setEnabled(false).setVisible(false);
                 else
                     menu.findItem(R.id.menu_edit).setEnabled(true).setVisible(true);
@@ -319,11 +295,11 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_switch_to_reader:
-            mBookOpenMode = BookOpenMode.READER;
+            mBookOpenMode = PlayMode.READER;
             invalidateOptionsMenu();
             return true;
         case R.id.menu_switch_to_author:
-            mBookOpenMode = BookOpenMode.AUTHOR;
+            mBookOpenMode = PlayMode.AUTHOR;
             invalidateOptionsMenu();
             return true;
         case R.id.menu_create:
@@ -333,7 +309,7 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
         }
     }
 
-    private BookOpenMode mBookOpenMode;
+    private PlayMode mBookOpenMode;
 
     private ArrayList<BookInfo> mBookInfos;
     private Set<Integer> mSelected, mToBeOped;
