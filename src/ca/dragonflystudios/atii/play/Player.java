@@ -1,6 +1,7 @@
 package ca.dragonflystudios.atii.play;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -10,6 +11,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import ca.dragonflystudios.android.dialog.WarningDialogFragment;
+import ca.dragonflystudios.android.dialog.WarningDialogFragment.WarningDialogListener;
 import ca.dragonflystudios.android.view.SeesawButton;
 import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.R;
@@ -19,7 +22,7 @@ import ca.dragonflystudios.atii.play.PlayManager.PlayMode;
 import ca.dragonflystudios.atii.play.PlayManager.PlayState;
 import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
 
-public class Player extends FragmentActivity implements ReaderGestureListener, PlayChangeListener
+public class Player extends FragmentActivity implements ReaderGestureListener, PlayChangeListener, WarningDialogListener
 {
 
     public static final String STORY_EXTRA_KEY     = "STORY_FOLDER_NAME";
@@ -155,7 +158,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mDeleteButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v)
             {
-                mPlayManager.deletePage();
+                DialogFragment dialog = WarningDialogFragment.newInstance(R.string.page_deletion_dialog_title,
+                        R.string.deletion_no_undo_warning);
+                dialog.show(getFragmentManager(), "PageDeletionDialogFragment");
             }
         });
 
@@ -322,6 +327,17 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mPager.setAdapter(mAdapter);
         mPager.setCurrentItem(newPage);
         updatePageNumView(newPage);
+    }
+
+    @Override
+    // implementation for DeleteDialogListener
+    public void onPositive() {
+        mPlayManager.deletePage();
+    }
+
+    @Override
+    // implementation for DeleteDialogListener
+    public void onNegative() {
     }
 
     private void updateControls()

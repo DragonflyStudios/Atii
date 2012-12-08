@@ -8,18 +8,33 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import ca.dragonflystudios.atii.R;
 
-public class DeleteDialogFragment extends DialogFragment {
-    public interface DeleteDialogListener {
-        public void onDeletePositive();
+public class WarningDialogFragment extends DialogFragment
+{
+    public interface WarningDialogListener
+    {
+        public void onPositive();
 
-        public void onDeleteNegative();
+        public void onNegative();
+    }
+
+    private static final String TITLE_KEY   = "title";
+    private static final String MESSAGE_KEY = "message";
+
+    public static WarningDialogFragment newInstance(int titleId, int messageId) {
+        WarningDialogFragment wdf = new WarningDialogFragment();
+        Bundle args = new Bundle();
+        args.putInt(TITLE_KEY, titleId);
+        args.putInt(MESSAGE_KEY, messageId);
+        wdf.setArguments(args);
+
+        return wdf;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (DeleteDialogListener) activity;
+            mListener = (WarningDialogListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement DeleteDialogListener");
         }
@@ -27,19 +42,23 @@ public class DeleteDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Bundle args = getArguments();
+        int titleId = args.getInt(TITLE_KEY);
+        int messageId = args.getInt(MESSAGE_KEY);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.book_deletion_dialog_title).setMessage(R.string.book_deletion_dialog_warning)
+        builder.setTitle(titleId).setMessage(messageId)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDeletePositive();
+                        mListener.onPositive();
                     }
                 }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDeleteNegative();
+                        mListener.onNegative();
                     }
                 });
         return builder.create();
     }
 
-    private DeleteDialogListener mListener;
+    private WarningDialogListener mListener;
 }

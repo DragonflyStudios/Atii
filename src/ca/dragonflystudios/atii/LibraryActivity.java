@@ -33,8 +33,8 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import ca.dragonflystudios.android.dialog.DeleteDialogFragment;
-import ca.dragonflystudios.android.dialog.DeleteDialogFragment.DeleteDialogListener;
+import ca.dragonflystudios.android.dialog.WarningDialogFragment;
+import ca.dragonflystudios.android.dialog.WarningDialogFragment.WarningDialogListener;
 import ca.dragonflystudios.android.storage.Storage;
 import ca.dragonflystudios.atii.model.book.BookInfo;
 import ca.dragonflystudios.atii.play.PlayManager.PlayMode;
@@ -43,12 +43,14 @@ import ca.dragonflystudios.utilities.Pathname;
 
 // TODO: handle the case when no book was found & show empty view
 
-public class LibraryActivity extends Activity implements DeleteDialogListener {
-    private static final String SETTINGS = "atii_settings";
-    private static final String FIRST_LAUNCH = "first_launch";
+public class LibraryActivity extends Activity implements WarningDialogListener
+{
+    private static final String SETTINGS       = "atii_settings";
+    private static final String FIRST_LAUNCH   = "first_launch";
     private static final String BOOK_OPEN_MODE = "book_open_mode";
 
-    public LibraryActivity() {
+    public LibraryActivity()
+    {
         mBookInfos = new ArrayList<BookInfo>();
     }
 
@@ -122,7 +124,7 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
                 int count = mSelected.size();
-                
+
                 if (count > 1 || mBookOpenMode == PlayMode.READER)
                     menu.findItem(R.id.menu_edit).setEnabled(false).setVisible(false);
                 else
@@ -138,9 +140,9 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
                     mode.finish();
                     return true;
                 case R.id.menu_delete:
-                    Log.d(getClass().getName(), "delete!");
-                    DialogFragment dialog = new DeleteDialogFragment();
-                    dialog.show(getFragmentManager(), "DeleteDialogFragment");
+                    DialogFragment dialog = WarningDialogFragment.newInstance(R.string.book_deletion_dialog_title,
+                            R.string.deletion_no_undo_warning);
+                    dialog.show(getFragmentManager(), "BookDeletionDialogFragment");
                     mToBeOped = new HashSet<Integer>();
                     mToBeOped.addAll(mSelected);
                     mode.finish();
@@ -168,7 +170,8 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
         super.onPause();
     }
 
-    private class BookGridAdapter extends BaseAdapter {
+    private class BookGridAdapter extends BaseAdapter
+    {
 
         public int getCount() {
             return mBookInfos.size();
@@ -241,7 +244,7 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
 
     @Override
     // implementation for DeleteDialogListener
-    public void onDeletePositive() {
+    public void onPositive() {
         deleteBooks(mToBeOped);
         mToBeOped.clear();
         mToBeOped = null;
@@ -249,7 +252,7 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
 
     @Override
     // implementation for DeleteDialogListener
-    public void onDeleteNegative() {
+    public void onNegative() {
 
     }
 
@@ -309,12 +312,12 @@ public class LibraryActivity extends Activity implements DeleteDialogListener {
         }
     }
 
-    private PlayMode mBookOpenMode;
+    private PlayMode            mBookOpenMode;
 
     private ArrayList<BookInfo> mBookInfos;
-    private Set<Integer> mSelected, mToBeOped;
-    private GridView mBookGridView;
-    private BookGridAdapter mBookGridAdapter;
+    private Set<Integer>        mSelected, mToBeOped;
+    private GridView            mBookGridView;
+    private BookGridAdapter     mBookGridAdapter;
 
-    private static Context sAppContext;
+    private static Context      sAppContext;
 }

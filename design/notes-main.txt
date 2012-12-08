@@ -162,10 +162,7 @@ Story Player UI:
  *         [ ] Folder browsing
  * [ ] Author mode
  *     [ ] Warn about replacing page image, if there is already one
- *         [ ] Animation for page image replacing
- *     [ ] Warning about page deletion
- *     [ ] Animation for page deletion
- *     [ ] Animation for page addition
+ *     [x] Warning about page deletion
  * [x] Switch between author and reader modes in Settings
  * [x] Separate "author" and "reader" modes so that there is no switching between them
  *
@@ -212,6 +209,9 @@ Story Player UI:
  * [ ] Make UI pretty
  *     [ ] Find a designer
  * [ ] Usability features
+ *     [ ] Animation for page deletion
+ *     [ ] Animation for page addition
+ *     [ ] Animation for page image replacing
  *     [ ] Fading: during playback, controls disappear after a certain delay (e.g. 5 seconds); otherwise stays
  *     [ ] Show draggable progress bar.
  *         [ ] For audio?

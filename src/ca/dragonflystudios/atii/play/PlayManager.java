@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -47,7 +46,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public enum PlayMode {
-        INVALID, READER, AUTHOR
+        READER, AUTHOR
     }
 
     public enum PlayState {

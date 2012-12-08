@@ -37,13 +37,14 @@
     <!-- action items - book list -->
     <string name="menu_create">Create</string>
 
-    <!--  action mode - book selected -->
+    <!-- action mode - book selected -->
     <string name="menu_edit">Edit</string>
     <string name="menu_delete">Delete</string>
 
-    <!--  book deletion dialog -->
+    <!-- book deletion dialog -->
     <string name="book_deletion_dialog_title">Book Deletion</string>
-    <string name="book_deletion_dialog_warning">This cannot be undone.</string>
+    <string name="deletion_no_undo_warning">This cannot be undone.</string>
+    <string name="page_deletion_dialog_title">Page Deletion</string>
 
     <!-- action items -->
     <string name="menu_settings">Settings</string>
