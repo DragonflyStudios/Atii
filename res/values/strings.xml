@@ -8,6 +8,7 @@
 
     <!-- page -->
     <string name="page_image_view">Page Image View</string>
+    <string name="page_image_preview">Page Image Preview</string>
     <string name="empty_page">Page is empty.\nPlease add page image.</string>
 
     <!-- modes -->

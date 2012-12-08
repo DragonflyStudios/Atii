@@ -162,6 +162,8 @@ Story Player UI:
  *         [ ] Folder browsing
  * [ ] Author mode
  *     [ ] Warn about replacing page image, if there is already one
+ *         [ ] Should handle this as a page state ... through getView (while blocking page change)
+ *             - In the future, could do image editing/cropping here!
  *     [x] Warning about page deletion
  * [x] Switch between author and reader modes in Settings
  * [x] Separate "author" and "reader" modes so that there is no switching between them
