@@ -11,13 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <ImageView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/page_image_preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:contentDescription="@string/page_image_preview" />
-
     <RelativeLayout
         android:id="@+id/controls"
         android:layout_width="match_parent"

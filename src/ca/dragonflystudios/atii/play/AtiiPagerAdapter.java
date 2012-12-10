@@ -1,5 +1,6 @@
 package ca.dragonflystudios.atii.play;
 
+import ca.dragonflystudios.atii.model.book.Page;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -18,7 +19,8 @@ public class AtiiPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return PageFragment.newInstance(mPlayManager.getImagePathForPage(position));
+        Page page = mPlayManager.getPage(position);
+        return PageFragment.newInstance(page.getImagePath(), page.isUsingNewImage());
     }
 
     private PlayManager mPlayManager;

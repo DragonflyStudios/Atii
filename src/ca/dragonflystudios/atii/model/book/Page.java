@@ -7,25 +7,32 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
+import android.util.Log;
+import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.model.Entity;
 import ca.dragonflystudios.atii.model.Parser;
 import ca.dragonflystudios.utilities.Pathname;
 
 // TODO: Should we also allow a page that has no page image? If only to be symmetrical?
 
-public class Page extends Entity {
+public class Page extends Entity
+{
 
-    public enum AudioPlaybackState {
+    public enum AudioPlaybackState
+    {
         INVALID, NO_AUDIO, NOT_STARTED, PLAYING, PAUSED, FINISHED
     }
 
-    public Page(File imageFolder, File audioFolder) {
+    public Page(File imageFolder, File audioFolder)
+    {
         mImageFolder = imageFolder;
         mAudioFolder = audioFolder;
 
         // uses lazy initialization
         mInitialized = false;
         mState = AudioPlaybackState.INVALID;
+
+        mUsingNewImage = false;
     }
 
     public AudioPlaybackState getAudioPlaybackState() {
@@ -40,14 +47,49 @@ public class Page extends Entity {
     }
 
     public File getImage() {
+        if (mUsingNewImage)
+            return mNewImage;
+
         return mImage;
     }
 
     public File getImageFileForWriting() {
-        if (null == mImage)
-            mImage = new File(mAudioFolder, Pathname.createUniqueFileName(mAudioFolder, "jpg"));
+        if (null == mNewImage)
+            mNewImage = Pathname.createUniqueFile(mAudioFolder, ".jpg");
+        mUsingNewImage = true;
 
-        return mImage;
+        return mNewImage;
+    }
+
+    public void commitNewImage() {
+        if (null != mImage && mImage.exists()) {
+            if (!mImage.delete()) {
+                String msg = "failed to delete " + mImage.getAbsolutePath();
+                if (BuildConfig.DEBUG)
+                    throw new RuntimeException(msg);
+                else
+                    Log.w(getClass().getName(), msg);
+            }
+        }
+
+        mImage = mNewImage;
+        mNewImage = null;
+        mUsingNewImage = false;
+    }
+
+    public void discardNewImage() {
+        if (null != mNewImage && mNewImage.exists()) {
+            if (!mNewImage.delete()) {
+                String msg = "failed to delete " + mNewImage.getAbsolutePath();
+                if (BuildConfig.DEBUG)
+                    throw new RuntimeException(msg);
+                else
+                    Log.w(getClass().getName(), msg);
+            }
+        }
+
+        mNewImage = null;
+        mUsingNewImage = false;
     }
 
     // TODO: something tricky here w.r.t. name correspondence. May not need to
@@ -116,11 +158,17 @@ public class Page extends Entity {
         mInitialized = true;
     }
 
+    public boolean isUsingNewImage() {
+        return mUsingNewImage;
+    }
+
     public String getImagePath() {
-        if (null == mImage)
+        File imageFile = mUsingNewImage ? mNewImage : mImage;
+
+        if (null == imageFile)
             return null;
 
-        return mImage.getAbsolutePath();
+        return imageFile.getAbsolutePath();
     }
 
     public String getAudioPath() {
@@ -184,6 +232,7 @@ public class Page extends Entity {
     }
 
     private AudioPlaybackState mState;
-    private File mImageFolder, mAudioFolder, mImage, mAudio;
-    private boolean mInitialized;
+    private File               mImageFolder, mAudioFolder, mImage, mAudio;
+    private File               mNewImage;
+    private boolean            mInitialized, mUsingNewImage;
 }

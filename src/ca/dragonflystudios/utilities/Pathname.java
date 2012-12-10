@@ -1,9 +1,7 @@
 package ca.dragonflystudios.utilities;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.UUID;
 
 public class Pathname
@@ -27,6 +25,16 @@ public class Pathname
         public int compare(File f1, File f2) {
             return f1.getName().compareToIgnoreCase(f2.getName());
         }
+    }
+
+    public static File createUniqueFile(File folder, String extension) {
+        File file;
+
+        do
+            file = new File(folder, Time.getTimeStamp() + "." + extension);
+        while (file.exists());
+
+        return file;
     }
 
     public static String createUniqueFileName(File folder, String extension) {

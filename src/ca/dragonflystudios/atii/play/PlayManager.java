@@ -22,11 +22,13 @@ import ca.dragonflystudios.atii.model.book.Page.AudioPlaybackState;
 import ca.dragonflystudios.utilities.Pathname;
 
 public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener,
-        PhotoSnapper.OnCompletionListener {
+        PhotoSnapper.OnCompletionListener
+{
 
     // TODO: auto (page) advance ...
 
-    public interface PlayChangeListener {
+    public interface PlayChangeListener
+    {
         public void onModeChanged(PlayMode newMode);
 
         public void onPlayStateChanged(PlayState newState);
@@ -45,11 +47,13 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         public void requestPageChangeNotify(int newPage);
     }
 
-    public enum PlayMode {
+    public enum PlayMode
+    {
         READER, AUTHOR
     }
 
-    public enum PlayState {
+    public enum PlayState
+    {
         IDLE, PLAYING_BACK_AUDIO, RECORDING_AUDIO, CAPTURING_PHOTO
     }
 
@@ -77,7 +81,8 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         return mCurrentPage.getAudioPlaybackState();
     }
 
-    public PlayManager(String storyPath, PlayChangeListener pcl, PlayMode mode) {
+    public PlayManager(String storyPath, PlayChangeListener pcl, PlayMode mode)
+    {
 
         File storyDir = new File(storyPath);
         mStoryPath = storyDir.getAbsolutePath();
@@ -337,6 +342,14 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         requestingActivity.startActivityForResult(intent, Player.CAPTURE_PHOTO);
     }
 
+    public void discardNewPageImage() {
+        mCurrentPage.discardNewImage();
+    }
+
+    public void keepNewPageImage() {
+        mCurrentPage.commitNewImage();
+    }
+
     @Override
     // implementation for PlayCommandHandler
     public void stopPhotoCapture() {
@@ -423,22 +436,22 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         mBook.save();
     }
 
-    private String mStoryPath;
-    private String mStoryTitle;
+    private String             mStoryPath;
+    private String             mStoryTitle;
 
-    private Book mBook;
+    private Book               mBook;
 
-    private boolean mAutoReplay;
-    private boolean mAutoAdvance;
+    private boolean            mAutoReplay;
+    private boolean            mAutoAdvance;
 
-    private int mCurrentPageNum;
-    private Page mCurrentPage;
+    private int                mCurrentPageNum;
+    private Page               mCurrentPage;
 
-    private PlayMode mPlayMode;
-    private PlayState mPlayState;
+    private PlayMode           mPlayMode;
+    private PlayState          mPlayState;
 
     private PlayChangeListener mPlayChangeListener;
 
-    private MediaPlayer mMediaPlayer;
-    private MediaRecorder mMediaRecorder;
+    private MediaPlayer        mMediaPlayer;
+    private MediaRecorder      mMediaRecorder;
 }
