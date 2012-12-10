@@ -37,20 +37,20 @@ import ca.dragonflystudios.android.dialog.WarningDialogFragment;
 import ca.dragonflystudios.android.dialog.WarningDialogFragment.WarningDialogListener;
 import ca.dragonflystudios.android.storage.Storage;
 import ca.dragonflystudios.atii.model.book.BookInfo;
+import ca.dragonflystudios.atii.play.BookCreationDialog;
+import ca.dragonflystudios.atii.play.BookCreationDialog.BookCreationListener;
 import ca.dragonflystudios.atii.play.PlayManager.PlayMode;
 import ca.dragonflystudios.atii.play.Player;
 import ca.dragonflystudios.utilities.Pathname;
 
 // TODO: handle the case when no book was found & show empty view
 
-public class LibraryActivity extends Activity implements WarningDialogListener
-{
-    private static final String SETTINGS       = "atii_settings";
-    private static final String FIRST_LAUNCH   = "first_launch";
+public class LibraryActivity extends Activity implements WarningDialogListener, BookCreationListener {
+    private static final String SETTINGS = "atii_settings";
+    private static final String FIRST_LAUNCH = "first_launch";
     private static final String BOOK_OPEN_MODE = "book_open_mode";
 
-    public LibraryActivity()
-    {
+    public LibraryActivity() {
         mBookInfos = new ArrayList<BookInfo>();
     }
 
@@ -73,7 +73,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener
         }
 
         String bom = prefs.getString(BOOK_OPEN_MODE, PlayMode.READER.toString());
-        mBookOpenMode = PlayMode.valueOf(bom);
+        mAppMode = PlayMode.valueOf(bom);
 
         mBookGridView = (GridView) getLayoutInflater().inflate(R.layout.book_grid, null);
 
@@ -85,7 +85,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent playIntent = new Intent(LibraryActivity.this, Player.class);
                 playIntent.putExtra(Player.STORY_EXTRA_KEY, mBookInfos.get(position).getBookPath());
-                playIntent.putExtra(Player.PLAY_MODE_EXTRA_KEY, mBookOpenMode.toString());
+                playIntent.putExtra(Player.PLAY_MODE_EXTRA_KEY, PlayMode.READER.toString());
                 startActivity(playIntent);
             }
         });
@@ -123,9 +123,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener
 
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                int count = mSelected.size();
-
-                if (count > 1 || mBookOpenMode == PlayMode.READER)
+                if (mSelected.size() > 1 || mAppMode == PlayMode.READER)
                     menu.findItem(R.id.menu_edit).setEnabled(false).setVisible(false);
                 else
                     menu.findItem(R.id.menu_edit).setEnabled(true).setVisible(true);
@@ -137,6 +135,19 @@ public class LibraryActivity extends Activity implements WarningDialogListener
                 switch (item.getItemId()) {
                 case R.id.menu_edit:
                     Log.d(getClass().getName(), "edit!");
+                    if (1 < mSelected.size()) {
+                        Log.w(getClass().getName(), "selected more than 1 book for editing!");
+                        if (BuildConfig.DEBUG)
+                            throw new RuntimeException("attempting to open more than 1 book for editing!");
+                    }
+                    int position = -1;
+                    for (int p : mSelected)
+                        position = p;
+                    Intent playIntent = new Intent(LibraryActivity.this, Player.class);
+                    playIntent.putExtra(Player.STORY_EXTRA_KEY, mBookInfos.get(position).getBookPath());
+                    playIntent.putExtra(Player.PLAY_MODE_EXTRA_KEY, PlayMode.AUTHOR.toString());
+                    startActivity(playIntent);
+
                     mode.finish();
                     return true;
                 case R.id.menu_delete:
@@ -145,6 +156,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener
                     dialog.show(getFragmentManager(), "BookDeletionDialogFragment");
                     mToBeOped = new HashSet<Integer>();
                     mToBeOped.addAll(mSelected);
+
                     mode.finish();
                     return true;
                 default:
@@ -165,13 +177,12 @@ public class LibraryActivity extends Activity implements WarningDialogListener
     @Override
     public void onPause() {
         SharedPreferences prefs = getSharedPreferences(SETTINGS, MODE_PRIVATE);
-        prefs.edit().putString(BOOK_OPEN_MODE, mBookOpenMode.toString()).commit();
+        prefs.edit().putString(BOOK_OPEN_MODE, mAppMode.toString()).commit();
 
         super.onPause();
     }
 
-    private class BookGridAdapter extends BaseAdapter
-    {
+    private class BookGridAdapter extends BaseAdapter {
 
         public int getCount() {
             return mBookInfos.size();
@@ -256,6 +267,18 @@ public class LibraryActivity extends Activity implements WarningDialogListener
 
     }
 
+    @Override
+    // implementation for BookCreationListener
+    public void onCreateBook(String title, File sourceFolder) {
+        Log.d(getClass().getName(), "create book titled: " + title);
+    }
+
+    @Override
+    // implementation for BookCreationListener
+    public void onCancelBookCreation() {
+        Log.d(getClass().getName(), "book creation cancelled");
+    }
+
     private void deleteBooks(Set<Integer> bookPositions) {
         ArrayList<BookInfo> booksToDelete = new ArrayList<BookInfo>();
 
@@ -279,7 +302,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        switch (mBookOpenMode) {
+        switch (mAppMode) {
         case READER:
             menu.findItem(R.id.menu_create).setEnabled(false).setVisible(false);
             menu.findItem(R.id.menu_switch_to_reader).setEnabled(false).setVisible(false);
@@ -298,26 +321,28 @@ public class LibraryActivity extends Activity implements WarningDialogListener
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_switch_to_reader:
-            mBookOpenMode = PlayMode.READER;
+            mAppMode = PlayMode.READER;
             invalidateOptionsMenu();
             return true;
         case R.id.menu_switch_to_author:
-            mBookOpenMode = PlayMode.AUTHOR;
+            mAppMode = PlayMode.AUTHOR;
             invalidateOptionsMenu();
             return true;
         case R.id.menu_create:
+            DialogFragment dialog = BookCreationDialog.newInstance();
+            dialog.show(getFragmentManager(), "BookCreationDialogFragment");
             return true;
         default:
             return super.onOptionsItemSelected(item);
         }
     }
 
-    private PlayMode            mBookOpenMode;
+    private PlayMode mAppMode;
 
     private ArrayList<BookInfo> mBookInfos;
-    private Set<Integer>        mSelected, mToBeOped;
-    private GridView            mBookGridView;
-    private BookGridAdapter     mBookGridAdapter;
+    private Set<Integer> mSelected, mToBeOped;
+    private GridView mBookGridView;
+    private BookGridAdapter mBookGridAdapter;
 
-    private static Context      sAppContext;
+    private static Context sAppContext;
 }

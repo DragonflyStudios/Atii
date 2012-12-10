@@ -44,6 +44,11 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_delete">Delete</string>
 
+    <!-- book creation dialog -->
+    <string name="book_creation">Book Creation</string>
+    <string name="book_title_entry">Please enter title of the book here.</string>
+    <string name="book_title_default">Untitled</string>
+
     <!-- book deletion dialog -->
     <string name="book_deletion_dialog_title">Book Deletion</string>
     <string name="deletion_no_undo_warning">This cannot be undone.</string>
