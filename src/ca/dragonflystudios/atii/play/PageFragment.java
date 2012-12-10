@@ -15,11 +15,9 @@ import android.widget.ImageView;
 import ca.dragonflystudios.android.media.Image;
 import ca.dragonflystudios.atii.R;
 
-public class PageFragment extends Fragment
-{
+public class PageFragment extends Fragment {
 
-    public interface OnPageImageChoice
-    {
+    public interface OnPageImageChoice {
         public void onDiscard();
 
         public void onKeep();
@@ -62,16 +60,16 @@ public class PageFragment extends Fragment
             if (mIsNewImage) {
                 View bv = v.findViewById(R.id.choice_buttons);
                 bv.setVisibility(View.VISIBLE);
-                mDiscardButton = bv.findViewById(R.id.discard_button);
+                mDiscardButton = (Button) bv.findViewById(R.id.discard_button);
                 mDiscardButton.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
-                        ((OnPageImageChoice)getActivity()).onDiscard();
+                        ((OnPageImageChoice) getActivity()).onDiscard();
                     }
                 });
-                mKeepButton = bv.findViewById(R.id.keep_button);
+                mKeepButton = (Button) bv.findViewById(R.id.keep_button);
                 mKeepButton.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
-                        ((OnPageImageChoice)getActivity()).onKeep();
+                        ((OnPageImageChoice) getActivity()).onKeep();
                     }
                 });
             }
@@ -102,8 +100,8 @@ public class PageFragment extends Fragment
         super.onDestroy();
     }
 
-    private Bitmap  mBitmap;
+    private Bitmap mBitmap;
     private boolean mIsNewImage;
-    private Button  mDiscardButton, mKeepButton;
-    private String  mPageImagePath;
+    private Button mDiscardButton, mKeepButton;
+    private String mPageImagePath;
 }

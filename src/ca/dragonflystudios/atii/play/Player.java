@@ -315,13 +315,19 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     @Override
     // implementation for OnPageImageChoice
     public void onDiscard() {
+        int pageNum = mPlayManager.getCurrentPageNum();
         mPlayManager.discardNewPageImage();
+        mPager.setAdapter(mAdapter);
+        mPager.setCurrentItem(pageNum);
     }
 
     @Override
     // implementation for OnPageImageChoice
     public void onKeep() {
+        int pageNum = mPlayManager.getCurrentPageNum();
         mPlayManager.keepNewPageImage();
+        mPager.setAdapter(mAdapter);
+        mPager.setCurrentItem(pageNum);
     }
 
     private void updateControls() {
