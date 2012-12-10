@@ -23,6 +23,13 @@ public class Storage {
         return (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()));
     }
 
+    public static String getExternalStorageRoot() {
+        if (isExternalStorageAvailable())
+            return Environment.getExternalStorageDirectory().getAbsolutePath();
+        
+        return null;
+    }
+
     public static void copyAssets(AssetManager assetManager, String srcPath, String dstPath) {
         String assets[] = null;
         try {
@@ -53,7 +60,7 @@ public class Storage {
 
         if (null != cacheDir)
             return new File(cacheDir, "_dragons_do_not_fly_" + Time.getTimeStamp() + ".tmp");
-    
+
         return null;
     }
 }

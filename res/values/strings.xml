@@ -36,6 +36,7 @@
     <string name="cancel">Cancel</string>
     <string name="keep">Keep</string>
     <string name="discard">Discard</string>
+    <string name="choose_folder">Choose Folder</string>
 
     <!-- action items - book list -->
     <string name="menu_create">Create</string>
@@ -48,6 +49,7 @@
     <string name="book_creation">Book Creation</string>
     <string name="book_title_entry">Please enter title of the book here.</string>
     <string name="book_title_default">Untitled</string>
+    <string name="import_page_images">Import Pages</string>
 
     <!-- book deletion dialog -->
     <string name="book_deletion_dialog_title">Book Deletion</string>

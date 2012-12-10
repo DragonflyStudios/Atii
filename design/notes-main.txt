@@ -158,6 +158,7 @@ Story Player UI:
  *         [x] Title
  *         [ ] Checkbox: Create from folder
  *             [ ] Folder browsing
+ *                 - Mimic Google Drive app ...
  *         [ ] Cancel and Create
  *             [x] UI
  *             [ ] Upon "Create", generate folder structure, copy over files and open book for editing
