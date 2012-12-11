@@ -178,16 +178,25 @@ Story Player UI:
  *     [ ] Testing and debugging
  * [ ] Support for multiple audio tracks
  *     [ ] Use xml tag attributes
- *         [ ] "default" track
  *         [ ] named tracks
- *     [ ] Tracks UI
- *         [ ] Playback: a spinner above the playback button if there are more than one tracks
- *         [ ] Playout: show spinner above the record button ...
- *             [ ] New "narrator"?
- *             [ ] Mark track as "irreplaceable"?
- * [ ] Adjust button positioning and show-hide logic
+ *         [ ] indelible tracks
+ * [ ] Tracks UI
+ *     [ ] Layout: [Play] ( ...... spinner ...... ) [Record]
+ *         [ ] Future: During play or recording, spinner becomes draggable slider/progress bar
+ *     [ ] Spinner for selecting among tacks
+ *     [ ] Under Reader mode, there is no [Record] button shown for "indelible" tracks
+ *     [ ] Under Author mode, show a [Configure] under the spinner
+ *         [ ] Delete track
+ *         [ ] Rename track
+ *         [ ] Make track indelible
+ *     [ ] Adjust button positioning and show-hide logic
+ *         [ ] During play, [Play] becomes [Pause], [Record] is hidden
+ *         [ ] During recording, [Play] is hidden, [Record] becomes [Stop]
+ * [ ] Image UI, another row underneath the Tracks UI row
+ *     [ ] Layout: [Choose] [Capture]
+ *     [ ] Future: [Edit] in between [Choose] and [Capture]
  *
- * ~~~ The Above by end of Monday, Dec 10 ~~~
+ * ~~~ The Above by end of Wednesday, Dec 12 ~~~
  *
  * ......
  *
