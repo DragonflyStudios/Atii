@@ -5,7 +5,6 @@ import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -13,6 +12,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
@@ -20,11 +20,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import ca.dragonflystudios.android.storage.Storage;
 import ca.dragonflystudios.atii.R;
+import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 public class FolderChooser extends DialogFragment {
@@ -66,17 +67,19 @@ public class FolderChooser extends DialogFragment {
         mParents = new ArrayList<File>();
 
         ArrayList<File> subFolders = listFiles(mCurrentFolder);
-        mListAdapter = new FileListAdapter(context, subFolders);
+        mListAdapter = new FileListAdapter(context);
         mListView.setAdapter(mListAdapter);
+        mListAdapter.setItems(subFolders);
         mListView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mParents.add(mCurrentFolder);
-                mCurrentFolder = mListAdapter.getItem(position);
-                getDialog().setTitle(mCurrentFolder.getName());
-                ArrayList<File> subFolders = listFiles(mCurrentFolder);
-                mListAdapter.clear();
-                mListAdapter.addAll(subFolders);
-                mListAdapter.notifyDataSetChanged();
+                File selected = mListAdapter.getItem(position);
+                if (selected.isDirectory()) {
+                    mCurrentFolder = mListAdapter.getItem(position);
+                    mParents.add(mCurrentFolder);
+                    getDialog().setTitle(mCurrentFolder.getName());
+                    ArrayList<File> subFolders = listFiles(mCurrentFolder);
+                    mListAdapter.setItems(subFolders);
+                }
             }
         });
 
@@ -104,9 +107,13 @@ public class FolderChooser extends DialogFragment {
         return files;
     }
 
-    public static class FileListAdapter extends ArrayAdapter<File> {
-        public FileListAdapter(Context context, List<File> fileList) {
-            super(context, R.id.file_name, fileList);
+    public static class FileListAdapter extends BaseAdapter {
+
+        public FileListAdapter(Context context) {
+            mFiles = new ArrayList<File>();
+            mFolderDrawable = context.getResources().getDrawable(R.drawable.file_folder);
+            mFileDrawable = context.getResources().getDrawable(R.drawable.file_file);
+            mPictureDrawable = context.getResources().getDrawable(R.drawable.file_picture);
         }
 
         @Override
@@ -115,10 +122,47 @@ public class FolderChooser extends DialogFragment {
                 convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.file_list_item, null);
             }
 
+            TextView tv = (TextView) convertView;
             File file = getItem(position);
             ((TextView) convertView).setText(file.getName());
-            return convertView;
+            if (file.isDirectory())
+                tv.setCompoundDrawablesWithIntrinsicBounds(mFolderDrawable, null, null, null);
+            else if (isImageFile(file.getName()))
+                tv.setCompoundDrawablesWithIntrinsicBounds(mPictureDrawable, null, null, null);
+            else
+                tv.setCompoundDrawablesWithIntrinsicBounds(mFileDrawable, null, null, null);
+
+            return tv;
         }
+
+        @Override
+        public File getItem(int position) {
+            return mFiles.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public int getCount() {
+            return mFiles.size();
+        }
+
+        public void setItems(ArrayList<File> items) {
+            mFiles.clear();
+            mFiles.addAll(items);
+            notifyDataSetChanged();
+        }
+
+        private boolean isImageFile(String pathname) {
+            String ext = Pathname.extractExtension(pathname);
+            return ("jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext) || "png".equalsIgnoreCase(ext));
+        }
+
+        private ArrayList<File> mFiles;
+        private Drawable mFileDrawable, mPictureDrawable, mFolderDrawable;
     }
 
     private FolderChooserListener mListener;
@@ -129,7 +173,7 @@ public class FolderChooser extends DialogFragment {
     private FileFilter mFilter = new FileFilter() {
         @Override
         public boolean accept(File path) {
-            return path.exists() && path.isDirectory();
+            return path.exists() && !path.isHidden();
         }
     };
 
