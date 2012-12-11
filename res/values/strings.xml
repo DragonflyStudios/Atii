@@ -36,6 +36,7 @@
     <string name="cancel">Cancel</string>
     <string name="keep">Keep</string>
     <string name="discard">Discard</string>
+    <string name="choose">Choose</string>
 
     <!-- action items - book list -->
     <string name="menu_create">Create</string>

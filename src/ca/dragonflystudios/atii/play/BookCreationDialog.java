@@ -17,20 +17,19 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import ca.dragonflystudios.android.dialog.FolderChooser;
+import ca.dragonflystudios.android.dialog.FolderChooser.FolderChooserListener;
 import ca.dragonflystudios.atii.R;
 
-public class BookCreationDialog extends DialogFragment
-{
-    public interface BookCreationListener
-    {
+public class BookCreationDialog extends DialogFragment {
+    public interface BookCreationListener {
         public void onCreateBook(String title, File sourceFolder);
 
         public void onCancelBookCreation();
     }
 
     public static BookCreationDialog newInstance() {
-        BookCreationDialog wdf = new BookCreationDialog();
-        return wdf;
+        return new BookCreationDialog();
     }
 
     @Override
@@ -39,7 +38,7 @@ public class BookCreationDialog extends DialogFragment
         try {
             mListener = (BookCreationListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement DeleteDialogListener");
+            throw new ClassCastException(activity.toString() + " must implement BookCreationListener");
         }
     }
 
@@ -58,11 +57,12 @@ public class BookCreationDialog extends DialogFragment
                     mImportFolderEntry.setVisibility(View.INVISIBLE);
             }
         });
-        
+
         mImportFolderEntry = (EditText) creationView.findViewById(R.id.source_folder_entry);
         mImportFolderEntry.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                Log.d(getClass().getName(), "choose a folder");
+                FolderChooser fc = FolderChooser.newInstance();
+                fc.show(getFragmentManager(), "FolderChooserFragment");
             }
         });
         builder.setView(creationView).setTitle(R.string.book_creation)
@@ -81,9 +81,13 @@ public class BookCreationDialog extends DialogFragment
         return builder.create();
     }
 
+    public void updateImportPath(String newPath) {
+        mImportFolderEntry.setText(newPath);
+    }
+
     private BookCreationListener mListener;
-    private File                 mSourceFolder;
-    private EditText             mTitleEntry;
-    private CheckBox             mImportCheckBox;
-    private EditText             mImportFolderEntry;
+    private File mSourceFolder;
+    private EditText mTitleEntry;
+    private CheckBox mImportCheckBox;
+    private EditText mImportFolderEntry;
 }

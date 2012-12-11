@@ -33,6 +33,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import ca.dragonflystudios.android.dialog.FolderChooser.FolderChooserListener;
 import ca.dragonflystudios.android.dialog.WarningDialogFragment;
 import ca.dragonflystudios.android.dialog.WarningDialogFragment.WarningDialogListener;
 import ca.dragonflystudios.android.storage.Storage;
@@ -45,7 +46,7 @@ import ca.dragonflystudios.utilities.Pathname;
 
 // TODO: handle the case when no book was found & show empty view
 
-public class LibraryActivity extends Activity implements WarningDialogListener, BookCreationListener {
+public class LibraryActivity extends Activity implements WarningDialogListener, BookCreationListener, FolderChooserListener {
     private static final String SETTINGS = "atii_settings";
     private static final String FIRST_LAUNCH = "first_launch";
     private static final String BOOK_OPEN_MODE = "book_open_mode";
@@ -292,6 +293,17 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
             info.delete();
 
         mBookGridAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    // implementation for FolderChooserListener
+    public void onFolderChosen(File file) {
+        BookCreationDialog bcd = (BookCreationDialog) getFragmentManager().findFragmentByTag("BookCreationDialogFragment");
+        bcd.updateImportPath(file.getAbsolutePath());
+    }
+
+    // implementation for FolderChooserListener
+    public void onFolderChooserCancel() {
     }
 
     @Override
