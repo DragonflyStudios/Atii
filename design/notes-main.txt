@@ -156,9 +156,11 @@ Story Player UI:
  *         [x] Tap on "Edit" in action mode to open book for page editing (i.e. "playout")
  *     [ ] Create book dialog
  *         [x] Title
- *         [ ] Checkbox: Create from folder
- *             [ ] Folder browsing
- *                 - Mimic Google Drive app ...
+ *         [ ] Checkbox: Import Pages
+ *             [ ] When checked
+ *                 - Enabled the EditText for Folder ("Choose a Folder")
+ *         [ ] Folder browsing
+ *             - Mimic Google Drive app ...
  *         [ ] Cancel and Create
  *             [x] UI
  *             [ ] Upon "Create", generate folder structure, copy over files and open book for editing
