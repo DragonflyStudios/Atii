@@ -37,6 +37,7 @@ import ca.dragonflystudios.android.dialog.FolderChooser.FolderChooserListener;
 import ca.dragonflystudios.android.dialog.WarningDialogFragment;
 import ca.dragonflystudios.android.dialog.WarningDialogFragment.WarningDialogListener;
 import ca.dragonflystudios.android.storage.Storage;
+import ca.dragonflystudios.atii.model.book.Book;
 import ca.dragonflystudios.atii.model.book.BookInfo;
 import ca.dragonflystudios.atii.play.BookCreationDialog;
 import ca.dragonflystudios.atii.play.BookCreationDialog.BookCreationListener;
@@ -51,6 +52,10 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
     private static final String FIRST_LAUNCH = "first_launch";
     private static final String BOOK_OPEN_MODE = "book_open_mode";
 
+    public static File getLibraryFolder() {
+        return new File(Environment.getExternalStorageDirectory(), "Atii/Stories");
+    }
+
     public LibraryActivity() {
         mBookInfos = new ArrayList<BookInfo>();
     }
@@ -63,7 +68,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
         if (null == sAppContext)
             sAppContext = getApplicationContext();
 
-        File storiesDir = new File(Environment.getExternalStorageDirectory(), "Atii/Stories");
+        File storiesDir = getLibraryFolder();
         if (!storiesDir.exists())
             storiesDir.mkdirs();
 
@@ -207,13 +212,12 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
             TextView bookNameView = (TextView) convertView.findViewById(R.id.book_title);
             bookNameView.setText(book.getTitle());
 
-            // Apparently no need to show title, coz it's already on the cover!
-            bookNameView.setVisibility(View.INVISIBLE);
-
             ImageView bookPreviewView = (ImageView) convertView.findViewById(R.id.book_preview);
             File previewFile = book.getPreviewFile();
 
             if (previewFile.exists()) {
+                // Apparently no need to show title, coz it's already on the cover!
+                bookNameView.setVisibility(View.INVISIBLE);
                 Bitmap bitmap = BitmapFactory.decodeFile(previewFile.getAbsolutePath());
                 bookPreviewView.setImageBitmap(bitmap);
             } else {
@@ -271,7 +275,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
     @Override
     // implementation for BookCreationListener
     public void onCreateBook(String title, File sourceFolder) {
-        Log.d(getClass().getName(), "create book titled: " + title);
+        createBook(title, sourceFolder);
     }
 
     @Override
@@ -293,6 +297,16 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
             info.delete();
 
         mBookGridAdapter.notifyDataSetChanged();
+    }
+
+    private void createBook(String title, File sourceFolder) {
+        Book book = Book.create(getLibraryFolder(), title, sourceFolder);
+        book.save();
+
+        Intent playIntent = new Intent(LibraryActivity.this, Player.class);
+        playIntent.putExtra(Player.STORY_EXTRA_KEY, book.getBookPath());
+        playIntent.putExtra(Player.PLAY_MODE_EXTRA_KEY, PlayMode.READER.toString());
+        startActivity(playIntent);
     }
 
     @Override

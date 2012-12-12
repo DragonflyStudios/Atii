@@ -14,8 +14,23 @@ import android.util.Xml;
 
 import ca.dragonflystudios.atii.model.Entity;
 import ca.dragonflystudios.atii.model.Parser;
+import ca.dragonflystudios.utilities.Pathname;
 
 public class Book extends Entity {
+
+    public static Book create(File parentFolder, String title, File sourceFolder) {
+        
+        String name = Pathname.makeSafeForPath(title);
+        // create bookFolder
+        // copy files over 
+        // generate preview.png
+        
+        Book book = new Book();
+        if (null != sourceFolder && sourceFolder.exists())
+            book.importPages(sourceFolder);
+
+        return book;
+    }
 
     public Book(File bookFolder) {
         mFolder = bookFolder;
@@ -149,6 +164,10 @@ public class Book extends Entity {
         }
         serializer.endDocument();
         os.close();
+    }
+
+    public String getBookPath() {
+        return mFolder.getAbsolutePath();
     }
 
     private File mFolder, mPagesXmlFile, mImageFolder, mAudioFolder;

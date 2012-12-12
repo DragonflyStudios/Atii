@@ -72,7 +72,12 @@ public class BookCreationDialog extends DialogFragment {
                         String title = mTitleEntry.getText().toString();
                         if ("".equals(title))
                             title = mTitleEntry.getHint().toString();
-                        mListener.onCreateBook(title, mSourceFolder);
+
+                        File sourceFolder = new File(mImportFolderPath);
+                        if (null == mImportFolderPath || "".equals(mImportFolderPath) || !sourceFolder.exists())
+                            sourceFolder = null;
+
+                        mListener.onCreateBook(title, sourceFolder);
                     }
                 }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -83,11 +88,12 @@ public class BookCreationDialog extends DialogFragment {
     }
 
     public void updateImportPath(String newPath) {
+        mImportFolderPath = newPath;
         mImportFolderEntry.setText(newPath);
     }
 
     private BookCreationListener mListener;
-    private File mSourceFolder;
+    private String mImportFolderPath;
     private EditText mTitleEntry;
     private CheckBox mImportCheckBox;
     private EditText mImportFolderEntry;

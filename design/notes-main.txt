@@ -159,7 +159,7 @@ Story Player UI:
  *         [x] Checkbox: Import Pages
  *             [x] When checked
  *                 - Show the EditText for Folder ("Choose a Folder")
- *         [ ] Folder browsing
+ *         [x] Folder browsing
  *             - Mimic Google Drive app ...
  *         [ ] Cancel and Create
  *             [x] UI

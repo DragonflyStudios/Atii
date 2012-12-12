@@ -19,7 +19,6 @@ import ca.dragonflystudios.android.media.camera.PhotoSnapper;
 import ca.dragonflystudios.atii.model.book.Book;
 import ca.dragonflystudios.atii.model.book.Page;
 import ca.dragonflystudios.atii.model.book.Page.AudioPlaybackState;
-import ca.dragonflystudios.utilities.Pathname;
 
 public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener,
         PhotoSnapper.OnCompletionListener
@@ -81,15 +80,9 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         return mCurrentPage.getAudioPlaybackState();
     }
 
-    public PlayManager(String storyPath, PlayChangeListener pcl, PlayMode mode)
+    public PlayManager(String bookPath, PlayChangeListener pcl, PlayMode mode)
     {
-
-        File storyDir = new File(storyPath);
-        mStoryPath = storyDir.getAbsolutePath();
-
-        mStoryTitle = Pathname.extractStem(storyDir.getName());
-
-        mBook = new Book(storyDir);
+        mBook = new Book(new File(bookPath));
 
         mPlayMode = mode;
         mPlayState = PlayState.IDLE;
@@ -112,14 +105,6 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
             return null;
 
         return imageFile.getAbsolutePath();
-    }
-
-    public String getStoryPath() {
-        return mStoryPath;
-    }
-
-    public String getStoryTitle() {
-        return mStoryTitle;
     }
 
     public Page getPage(int pageNum) {
@@ -435,9 +420,6 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     public void saveBook() {
         mBook.save();
     }
-
-    private String             mStoryPath;
-    private String             mStoryTitle;
 
     private Book               mBook;
 
