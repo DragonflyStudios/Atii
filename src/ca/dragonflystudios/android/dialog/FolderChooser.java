@@ -12,12 +12,15 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -64,7 +67,7 @@ public class FolderChooser extends DialogFragment {
         mListView = new ListView(context);
 
         mCurrentFolder = Environment.getExternalStorageDirectory();
-        mParents = new ArrayList<File>();
+        mAncestors = new ArrayList<File>();
 
         ArrayList<File> subFolders = listFiles(mCurrentFolder);
         mListAdapter = new FileListAdapter(context);
@@ -74,16 +77,39 @@ public class FolderChooser extends DialogFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 File selected = mListAdapter.getItem(position);
                 if (selected.isDirectory()) {
-                    mCurrentFolder = mListAdapter.getItem(position);
-                    mParents.add(mCurrentFolder);
-                    getDialog().setTitle(mCurrentFolder.getName());
+                    mAncestors.add(mCurrentFolder);
+                    mCurrentFolder = selected;
+                    if (mAncestors.size() == 1)
+                        mBackToParent.setVisibility(View.VISIBLE);
+                    mTitleTextView.setText(mCurrentFolder.getName());
                     ArrayList<File> subFolders = listFiles(mCurrentFolder);
                     mListAdapter.setItems(subFolders);
                 }
             }
         });
 
-        builder.setView(mListView).setTitle(R.string.choose_folder)
+        mCustomTitleView = (ViewGroup) LayoutInflater.from(context).inflate(R.layout.file_chooser_title, null);
+        mBackToParent = mCustomTitleView.findViewById(R.id.back_to_parent);
+        mTitleTextView = (TextView) mCustomTitleView.findViewById(R.id.title_text);
+        mTitleTextView.setText("Storage");
+        mBackToParent.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                if (mAncestors.size() > 0) {
+                    mCurrentFolder = mAncestors.remove(mAncestors.size() - 1);
+                    if (mAncestors.isEmpty()) {
+                        // TODO: get this done in a better way ... handle
+                        // "media storage"; use "Device" etc.
+                        mTitleTextView.setText("Storage");
+                        mBackToParent.setVisibility(View.GONE);
+                    } else
+                        mTitleTextView.setText(mCurrentFolder.getName());
+                    ArrayList<File> subFolders = listFiles(mCurrentFolder);
+                    mListAdapter.setItems(subFolders);
+                }
+            }
+        });
+
+        builder.setView(mListView).setCustomTitle(mCustomTitleView)
                 .setPositiveButton(R.string.choose, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         mListener.onFolderChosen(mCurrentFolder);
@@ -93,7 +119,15 @@ public class FolderChooser extends DialogFragment {
                         mListener.onFolderChooserCancel();
                     }
                 });
+
         return builder.create();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // fix the dialog's size; but apparently only able to fix width ...
+        getDialog().getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 
     private ArrayList<File> listFiles(File dir) {
@@ -168,7 +202,7 @@ public class FolderChooser extends DialogFragment {
     private FolderChooserListener mListener;
     private ListView mListView;
     private FileListAdapter mListAdapter;
-    private ArrayList<File> mParents;
+    private ArrayList<File> mAncestors;
     private File mCurrentFolder;
     private FileFilter mFilter = new FileFilter() {
         @Override
@@ -177,4 +211,7 @@ public class FolderChooser extends DialogFragment {
         }
     };
 
+    private ViewGroup mCustomTitleView;
+    private View mBackToParent;
+    private TextView mTitleTextView;
 }

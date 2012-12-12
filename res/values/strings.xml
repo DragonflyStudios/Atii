@@ -38,6 +38,10 @@
     <string name="discard">Discard</string>
     <string name="choose">Choose</string>
 
+    <!-- file chooser -->
+    <string name="back_to_parent_folder">Back to parent folder</string>
+    <string name="file_type">File type</string>
+
     <!-- action items - book list -->
     <string name="menu_create">Create</string>
 
@@ -51,7 +55,7 @@
     <string name="book_title_default">Untitled Book</string>
     <string name="import_page_images">Import Page Images</string>
     <string name="choose_folder">Choose a Folder</string>
-    
+
     <!-- book deletion dialog -->
     <string name="book_deletion_dialog_title">Book Deletion</string>
     <string name="deletion_no_undo_warning">This cannot be undone.</string>
