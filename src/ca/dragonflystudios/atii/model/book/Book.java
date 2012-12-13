@@ -12,8 +12,10 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.Xml;
+import ca.dragonflystudios.android.media.Image;
 import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.Globals;
 import ca.dragonflystudios.atii.model.Entity;
@@ -24,11 +26,13 @@ import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 public class Book extends Entity {
 
+    private static final int MAX_TITLE_CHARS_FOR_PATH = 20;
+
     public static Book create(File parentFolder, String title, File sourceFolder) {
 
         int length = title.length();
-        File bookFolder = Pathname.createUniqueFile(parentFolder,
-                Pathname.makeSafeForPath(title.substring(0, (length > 20) ? 19 : length - 1)), "atii");
+        File bookFolder = Pathname.createUniqueFile(parentFolder, Pathname.makeSafeForPath(title.substring(0,
+                (length > MAX_TITLE_CHARS_FOR_PATH) ? MAX_TITLE_CHARS_FOR_PATH : length)), "atii");
         if (!bookFolder.mkdirs()) {
             if (BuildConfig.DEBUG)
                 throw new RuntimeException("failed to create book folder for new book titled " + title);
@@ -167,31 +171,40 @@ public class Book extends Entity {
 
         // TODO: this is blocking the UI thread
         for (File file : imageFiles) {
+            String name = file.getName();
             try {
-                Files.copy(file.getAbsolutePath(), new File(mImageFolder, file.getName()).getAbsolutePath());
+                File newFile = new File(mImageFolder, name);
+                Log.d(getClass().getName(), "copying from " + file.getAbsolutePath() + " to " + newFile.getAbsolutePath());
+                if (!file.exists())
+                    Log.w(getClass().getName(), "that's really weird: " + file.getAbsolutePath()
+                            + " attempting to copy a file that does not exist");
+                else
+                    Log.w(getClass().getName(), "size of " + file.getAbsolutePath() + " is " + file.length());
+                Files.copy(file.getAbsolutePath(), newFile.getAbsolutePath());
+                if (!newFile.exists())
+                    Log.w(getClass().getName(), "that's really bizarre: " + newFile.getAbsolutePath()
+                            + " does not exist right after copying");
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 if (BuildConfig.DEBUG)
                     throw new RuntimeException(ioe);
             }
-            mPages.add(new Page(mImageFolder, file.getName(), mAudioFolder, null));
+            mPages.add(new Page(mImageFolder, name, mAudioFolder, null));
         }
 
-        /*
         // TODO: refactor this one into a separate method
-        // generate preview.png
         if (!imageFiles.isEmpty()) {
             Bitmap coverBmp = Image.decodeBitmapFileIntoSize(imageFiles.get(0).getAbsolutePath(), Globals.PREVIEW_WIDTH,
                     Globals.PREVIEW_HEIGHT);
             try {
-                FileOutputStream out = new FileOutputStream(new File(mImageFolder, imageFiles.get(0).getName()).getAbsolutePath());
+                FileOutputStream out = new FileOutputStream(mPreviewFile);
                 coverBmp.compress(Bitmap.CompressFormat.PNG, 90, out);
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 if (BuildConfig.DEBUG)
                     throw new RuntimeException(ioe);
             }
-        }*/
+        }
     }
 
     @Override

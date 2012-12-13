@@ -6,9 +6,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
+import android.util.Log;
+
 public class Files {
     public static void copy(String src, String dst) throws IOException {
-        copy(new FileInputStream(src), new FileOutputStream(src));
+        copy(new FileInputStream(src), new FileOutputStream(dst));
     }
 
     // TODO: shouldn't close streams from within the method!
@@ -18,8 +20,10 @@ public class Files {
                 FileChannel inChannel = inStream.getChannel();
                 FileChannel outChannel = outStream.getChannel();
 
-                if (null != inChannel && null != outChannel)
-                    inChannel.transferTo(0, inChannel.size(), outChannel);
+                if (null != inChannel && null != outChannel) {
+                    long count = inChannel.transferTo(0, inChannel.size(), outChannel);
+                    Log.d("Files.copy", count + " many bytes have been transferred.");
+                }
             }
         } finally {
             inStream.close();
