@@ -1,31 +1,46 @@
 package ca.dragonflystudios.atii.model.book;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.Xml;
-
+import ca.dragonflystudios.android.media.Image;
+import ca.dragonflystudios.atii.BuildConfig;
+import ca.dragonflystudios.atii.Globals;
 import ca.dragonflystudios.atii.model.Entity;
 import ca.dragonflystudios.atii.model.Parser;
+import ca.dragonflystudios.utilities.Files;
 import ca.dragonflystudios.utilities.Pathname;
+import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 public class Book extends Entity {
 
     public static Book create(File parentFolder, String title, File sourceFolder) {
-        
-        String name = Pathname.makeSafeForPath(title);
-        // create bookFolder
-        // copy files over 
-        // generate preview.png
-        
-        Book book = new Book();
+
+        int length = title.length();
+        File bookFolder = Pathname.createUniqueFile(parentFolder,
+                Pathname.makeSafeForPath(title.substring(0, (length > 20) ? 19 : length - 1)), "atii");
+        if (!bookFolder.mkdirs()) {
+            if (BuildConfig.DEBUG)
+                throw new RuntimeException("failed to create book folder for new book titled " + title);
+            else {
+                Log.w("Book.create()", "failed to create book folder for new booked titled " + title);
+                return null;
+            }
+        }
+
+        Book book = new Book(bookFolder);
         if (null != sourceFolder && sourceFolder.exists())
             book.importPages(sourceFolder);
 
@@ -132,6 +147,50 @@ public class Book extends Entity {
         page.removePageFiles();
 
         return newPage;
+    }
+
+    private void importPages(File sourceFolder) {
+
+        File[] imageList = sourceFolder.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File path) {
+                return path.exists() && !path.isHidden() && Globals.isImageFile(path.getName());
+            }
+        });
+        ArrayList<File> imageFiles = new ArrayList<File>();
+        if (imageList != null) {
+            imageFiles.addAll(Arrays.asList(imageList));
+            Collections.sort(imageFiles, new FileNameComparator());
+        }
+
+        mPages.clear();
+
+        // TODO: this is blocking the UI thread
+        for (File file : imageFiles) {
+            try {
+                Files.copy(file.getAbsolutePath(), new File(mImageFolder, file.getName()).getAbsolutePath());
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                if (BuildConfig.DEBUG)
+                    throw new RuntimeException(ioe);
+            }
+            mPages.add(new Page(mImageFolder, file.getName(), mAudioFolder, null));
+        }
+
+        // TODO: refactor this one into a separate method
+        // generate preview.png
+        if (!imageFiles.isEmpty()) {
+            Bitmap coverBmp = Image.decodeBitmapFileSampled(imageFiles.get(0).getAbsolutePath(), Globals.PREVIEW_WIDTH,
+                    Globals.PREVIEW_HEIGHT);
+            try {
+                FileOutputStream out = new FileOutputStream(new File(mImageFolder, imageFiles.get(0).getName()).getAbsolutePath());
+                coverBmp.compress(Bitmap.CompressFormat.PNG, 90, out);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                if (BuildConfig.DEBUG)
+                    throw new RuntimeException(ioe);
+            }
+        }
     }
 
     @Override

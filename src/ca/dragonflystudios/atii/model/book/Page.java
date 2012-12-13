@@ -17,7 +17,6 @@ import ca.dragonflystudios.utilities.Pathname;
 
 public class Page extends Entity
 {
-
     public enum AudioPlaybackState
     {
         INVALID, NO_AUDIO, NOT_STARTED, PLAYING, PAUSED, FINISHED
@@ -27,6 +26,21 @@ public class Page extends Entity
     {
         mImageFolder = imageFolder;
         mAudioFolder = audioFolder;
+
+        // uses lazy initialization
+        mInitialized = false;
+        mState = AudioPlaybackState.INVALID;
+
+        mUsingNewImage = false;
+    }
+
+    public Page(File imageFolder, String imageFileName, File audioFolder, String audioFileName)
+    {
+        mImageFolder = imageFolder;
+        mAudioFolder = audioFolder;
+
+        mImage = new File(mImageFolder, imageFileName);
+        mAudio = new File(mAudioFolder, audioFileName);
 
         // uses lazy initialization
         mInitialized = false;

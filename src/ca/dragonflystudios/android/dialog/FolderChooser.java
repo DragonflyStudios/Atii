@@ -12,7 +12,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -27,8 +26,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import ca.dragonflystudios.android.storage.Storage;
+import ca.dragonflystudios.atii.Globals;
 import ca.dragonflystudios.atii.R;
-import ca.dragonflystudios.utilities.Pathname;
 import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 public class FolderChooser extends DialogFragment {
@@ -161,7 +160,7 @@ public class FolderChooser extends DialogFragment {
             ((TextView) convertView).setText(file.getName());
             if (file.isDirectory())
                 tv.setCompoundDrawablesWithIntrinsicBounds(mFolderDrawable, null, null, null);
-            else if (isImageFile(file.getName()))
+            else if (Globals.isImageFile(file.getName()))
                 tv.setCompoundDrawablesWithIntrinsicBounds(mPictureDrawable, null, null, null);
             else
                 tv.setCompoundDrawablesWithIntrinsicBounds(mFileDrawable, null, null, null);
@@ -188,11 +187,6 @@ public class FolderChooser extends DialogFragment {
             mFiles.clear();
             mFiles.addAll(items);
             notifyDataSetChanged();
-        }
-
-        private boolean isImageFile(String pathname) {
-            String ext = Pathname.extractExtension(pathname);
-            return ("jpg".equalsIgnoreCase(ext) || "jpeg".equalsIgnoreCase(ext) || "png".equalsIgnoreCase(ext));
         }
 
         private ArrayList<File> mFiles;
