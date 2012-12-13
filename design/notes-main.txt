@@ -154,16 +154,16 @@ Story Player UI:
  *     [x] Edit
  *         [x] "Edit" is shown only in action mode when under Author mode
  *         [x] Tap on "Edit" in action mode to open book for page editing (i.e. "playout")
- *     [ ] Create book dialog
+ *     [x] Create book dialog
  *         [x] Title
  *         [x] Checkbox: Import Pages
  *             [x] When checked
  *                 - Show the EditText for Folder ("Choose a Folder")
  *         [x] Folder browsing
  *             - Mimic Google Drive app ...
- *         [ ] Cancel and Create
+ *         [x] Cancel and Create
  *             [x] UI
- *             [ ] Upon "Create", generate folder structure, copy over files and open book for editing
+ *             [x] Upon "Create", generate folder structure, copy over files and open book for editing
  * [x] Action item in action menu for "Create"
  * [x] Author mode
  *     [x] Warn about replacing page image, if there is already one
@@ -196,7 +196,7 @@ Story Player UI:
  *     [ ] Layout: [Choose] [Capture]
  *     [ ] Future: [Edit] in between [Choose] and [Capture]
  *
- * ~~~ The Above by end of Wednesday, Dec 12 ~~~
+ * ~~~ The Above by end of Friday, Dec 14 ~~~
  *
  * ......
  *

@@ -26,13 +26,13 @@ import ca.dragonflystudios.utilities.Pathname.FileNameComparator;
 
 public class Book extends Entity {
 
-    private static final int MAX_TITLE_CHARS_FOR_PATH = 20;
+    private static final int MAX_TITLE_CHARS = 20;
 
     public static Book create(File parentFolder, String title, File sourceFolder) {
 
         int length = title.length();
         File bookFolder = Pathname.createUniqueFile(parentFolder, Pathname.makeSafeForPath(title.substring(0,
-                (length > MAX_TITLE_CHARS_FOR_PATH) ? MAX_TITLE_CHARS_FOR_PATH : length)), "atii");
+                (length > MAX_TITLE_CHARS) ? MAX_TITLE_CHARS : length)) + "_", "atii");
         if (!bookFolder.mkdirs()) {
             if (BuildConfig.DEBUG)
                 throw new RuntimeException("failed to create book folder for new book titled " + title);
