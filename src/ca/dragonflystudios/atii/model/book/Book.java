@@ -173,17 +173,7 @@ public class Book extends Entity {
         for (File file : imageFiles) {
             String name = file.getName();
             try {
-                File newFile = new File(mImageFolder, name);
-                Log.d(getClass().getName(), "copying from " + file.getAbsolutePath() + " to " + newFile.getAbsolutePath());
-                if (!file.exists())
-                    Log.w(getClass().getName(), "that's really weird: " + file.getAbsolutePath()
-                            + " attempting to copy a file that does not exist");
-                else
-                    Log.w(getClass().getName(), "size of " + file.getAbsolutePath() + " is " + file.length());
-                Files.copy(file.getAbsolutePath(), newFile.getAbsolutePath());
-                if (!newFile.exists())
-                    Log.w(getClass().getName(), "that's really bizarre: " + newFile.getAbsolutePath()
-                            + " does not exist right after copying");
+                Files.copy(file.getAbsolutePath(), new File(mImageFolder, name).getAbsolutePath());
             } catch (IOException ioe) {
                 ioe.printStackTrace();
                 if (BuildConfig.DEBUG)
