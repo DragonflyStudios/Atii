@@ -82,7 +82,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
     public PlayManager(String bookPath, PlayChangeListener pcl, PlayMode mode)
     {
-        mBook = new Book(new File(bookPath));
+        mBook = new Book(new File(bookPath), null);
 
         mPlayMode = mode;
         mPlayState = PlayState.IDLE;

@@ -12,10 +12,8 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
 
-import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.Xml;
-import ca.dragonflystudios.android.media.Image;
 import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.Globals;
 import ca.dragonflystudios.atii.model.Entity;
@@ -40,17 +38,19 @@ public class Book extends Entity {
             }
         }
 
-        Book book = new Book(bookFolder);
+        Book book = new Book(bookFolder, title);
         if (null != sourceFolder && sourceFolder.exists())
             book.importPages(sourceFolder);
+
+        book.save();
 
         return book;
     }
 
-    public Book(File bookFolder) {
+    public Book(File bookFolder, String title) {
         mFolder = bookFolder;
 
-        mInfo = new BookInfo(bookFolder);
+        mInfo = new BookInfo(bookFolder, title);
         mPreviewFile = new File(bookFolder, "preview.png");
         mPages = new ArrayList<Page>();
         mImageFolder = new File(bookFolder, "images");
@@ -177,10 +177,11 @@ public class Book extends Entity {
             mPages.add(new Page(mImageFolder, file.getName(), mAudioFolder, null));
         }
 
+        /*
         // TODO: refactor this one into a separate method
         // generate preview.png
         if (!imageFiles.isEmpty()) {
-            Bitmap coverBmp = Image.decodeBitmapFileSampled(imageFiles.get(0).getAbsolutePath(), Globals.PREVIEW_WIDTH,
+            Bitmap coverBmp = Image.decodeBitmapFileIntoSize(imageFiles.get(0).getAbsolutePath(), Globals.PREVIEW_WIDTH,
                     Globals.PREVIEW_HEIGHT);
             try {
                 FileOutputStream out = new FileOutputStream(new File(mImageFolder, imageFiles.get(0).getName()).getAbsolutePath());
@@ -190,7 +191,7 @@ public class Book extends Entity {
                 if (BuildConfig.DEBUG)
                     throw new RuntimeException(ioe);
             }
-        }
+        }*/
     }
 
     @Override

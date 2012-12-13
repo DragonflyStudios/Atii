@@ -18,14 +18,17 @@ import ca.dragonflystudios.utilities.Pathname;
 
 public class BookInfo extends Entity {
 
-    public BookInfo(File bookFolder) {
+    public BookInfo(File bookFolder, String title) {
         mBookFolder = bookFolder;
         mAuthorNames = new ArrayList<String>();
         mIllustratorNames = new ArrayList<String>();
 
-        initializeWithDefaults(bookFolder);
+        if (null == title || "".equals(title))
+            mTitle = Pathname.extractStem(bookFolder.getName());
+        else
+            mTitle = title;
 
-        File mBookXmlFile = new File(bookFolder, "book.xml");
+        mBookXmlFile = new File(bookFolder, "book.xml");
         if (mBookXmlFile.exists()) {
             Parser parser = new Parser();
             try {
@@ -60,10 +63,6 @@ public class BookInfo extends Entity {
 
     public File getPreviewFile() {
         return new File(mBookFolder, "preview.png");
-    }
-
-    private void initializeWithDefaults(File bookFolder) {
-        mTitle = Pathname.extractStem(bookFolder.getName());
     }
 
     @Override

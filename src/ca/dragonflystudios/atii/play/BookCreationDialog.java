@@ -73,9 +73,12 @@ public class BookCreationDialog extends DialogFragment {
                         if ("".equals(title))
                             title = mTitleEntry.getHint().toString();
 
-                        File sourceFolder = new File(mImportFolderPath);
-                        if (null == mImportFolderPath || "".equals(mImportFolderPath) || !sourceFolder.exists())
-                            sourceFolder = null;
+                        File sourceFolder = null;
+                        if (null != mImportFolderPath && !"".equals(mImportFolderPath)) {
+                            sourceFolder = new File(mImportFolderPath);
+                            if (!sourceFolder.exists())
+                                sourceFolder = null;
+                        }
 
                         mListener.onCreateBook(title, sourceFolder);
                     }

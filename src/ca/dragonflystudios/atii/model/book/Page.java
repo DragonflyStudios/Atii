@@ -15,15 +15,12 @@ import ca.dragonflystudios.utilities.Pathname;
 
 // TODO: Should we also allow a page that has no page image? If only to be symmetrical?
 
-public class Page extends Entity
-{
-    public enum AudioPlaybackState
-    {
+public class Page extends Entity {
+    public enum AudioPlaybackState {
         INVALID, NO_AUDIO, NOT_STARTED, PLAYING, PAUSED, FINISHED
     }
 
-    public Page(File imageFolder, File audioFolder)
-    {
+    public Page(File imageFolder, File audioFolder) {
         mImageFolder = imageFolder;
         mAudioFolder = audioFolder;
 
@@ -34,13 +31,14 @@ public class Page extends Entity
         mUsingNewImage = false;
     }
 
-    public Page(File imageFolder, String imageFileName, File audioFolder, String audioFileName)
-    {
+    public Page(File imageFolder, String imageFileName, File audioFolder, String audioFileName) {
         mImageFolder = imageFolder;
         mAudioFolder = audioFolder;
 
-        mImage = new File(mImageFolder, imageFileName);
-        mAudio = new File(mAudioFolder, audioFileName);
+        if (null != imageFileName)
+            mImage = new File(mImageFolder, imageFileName);
+        if (null != audioFileName)
+            mAudio = new File(mAudioFolder, audioFileName);
 
         // uses lazy initialization
         mInitialized = false;
@@ -246,7 +244,7 @@ public class Page extends Entity
     }
 
     private AudioPlaybackState mState;
-    private File               mImageFolder, mAudioFolder, mImage, mAudio;
-    private File               mNewImage;
-    private boolean            mInitialized, mUsingNewImage;
+    private File mImageFolder, mAudioFolder, mImage, mAudio;
+    private File mNewImage;
+    private boolean mInitialized, mUsingNewImage;
 }

@@ -221,6 +221,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
                 Bitmap bitmap = BitmapFactory.decodeFile(previewFile.getAbsolutePath());
                 bookPreviewView.setImageBitmap(bitmap);
             } else {
+                bookNameView.setVisibility(View.VISIBLE);
                 bookPreviewView.setImageResource(R.drawable.default_book_preview);
             }
 
@@ -246,16 +247,11 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
 
         File[] bookFileList = storiesDir.listFiles(filter);
         for (File bookFile : bookFileList) {
-            BookInfo bookInfo = new BookInfo(bookFile);
+            BookInfo bookInfo = new BookInfo(bookFile, null);
             mBookInfos.add(bookInfo);
         }
 
-        Collections.sort(mBookInfos, new Comparator<BookInfo>() {
-            @Override
-            public int compare(BookInfo b1, BookInfo b2) {
-                return b1.getTitle().compareToIgnoreCase(b2.getTitle());
-            }
-        });
+        Collections.sort(mBookInfos, bookInfoComparator);
     }
 
     @Override
@@ -302,6 +298,11 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
     private void createBook(String title, File sourceFolder) {
         Book book = Book.create(getLibraryFolder(), title, sourceFolder);
         book.save();
+
+        BookInfo bookInfo = new BookInfo(book.getFolder(), title);
+        mBookInfos.add(bookInfo);
+        Collections.sort(mBookInfos, bookInfoComparator);
+        mBookGridAdapter.notifyDataSetChanged();
 
         Intent playIntent = new Intent(LibraryActivity.this, Player.class);
         playIntent.putExtra(Player.STORY_EXTRA_KEY, book.getBookPath());
@@ -371,4 +372,11 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
     private BookGridAdapter mBookGridAdapter;
 
     private static Context sAppContext;
+
+    private Comparator<BookInfo> bookInfoComparator = new Comparator<BookInfo>() {
+        @Override
+        public int compare(BookInfo b1, BookInfo b2) {
+            return b1.getTitle().compareToIgnoreCase(b2.getTitle());
+        }
+    };
 }

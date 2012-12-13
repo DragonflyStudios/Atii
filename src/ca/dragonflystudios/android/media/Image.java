@@ -19,6 +19,34 @@ public class Image {
         return BitmapFactory.decodeFile(path, options);
     }
 
+    public static Bitmap decodeBitmapFileIntoSize(String path, int reqWidth, int reqHeight) {
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, options);
+
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        options.inJustDecodeBounds = false;
+        Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+
+        // scale to best fit
+        float sourceWidth = (float) options.outWidth;
+        float sourceHeight = (float) options.outHeight;
+        float sourceRatio = sourceWidth / sourceHeight;
+        float destRatio = (float) reqWidth / (float) reqHeight;
+        float destWidth, destHeight;
+        if (sourceRatio > destRatio) {
+            destWidth = reqWidth;
+            destHeight = reqWidth / sourceRatio;
+        } else {
+            destWidth = reqHeight * sourceRatio;
+            destHeight = reqHeight;
+        }
+
+        bitmap = Bitmap.createScaledBitmap(bitmap, (int) destWidth, (int) destHeight, false);
+        return bitmap;
+    }
+
     private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
         final int height = options.outHeight;
         final int width = options.outWidth;
