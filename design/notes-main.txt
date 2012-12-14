@@ -173,30 +173,43 @@ Story Player UI:
  * [x] Switch between author and reader modes in Settings
  *
  * ......
+ * 
+ * [ ] UI improvements
+ *     [ ] Image UI, center of page
+ *         [ ] Layout: [Choose] [Capture]
+ *         [ ] Future: [Edit] in between [Choose] and [Capture]
+ *     [ ] Audio UI, top of page
+ *         [ ] Layout: [Play] ( ...... display area ...... ) [Record]
+ *             [ ] When reading
+ *                 [ ] If audio, display area shows total time
+ *                 [ ] If no audio, display area shows "No Audio"
+ *                     [ ] Play button is hidden
+ *         [ ] During play
+ *             [ ] Display area shows progress
+ *             [ ] [Play] becomes [Pause]
+ *             [ ] [Record] is hidden
+ *             [ ] Future: progress bar tappable & draggable
+ *         [ ] During recording
+ *             [ ] Display area shows seconds recorded
+ *             [ ] [Play] is hidden
+ *             [ ] [Record] becomes [Stop]
  *
- * [ ] Refactor page model & operations
- *     [ ] Testing and debugging
+ * ......
+ *
  * [ ] Support for multiple audio tracks
  *     [ ] Use xml tag attributes
  *         [ ] named tracks
  *         [ ] indelible tracks
- * [ ] Tracks UI
- *     [ ] Layout: [Play] ( ...... spinner ...... ) [Record]
- *         [ ] Future: During play or recording, spinner becomes draggable slider/progress bar
- *     [ ] Spinner for selecting among tacks
- *     [ ] Under Reader mode, there is no [Record] button shown for "indelible" tracks
- *     [ ] Under Author mode, show a [Configure] under the spinner
- *         [ ] Delete track
- *         [ ] Rename track
- *         [ ] Make track indelible
- *     [ ] Adjust button positioning and show-hide logic
- *         [ ] During play, [Play] becomes [Pause], [Record] is hidden
- *         [ ] During recording, [Play] is hidden, [Record] becomes [Stop]
- * [ ] Image UI, another row underneath the Tracks UI row
- *     [ ] Layout: [Choose] [Capture]
- *     [ ] Future: [Edit] in between [Choose] and [Capture]
+ *     [ ] Player Tracks UI: top of page
+ *         [ ] Layout: [Play] ( ...... spinner ...... ) [Record]
+ *         [ ] Spinner for selecting among tracks
+ *             [ ] Under Reader mode, there is no [Record] button shown for "indelible" tracks
+ *             [ ] Under Author mode, show a [Configure] under the spinner
+ *                 [ ] Delete track
+ *                 [ ] Rename track
+ *                 [ ] Make track indelible
  *
- * ~~~ The Above by end of Friday, Dec 14 ~~~
+ * ~~~ The Above by end of Monday, Dec 17 ~~~
  *
  * ......
  *
