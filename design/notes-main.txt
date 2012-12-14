@@ -174,9 +174,12 @@ Story Player UI:
  *
  * ......
  * 
- * [ ] UI improvements
- *     [ ] Image UI, center of page
- *         [ ] Layout: [Choose] [Capture]
+ * [x] UI improvements
+ *     [x] Image UI, center of page
+ *         [x] Layout: [Choose] [Capture]
+ *         [x] Hide other buttons if page image is not yet accepted
+ *         [x] Show "Discard" and "Keep" buttons in the middle of page
+ *         [x] Disable page turning until choice of "Discard" or "Keep"
  *         [ ] Future: [Edit] in between [Choose] and [Capture]
  *     [ ] Audio UI, top of page
  *         [ ] Layout: [Play] ( ...... display area ...... ) [Record]

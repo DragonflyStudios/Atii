@@ -1,12 +1,14 @@
 package ca.dragonflystudios.atii.play;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -16,18 +18,18 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.ViewGroup;
 import ca.dragonflystudios.android.media.camera.PhotoSnapper;
+import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.model.book.Book;
 import ca.dragonflystudios.atii.model.book.Page;
 import ca.dragonflystudios.atii.model.book.Page.AudioPlaybackState;
+import ca.dragonflystudios.utilities.Streams;
 
 public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener,
-        PhotoSnapper.OnCompletionListener
-{
+        PhotoSnapper.OnCompletionListener {
 
     // TODO: auto (page) advance ...
 
-    public interface PlayChangeListener
-    {
+    public interface PlayChangeListener {
         public void onModeChanged(PlayMode newMode);
 
         public void onPlayStateChanged(PlayState newState);
@@ -46,13 +48,11 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         public void requestPageChangeNotify(int newPage);
     }
 
-    public enum PlayMode
-    {
+    public enum PlayMode {
         READER, AUTHOR
     }
 
-    public enum PlayState
-    {
+    public enum PlayState {
         IDLE, PLAYING_BACK_AUDIO, RECORDING_AUDIO, CAPTURING_PHOTO
     }
 
@@ -80,8 +80,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         return mCurrentPage.getAudioPlaybackState();
     }
 
-    public PlayManager(String bookPath, PlayChangeListener pcl, PlayMode mode)
-    {
+    public PlayManager(String bookPath, PlayChangeListener pcl, PlayMode mode) {
         mBook = new Book(new File(bookPath), null);
 
         mPlayMode = mode;
@@ -315,16 +314,53 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     @Override
     // implementation for PlayCommandHandler
     public void capturePhoto(Activity requestingActivity) {
-
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-
         Uri imageFileUri = Uri.fromFile(mCurrentPage.getImageFileForWriting());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
         intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
         requestingActivity.startActivityForResult(intent, Player.CAPTURE_PHOTO);
+    }
+
+    @Override
+    // implementation for PlayCommandHandler
+    public void pickPhoto(Activity requestingActivity) {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        requestingActivity.startActivityForResult(Intent.createChooser(intent, "Select File"), Player.PICK_PHOTO);
+    }
+
+    public boolean setNewPageImage(InputStream newImageStream) {
+        File imageFile = mCurrentPage.getImageFileForWriting();
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(imageFile);
+        } catch (FileNotFoundException fnfe) {
+            if (BuildConfig.DEBUG) {
+                fnfe.printStackTrace();
+                throw new RuntimeException(fnfe);
+            } else {
+                Log.w(getClass().getName(), "target page image file not found: " + imageFile);
+                return false;
+            }
+        }
+
+        try {
+            Streams.copy(newImageStream, fos);
+            // TODO: should not close newImageStream here!
+            newImageStream.close();
+            fos.close();
+        } catch (IOException ioe) {
+            if (BuildConfig.DEBUG) {
+                ioe.printStackTrace();
+                throw new RuntimeException(ioe);
+            } else {
+                Log.w(getClass().getName(), "failed to copy to target page image file: " + imageFile);
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public void discardNewPageImage() {
@@ -421,19 +457,19 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         mBook.save();
     }
 
-    private Book               mBook;
+    private Book mBook;
 
-    private boolean            mAutoReplay;
-    private boolean            mAutoAdvance;
+    private boolean mAutoReplay;
+    private boolean mAutoAdvance;
 
-    private int                mCurrentPageNum;
-    private Page               mCurrentPage;
+    private int mCurrentPageNum;
+    private Page mCurrentPage;
 
-    private PlayMode           mPlayMode;
-    private PlayState          mPlayState;
+    private PlayMode mPlayMode;
+    private PlayState mPlayState;
 
     private PlayChangeListener mPlayChangeListener;
 
-    private MediaPlayer        mMediaPlayer;
-    private MediaRecorder      mMediaRecorder;
+    private MediaPlayer mMediaPlayer;
+    private MediaRecorder mMediaRecorder;
 }
