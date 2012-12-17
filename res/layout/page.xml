@@ -17,23 +17,21 @@
         android:orientation="horizontal"
         android:visibility="gone" >
 
-        <Button
+        <ImageButton
             android:id="@+id/discard_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/discard"
-            android:textColor="@android:color/white"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/discard"
+            android:src="@drawable/button_discard" />
 
-        <Button
+        <ImageButton
             android:id="@+id/keep_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/keep"
-            android:textColor="@android:color/white"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/discard"
+            android:src="@drawable/button_keep" />
     </LinearLayout>
 
 </FrameLayout>

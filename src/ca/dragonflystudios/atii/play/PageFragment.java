@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import ca.dragonflystudios.android.media.Image;
 import ca.dragonflystudios.atii.R;
@@ -60,13 +60,13 @@ public class PageFragment extends Fragment {
             if (mIsNewImage) {
                 View bv = v.findViewById(R.id.choice_buttons);
                 bv.setVisibility(View.VISIBLE);
-                mDiscardButton = (Button) bv.findViewById(R.id.discard_button);
+                mDiscardButton = (ImageButton) bv.findViewById(R.id.discard_button);
                 mDiscardButton.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         ((OnPageImageChoice) getActivity()).onDiscard();
                     }
                 });
-                mKeepButton = (Button) bv.findViewById(R.id.keep_button);
+                mKeepButton = (ImageButton) bv.findViewById(R.id.keep_button);
                 mKeepButton.setOnClickListener(new OnClickListener() {
                     public void onClick(View v) {
                         ((OnPageImageChoice) getActivity()).onKeep();
@@ -102,6 +102,6 @@ public class PageFragment extends Fragment {
 
     private Bitmap mBitmap;
     private boolean mIsNewImage;
-    private Button mDiscardButton, mKeepButton;
+    private ImageButton mDiscardButton, mKeepButton;
     private String mPageImagePath;
 }
