@@ -16,6 +16,9 @@
     <string name="playback">Play Back</string>
     <string name="playout">Play Out</string>
 
+    <!-- track info -->
+    <string name="no_audio">No Audio</string>
+
     <!-- buttons -->
     <string name="add_before">Add Before</string>
     <string name="add_after">Add After</string>
@@ -38,7 +41,7 @@
     <string name="discard">Discard</string>
     <string name="choose">Choose</string>
     <string name="pick_picture">Choose Page Image</string>
-    
+
     <!-- file chooser -->
     <string name="back_to_parent_folder">Back to parent folder</string>
     <string name="file_type">File type</string>

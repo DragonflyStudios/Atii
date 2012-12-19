@@ -54,13 +54,33 @@
         <!-- Playback and Recording Begin -->
 
         <TextView
-            android:id="@+id/status"
-            android:layout_width="150dp"
+            android:id="@+id/track_info"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:text="This is status"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp" />
+            android:layout_marginTop="20dp"
+            android:background="@drawable/rounded_rect"
+            android:gravity="center"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <SeekBar
+            android:id="@+id/replay_seek_bar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp" />
 
         <!-- Play Begin -->
 
@@ -69,9 +89,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@id/status"
+            android:layout_marginTop="20dp"
+            android:layout_toLeftOf="@id/replay_seek_bar"
             android:background="@android:color/transparent"
             android:contentDescription="@string/play"
             android:src="@drawable/button_play" />
@@ -81,9 +101,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@id/status"
+            android:layout_marginTop="20dp"
+            android:layout_toLeftOf="@id/replay_seek_bar"
             android:background="@android:color/transparent"
             android:contentDescription="@string/pause"
             android:src="@drawable/button_pause" />
@@ -93,9 +113,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@id/status"
+            android:layout_marginTop="20dp"
+            android:layout_toLeftOf="@id/replay_seek_bar"
             android:background="@android:color/transparent"
             android:contentDescription="@string/repeat"
             android:src="@drawable/button_repeat" />
@@ -110,9 +130,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="20dp"
             android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/status"
+            android:layout_marginTop="20dp"
+            android:layout_toRightOf="@id/replay_seek_bar"
             android:background="@android:color/transparent"
             android:contentDescription="@string/record"
             android:src="@drawable/button_record" />
@@ -122,9 +142,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="20dp"
             android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/status"
+            android:layout_marginTop="20dp"
+            android:layout_toRightOf="@id/replay_seek_bar"
             android:background="@android:color/transparent"
             android:contentDescription="@string/stop"
             android:src="@drawable/button_stop" />

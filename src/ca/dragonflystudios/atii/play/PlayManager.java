@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -13,6 +15,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -40,6 +43,8 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         public void onPageChanged(int newPage);
 
         public void onPageImageChanged(int pageNum);
+        
+        public void updateProgress(int progress);
 
         // this is a hack that breaks the integrity of "PlayChangeListener".
         // TAI!
@@ -81,6 +86,8 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public PlayManager(String bookPath, PlayChangeListener pcl, PlayMode mode) {
+        mProgressHandler = new Handler();
+
         mBook = new Book(new File(bookPath), null);
 
         mPlayMode = mode;
@@ -113,6 +120,27 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     public int getInitialPage() {
         // could be a persisted value
         return 0;
+    }
+
+    public String getTrackInfo(int pageNum) {
+        if (!hasAudio())
+            return "No Audio";
+
+        if (null == mMediaPlayer) {
+            try {
+                mMediaPlayer = new MediaPlayer();
+                mMediaPlayer.setOnCompletionListener(this);
+                mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
+                mMediaPlayer.prepare();
+            } catch (IOException e) {
+                Log.e(getClass().getName(), "prepare() failed with IOException");
+                e.printStackTrace();
+            }
+        }
+
+        DateFormat df = new SimpleDateFormat("mm:ss");
+        long duration = mMediaPlayer.getDuration();
+        return df.format(duration);
     }
 
     public boolean isAutoReplay() {
@@ -210,6 +238,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
                 }
             }
 
+            updateProgressBar();
             mMediaPlayer.start();
             setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.PLAYING);
         }
@@ -457,6 +486,31 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         mBook.save();
     }
 
+    public void updateProgressBar() {
+        mProgressHandler.postDelayed(mUpdateTimeTask, 100);
+    }
+
+    private Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+            if (null != mMediaPlayer) {
+
+                long totalDuration = mMediaPlayer.getDuration();
+                long currentDuration = mMediaPlayer.getCurrentPosition();
+
+                long currentSeconds = (int) (currentDuration / 1000);
+                long totalSeconds = (int) (totalDuration / 1000);
+
+                int progressPercentage = (int) ((((double) currentSeconds) / totalSeconds) * 100);
+
+                if (null != mPlayChangeListener)
+                    mPlayChangeListener.updateProgress(progressPercentage);
+            }
+
+            // Running this thread after 100 milliseconds
+            mProgressHandler.postDelayed(this, 100);
+        }
+    };
+
     private Book mBook;
 
     private boolean mAutoReplay;
@@ -472,4 +526,6 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
     private MediaPlayer mMediaPlayer;
     private MediaRecorder mMediaRecorder;
+
+    private Handler mProgressHandler;
 }
