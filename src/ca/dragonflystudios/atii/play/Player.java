@@ -2,6 +2,7 @@ package ca.dragonflystudios.atii.play;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 
 import android.app.Activity;
 import android.app.DialogFragment;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import ca.dragonflystudios.android.dialog.WarningDialogFragment;
 import ca.dragonflystudios.android.dialog.WarningDialogFragment.WarningDialogListener;
@@ -30,7 +32,7 @@ import ca.dragonflystudios.atii.play.PlayManager.PlayState;
 import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
 
 public class Player extends FragmentActivity implements ReaderGestureListener, PlayChangeListener, WarningDialogListener,
-        OnPageImageChoice {
+        OnPageImageChoice, OnSeekBarChangeListener {
 
     public static final String STORY_EXTRA_KEY = "STORY_FOLDER_NAME";
     public static final String PLAY_MODE_EXTRA_KEY = "PLAY_MODE";
@@ -106,7 +108,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
         mTrackInfoView = (TextView) mControlsView.findViewById(R.id.track_info);
         mReplaySeekBar = (SeekBar) mControlsView.findViewById(R.id.replay_seek_bar);
-//        mReplaySeekBar.setVisibility(View.INVISIBLE);
+        mReplaySeekBar.setOnSeekBarChangeListener(this);
 
         mPlayButton = (ImageButton) mControlsView.findViewById(R.id.play);
         mPlayButton.setOnClickListener(new OnClickListener() {
@@ -179,8 +181,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         });
 
         mPageNumView = (TextView) mControlsView.findViewById(R.id.page_num);
-        updatePageNumView(mPlayManager.getInitialPage());
-        updateTrackInfoView(mPlayManager.getInitialPage());
+        updateProgressForPage(mPlayManager.getInitialPage());
 
         mStopButton = (ImageButton) findViewById(R.id.stop);
         mStopButton.setOnClickListener(new OnClickListener() {
@@ -287,7 +288,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         runOnUiThread(new Runnable() {
             public void run() {
                 updatePageNumView(newPage);
-                updateTrackInfoView(newPage);
+                updateProgressForPage(newPage);
             }
         });
     }
@@ -302,10 +303,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             sb.append(" ¥ ");
 
         mPageNumView.setText(sb);
-    }
-
-    private void updateTrackInfoView(int newPage) {
-        mTrackInfoView.setText(mPlayManager.getTrackInfo(newPage));
     }
 
     @Override
@@ -340,8 +337,19 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
     @Override
     // implementation for PlayChangeListener
-    public void updateProgress(int progress) {
+    public void updateProgress(int progress, int duration) {
+        if (mDuration != duration) {
+            mDuration = duration;
+            mReplaySeekBar.setMax(duration);
+        }
+        SimpleDateFormat df = new SimpleDateFormat("mm:ss");
+        String trackInfoText = df.format(progress) + " / " + df.format(duration);
+        mTrackInfoView.setText(trackInfoText);
         mReplaySeekBar.setProgress(progress);
+    }
+
+    private void updateProgressForPage(int pageNum) {
+        updateProgress(mPlayManager.getCurrentProgress(), mPlayManager.getTrackDuration(pageNum));
     }
 
     @Override
@@ -356,7 +364,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mPager.setAdapter(mAdapter);
         mPager.setCurrentItem(newPage);
         updatePageNumView(newPage);
-        updateTrackInfoView(newPage);
+        updateProgressForPage(newPage);
     }
 
     @Override
@@ -392,6 +400,28 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mPager.setPageChangeEnabled(true);
     }
 
+    @Override
+    // implementation for OnSeekBarChangeListener
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
+    }
+ 
+    @Override
+    // implementation for OnSeekBarChangeListener
+    public void onStartTrackingTouch(SeekBar seekBar) {
+        mPlayManager.stopUpdateProgressBar();
+    }
+ 
+    /**
+     * When user stops moving the progress hanlder
+     * */
+    @Override
+    // implementation for OnSeekBarChangeListener
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        mPlayManager.stopUpdateProgressBar();
+        mPlayManager.seekTo(mReplaySeekBar.getProgress());
+        mPlayManager.updateProgressBar();
+    }
+    
     private void updateControls() {
         mPager.setPageChangeEnabled(true);
 
@@ -516,4 +546,5 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
     private boolean mControlsToggleAllowed;
 
+    private int mDuration = -1;
 }

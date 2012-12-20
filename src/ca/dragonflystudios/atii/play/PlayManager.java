@@ -5,8 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -43,8 +41,8 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         public void onPageChanged(int newPage);
 
         public void onPageImageChanged(int pageNum);
-        
-        public void updateProgress(int progress);
+
+        public void updateProgress(int progress, int duration);
 
         // this is a hack that breaks the integrity of "PlayChangeListener".
         // TAI!
@@ -122,9 +120,9 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         return 0;
     }
 
-    public String getTrackInfo(int pageNum) {
+    public int getTrackDuration(int pageNum) {
         if (!hasAudio())
-            return "No Audio";
+            return -1;
 
         if (null == mMediaPlayer) {
             try {
@@ -138,9 +136,14 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
             }
         }
 
-        DateFormat df = new SimpleDateFormat("mm:ss");
-        long duration = mMediaPlayer.getDuration();
-        return df.format(duration);
+        return mMediaPlayer.getDuration();
+    }
+
+    public int getCurrentProgress() {
+        if (!hasAudio() || null == mMediaPlayer)
+            return -1;
+
+        return mMediaPlayer.getCurrentPosition();
     }
 
     public boolean isAutoReplay() {
@@ -490,26 +493,30 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         mProgressHandler.postDelayed(mUpdateTimeTask, 100);
     }
 
+    public void stopUpdateProgressBar() {
+        mProgressHandler.removeCallbacks(mUpdateTimeTask);
+    }
+
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             if (null != mMediaPlayer) {
 
-                long totalDuration = mMediaPlayer.getDuration();
-                long currentDuration = mMediaPlayer.getCurrentPosition();
-
-                long currentSeconds = (int) (currentDuration / 1000);
-                long totalSeconds = (int) (totalDuration / 1000);
-
-                int progressPercentage = (int) ((((double) currentSeconds) / totalSeconds) * 100);
+                int duration = mMediaPlayer.getDuration();
+                int currentPosition = mMediaPlayer.getCurrentPosition();
 
                 if (null != mPlayChangeListener)
-                    mPlayChangeListener.updateProgress(progressPercentage);
+                    mPlayChangeListener.updateProgress(currentPosition, duration);
             }
 
             // Running this thread after 100 milliseconds
             mProgressHandler.postDelayed(this, 100);
         }
     };
+
+    public void seekTo(int position) {
+        if (null != mMediaPlayer)
+            mMediaPlayer.seekTo(position);
+    }
 
     private Book mBook;
 

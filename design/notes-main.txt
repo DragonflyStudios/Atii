@@ -188,10 +188,10 @@ Story Player UI:
  *                 [ ] If no audio, display area shows "[Track Name] No Audio"
  *                     [ ] Play button is hidden
  *         [ ] During play
- *             [ ] Display area shows progress
+ *             [x] Display area shows progress
  *             [ ] [Play] becomes [Pause]
  *             [ ] [Record] is hidden
- *             [ ] Progress bar tappable & draggable
+ *             [x] Progress bar tappable & draggable
  *         [ ] During recording
  *             [ ] Display area shows "[Track Name] seconds recorded"
  *             [ ] [Play] is hidden
