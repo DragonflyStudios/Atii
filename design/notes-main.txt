@@ -182,15 +182,17 @@ Story Player UI:
  *         [x] Disable page turning until choice of "Discard" or "Keep"
  *     [ ] Audio UI, top of page
  *                            ( ...... display area ...... )
- *         [ ] Layout: [Play]            progress            [Record]
- *             [ ] When reading
+ *         [x] Layout: [Play]            progress            [Record]
+ *             [x] When reading
  *                 [x] If audio, display area shows total time
- *                 [ ] If no audio, progress is replaced by text showing "No Audio"
+ *                 [x] If no audio, progress is replaced by text showing "No Audio"
  *                     [x] Play button is hidden
- *                     [ ] Display area is hidden
- *                 [ ] Record button is shown
+ *                     [x] Display area is hidden
+ *                 [x] Record button is shown
  *         [ ] During play
  *             [x] Display area shows progress
+ *                 [ ] Make progress (SeekBar) translucent
+ *                 [ ] Advances to the very end!
  *             [ ] [Play] becomes [Pause]
  *             [ ] [Record] is hidden
  *         [ ] When playing done, show Replay

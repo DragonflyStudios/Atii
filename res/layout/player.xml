@@ -82,6 +82,23 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp" />
 
+        <TextView
+            android:id="@+id/no_audio_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/track_info"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="3dp"
+            android:background="@drawable/rounded_rect"
+            android:gravity="center"
+            android:paddingBottom="3dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="3dp"
+            android:text="@string/no_audio"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
+            android:textStyle="bold" />
         <!-- Play Begin -->
 
         <ImageButton
