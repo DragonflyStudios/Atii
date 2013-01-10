@@ -180,22 +180,31 @@ Story Player UI:
  *         [x] Hide other buttons if page image is not yet accepted
  *         [x] Show "Discard" and "Keep" buttons in the middle of page
  *         [x] Disable page turning until choice of "Discard" or "Keep"
- *         [ ] Future: [Edit] in between [Choose] and [Capture]
  *     [ ] Audio UI, top of page
- *         [ ] Layout: [Play] ( ...... display area ...... ) [Record]
+ *                            ( ...... display area ...... )
+ *         [ ] Layout: [Play]            progress            [Record]
  *             [ ] When reading
- *                 [ ] If audio, display area shows "[Track Name] total time"
- *                 [ ] If no audio, display area shows "[Track Name] No Audio"
- *                     [ ] Play button is hidden
+ *                 [x] If audio, display area shows total time
+ *                 [ ] If no audio, progress is replaced by text showing "No Audio"
+ *                     [x] Play button is hidden
+ *                     [ ] Display area is hidden
+ *                 [ ] Record button is shown
  *         [ ] During play
  *             [x] Display area shows progress
  *             [ ] [Play] becomes [Pause]
  *             [ ] [Record] is hidden
+ *         [ ] When playing done, show Replay
+ *             [ ] Once navigate away from page, show Play
+ *             [ ] Once tap or drag progress, show Play
+ *         [ ] During pause
  *             [x] Progress bar tappable & draggable
+ *             [ ] Play from the position as indicated by the progress
  *         [ ] During recording
- *             [ ] Display area shows "[Track Name] seconds recorded"
- *             [ ] [Play] is hidden
- *             [ ] [Record] becomes [Stop]
+ *             [ ] Display area shows "minutes and seconds recorded"
+ *             [ ] [Play], progress bar, & [Record] are hidden
+ *             [ ] Show [Stop] at center
+ *
+ * ~~~ The Above by end of Friday, Jan 18 ~~~
  *
  * ......
  *
@@ -212,63 +221,63 @@ Story Player UI:
  *                 [ ] Rename track
  *                 [ ] Make track indelible
  *
- * ~~~ The Above by end of Monday, Dec 17 ~~~
+ * ......
+ *
+ * [ ] Page text: allow multiple languages ...
+ *     [ ] Superimpose text display
+ *
+ * ~~~ The Above by end of Thursday, Jan 17 ~~~
+ *
+ * [ ] Video generation and sharing
+ *     [ ] Generate time-lapse videos
+ *     [ ] Upload to YouTube
+ *
+ * ~~~ The Above by end of Thursday, Jan 24 ~~~
+ *
+ * [ ] Usability features
+ *     [ ] Fading: during playback, controls disappear after a certain delay (e.g. 5 seconds); otherwise stays
+ *     [ ] Show draggable progress bar.
+ *         [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
+ *     [ ] In auto page advance ... appropriately time page turn in relation to audio stop and starting
+ *         - currently there is a 1s delay before audio starts on a new page
+ *     [ ] Visual feedback when playback is going on even when UIs are hidden
+ *     [ ] Page transition animation
+ *     [ ] When recording --
+ *         [ ] Hide all buttons (currently shows a Stop button)
+ *         [ ] Superimpose translucent equalizer/volume feedback
+ *             - See: https://groups.google.com/forum/?fromgroups=#!topic/android-developers/QVqlE--SkoA
+ *             -      http://developer.samsung.com/android/technical-docs/Displaying-Sound-Volume-in-Real-Time-While-Recording
+ *         [ ] Double tap to stop recording?
+ * [ ] Authoring usability features
+ *     [ ] Animation for page deletion
+ *     [ ] Animation for page addition
+ *     [ ] Animation for page image replacing
+ *     [ ] Preview
+ *         [ ] Default checkbox ... uses first page of book.
+ *         [ ] Use a dialog to pick an image anywhere on the device and bring it over
+ *     [ ] Page image editing: allow panning, zooming & cropping.
+ *         [ ] Future: [Edit] in between [Choose] and [Capture]
+ *         - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
+ *
+ * ......
+ *
+ * [ ] Gingerbread support
+ * [ ] Kindle Fire test
+ * [ ] Test on other devices
+ *
+ * ~~~ The Above by end of Thursday, Jan 31 -- Private Preview ~~~
+ *
+ * ......
+ *
+ * [ ] Make UI pretty
+ *     [ ] Find a designer
  *
  * ......
  *
  * [ ] HTML5 starts => Matt
  *     - See: http://multitouchdesign.wordpress.com/2011/11/19/extending-android-viewpager/
  *
- * ......
- *
- * [ ] Generate time-lapse videos
- * [ ] Upload to YouTube
- *
- * ......
- *
- * [ ] Google Drive integration -- This starts the sharing business
- *
- * ~~~ The Above by end of Monday, Dec 17 ~~~
- *
- * ......
- *
- * [ ] Make UI pretty
- *     [ ] Find a designer
- * [ ] Usability features
- *     [ ] Animation for page deletion
- *     [ ] Animation for page addition
- *     [ ] Animation for page image replacing
- *     [ ] Fading: during playback, controls disappear after a certain delay (e.g. 5 seconds); otherwise stays
- *     [ ] Show draggable progress bar.
- *         [ ] For audio?
- *         [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
- *     [ ] When recording --
- *         [ ] Hide all buttons (currently shows a Stop button)
- *         [ ] Superimpose translucent equalizer/volume feedback
- *             - See: https://groups.google.com/forum/?fromgroups=#!topic/android-developers/QVqlE--SkoA
- *             -      http://developer.samsung.com/android/technical-docs/Displaying-Sound-Volume-in-Real-Time-While-Recording
- *         [ ] Double tap to stop recording
- *     [ ] In auto page advance ... appropriately time page turn in relation to audio stop and starting
- *         - currently there is a 1s delay before audio starts on a new page
- *     [ ] Visual feedback when playback is going on ...
- *     [ ] Page transition animation
- *     [ ] Preview
- *         [ ] Default checkbox ... uses first page of book.
- *         [ ] Use a dialog to pick an image anywhere on the device and bring it over
- * [ ] Image cropping
- *     - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
- *
- * ......
- *
  * ~~~ Other possible core features ~~~
- *
- * [ ] Import PDF (copy over + extract basic info)
- *     - PDF as source of page image
- * [ ] Page image editing: allow panning, zooming & cropping.
- * [ ] Use other apps for audio recording?
- * [ ] Use any audio on device (copy over? maybe not?) -- is this a good idea?
- * [ ] Page text: allow multiple languages ...
- * [ ] Filter out background noise from recording
  *
  * ......
  *
@@ -280,10 +289,12 @@ Story Player UI:
  *
  * ......
  *
- * [ ] Gingerbread support
- * [ ] Kindle Fire test
- *
- * ~~~ The Above by end of Thursday, Jan 17 ~~~
+ * [ ] Google Drive integration -- This starts the sharing business
+ * [ ] Import PDF (copy over + extract basic info)
+ *     - PDF as source of page image
+ * [ ] Use other apps for audio recording?
+ * [ ] Use any audio on device (copy over? maybe not?) -- is this a good idea?
+ * [ ] Filter out background noise from recording
  *
  */
 
