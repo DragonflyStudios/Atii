@@ -139,7 +139,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
                 mControlsToggleAllowed = false;
                 mPlayManager.startAudioRecording();
                 mSecondsRecorded = 0;
-                mCountDownTimer.start();
+                mRecordingTimer.start();
             }
         });
 
@@ -191,7 +191,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mPlayManager.stopAudioRecording();
-                mCountDownTimer.cancel();
+                mRecordingTimer.cancel();
                 mSecondsRecorded = 0;
                 mControlsToggleAllowed = true;
             }
@@ -280,9 +280,18 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
     @Override
     // implementation for PlayChangeListener
-    public void onAudioPlaybackStateChanged(AudioPlaybackState newState) {
+    public void onAudioPlaybackStateChanged(final AudioPlaybackState newState) {
         runOnUiThread(new Runnable() {
             public void run() {
+                switch (newState) {
+                case PLAYING:
+                    mPlayingTimer.start();
+                    break;
+                default:
+                    mPlayingTimer.cancel();
+                    break;
+                }
+
                 updateControls();
             }
         });
@@ -341,9 +350,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         // mAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    // implementation for PlayChangeListener
     public void updateProgress(int progress, int duration) {
+        Log.w("updateProgress", progress + " of " + duration);
+
         if (duration > 0) {
             mReplaySeekBar.setVisibility(View.VISIBLE);
             mTrackInfoView.setVisibility(View.VISIBLE);
@@ -361,7 +370,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             mDuration = duration;
         }
 
-        if (mDuration > 0) {
+        if (mDuration > 0 & progress >= 0) {
             SimpleDateFormat df = new SimpleDateFormat("mm:ss");
             String trackInfoText = df.format(progress) + " / " + df.format(duration);
             mTrackInfoView.setText(trackInfoText);
@@ -429,7 +438,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     @Override
     // implementation for OnSeekBarChangeListener
     public void onStartTrackingTouch(SeekBar seekBar) {
-        mPlayManager.stopUpdateProgressBar();
+        mHasBeenPlaying = mPlayManager.isPlaying();
+        mPlayManager.pauseAudioReplay();
+        mPlayingTimer.cancel();
     }
 
     /**
@@ -438,9 +449,11 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     @Override
     // implementation for OnSeekBarChangeListener
     public void onStopTrackingTouch(SeekBar seekBar) {
-        mPlayManager.stopUpdateProgressBar();
         mPlayManager.seekTo(mReplaySeekBar.getProgress());
-        mPlayManager.updateProgressBar();
+        if (mHasBeenPlaying) {
+            mPlayManager.startAudioReplay();
+            mPlayingTimer.start();
+        }
     }
 
     private void updateControls() {
@@ -587,12 +600,14 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     private TextView mPageNumView, mTrackInfoView, mAudioStatusView;
     private SeekBar mReplaySeekBar;
 
+    private boolean mHasBeenPlaying;
+
     private boolean mControlsToggleAllowed;
 
     private int mDuration = -1;
 
     private int mSecondsRecorded = 0;
-    private CountDownTimer mCountDownTimer = new CountDownTimer(86400000, 1000) {
+    private CountDownTimer mRecordingTimer = new CountDownTimer(86400000, 1000) {
         public void onTick(long millisUntilFinished) {
             mSecondsRecorded++;
             int minutes = mSecondsRecorded / 60;
@@ -607,6 +622,14 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
         public void onFinish() {
         }
-     };
+    };
 
+    private CountDownTimer mPlayingTimer = new CountDownTimer(86400000, 100) {
+        public void onTick(long millisUntilFinished) {
+            updateProgressForPage(mPlayManager.getCurrentPageNum());
+        }
+
+        public void onFinish() {
+        }
+    };
 }

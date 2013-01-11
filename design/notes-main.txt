@@ -197,9 +197,6 @@ Story Player UI:
  *         [x] During pause
  *             [x] Progress bar tappable & draggable
  *             [x] Play from the position as indicated by the progress
- *         [ ] When playing done, show Replay
- *             [ ] Once navigate away from page, show Play
- *             [ ] Once tap or drag progress, show Play
  *         [x] During recording
  *             [x] Display area is hidden
  *             [x] [Play], progress bar, & [Record] are hidden
@@ -208,11 +205,15 @@ Story Player UI:
  *         [x] When recording done, update display area
  *             [x] Show progress (SeekBar)
  *             [x] Hide no audio message
- *     [ ] The audio for wrong page bug
  *
  * ~~~ The Above by end of Friday, Jan 11 ~~~
  *
  * [ ] Refactor
+ *     [ ] Solve the following during refactor
+ *         [ ] The audio for wrong page bug
+ *         [ ] When playing done, show Replay
+ *             [ ] Once navigate away from page, show Play
+ *             [ ] Once tap or drag progress, show Play
  *
  * ~~~ The Above by end of Monday, Jan 14 ~~~
  *

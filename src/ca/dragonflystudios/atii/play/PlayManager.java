@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -41,8 +40,6 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         public void onPageChanged(int newPage);
 
         public void onPageImageChanged(int pageNum);
-
-        public void updateProgress(int progress, int duration);
 
         // this is a hack that breaks the integrity of "PlayChangeListener".
         // TAI!
@@ -84,8 +81,6 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public PlayManager(String bookPath, PlayChangeListener pcl, PlayMode mode) {
-        mProgressHandler = new Handler();
-
         mBook = new Book(new File(bookPath), null);
 
         mPlayMode = mode;
@@ -140,8 +135,20 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public int getCurrentProgress() {
-        if (!hasAudio() || null == mMediaPlayer)
+        if (!hasAudio())
             return -1;
+
+        if (null == mMediaPlayer) {
+            try {
+                mMediaPlayer = new MediaPlayer();
+                mMediaPlayer.setOnCompletionListener(this);
+                mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
+                mMediaPlayer.prepare();
+            } catch (IOException e) {
+                Log.e(getClass().getName(), "prepare() failed with IOException");
+                e.printStackTrace();
+            }
+        }
 
         return mMediaPlayer.getCurrentPosition();
     }
@@ -206,7 +213,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         return mCurrentPage.getAudioPlaybackState() == AudioPlaybackState.NOT_STARTED;
     }
 
-    private boolean isPlaying() {
+    public boolean isPlaying() {
         return mCurrentPage.getAudioPlaybackState() == AudioPlaybackState.PLAYING;
     }
 
@@ -241,7 +248,6 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
                 }
             }
 
-            updateProgressBar();
             mMediaPlayer.start();
             setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.PLAYING);
         }
@@ -488,30 +494,6 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         mBook.save();
     }
 
-    public void updateProgressBar() {
-        mProgressHandler.postDelayed(mUpdateTimeTask, 100);
-    }
-
-    public void stopUpdateProgressBar() {
-        mProgressHandler.removeCallbacks(mUpdateTimeTask);
-    }
-
-    private Runnable mUpdateTimeTask = new Runnable() {
-        public void run() {
-            if (null != mMediaPlayer) {
-
-                int duration = mMediaPlayer.getDuration();
-                int currentPosition = mMediaPlayer.getCurrentPosition();
-
-                if (null != mPlayChangeListener)
-                    mPlayChangeListener.updateProgress(currentPosition, duration);
-
-                // Running this thread after 100 milliseconds
-                mProgressHandler.postDelayed(this, 100);
-            }
-        }
-    };
-
     public void seekTo(int position) {
         if (null != mMediaPlayer)
             mMediaPlayer.seekTo(position);
@@ -532,6 +514,4 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
     private MediaPlayer mMediaPlayer;
     private MediaRecorder mMediaRecorder;
-
-    private Handler mProgressHandler;
 }
