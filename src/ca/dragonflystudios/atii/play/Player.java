@@ -448,11 +448,15 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             switch (mPlayManager.getPlayState()) {
             case IDLE:
             case PLAYING_BACK_AUDIO:
+                mStopButton.setVisibility(View.INVISIBLE);
+                mRecordButton.setVisibility(View.VISIBLE);
                 updateAudioPlaybackButtons();
+                updateProgressForPage(mPlayManager.getCurrentPageNum());
                 break;
             case RECORDING_AUDIO:
                 mPager.setPageChangeEnabled(false);
                 setAuthoringControlsVisibility(View.INVISIBLE);
+                mRecordButton.setVisibility(View.INVISIBLE);
                 mStopButton.setVisibility(View.VISIBLE);
                 break;
             default:
@@ -469,11 +473,14 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             case PLAYING_BACK_AUDIO:
                 setAuthoringControlsVisibility(View.VISIBLE);
                 mStopButton.setVisibility(View.INVISIBLE);
+                mRecordButton.setVisibility(View.VISIBLE);
                 updateAudioPlaybackButtons();
+                updateProgressForPage(mPlayManager.getCurrentPageNum());
                 break;
             case RECORDING_AUDIO:
                 mPager.setPageChangeEnabled(false);
                 setAuthoringControlsVisibility(View.INVISIBLE);
+                mRecordButton.setVisibility(View.INVISIBLE);
                 mStopButton.setVisibility(View.VISIBLE);
                 break;
             case CAPTURING_PHOTO:

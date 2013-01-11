@@ -185,7 +185,7 @@ Story Player UI:
  *         [x] Layout: [Play]            progress            [Record]
  *             [x] When reading
  *                 [x] If audio, display area shows total time
- *                 [x] If no audio, progress is replaced by text showing "No Audio"
+ *                 [x] If no audio, progress is replaced by audio status text view showing "No Audio"
  *                     [x] Play button is hidden
  *                     [x] Display area is hidden
  *                 [x] Record button is shown
@@ -194,17 +194,21 @@ Story Player UI:
  *                 [ ] Make progress (SeekBar) translucent
  *                 [ ] Advances to the very end!
  *             [ ] [Play] becomes [Pause]
- *             [ ] [Record] is hidden
+ *         [x] During pause
+ *             [x] Progress bar tappable & draggable
+ *             [x] Play from the position as indicated by the progress
  *         [ ] When playing done, show Replay
  *             [ ] Once navigate away from page, show Play
  *             [ ] Once tap or drag progress, show Play
- *         [ ] During pause
- *             [x] Progress bar tappable & draggable
- *             [ ] Play from the position as indicated by the progress
  *         [ ] During recording
- *             [ ] Display area shows "minutes and seconds recorded"
- *             [ ] [Play], progress bar, & [Record] are hidden
- *             [ ] Show [Stop] at center
+ *             [x] Display area is hidden
+ *             [x] [Play], progress bar, & [Record] are hidden
+ *             [x] [Stop] replaces [Record]
+ *             [ ] Show seconds recorded so far in audio status text view
+ *         [x] When recording done, update display area
+ *             [x] Show progress (SeekBar)
+ *             [x] Hide no audio message
+ *     [ ] The audio for wrong page bug
  *
  * ~~~ The Above by end of Friday, Jan 18 ~~~
  *

@@ -260,13 +260,12 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     @Override
     // implementation for PlayCommandHandler
     public void stopAudioReplay() {
-        if (hasAudio() && (isPlaying() || isPaused()))
-            if (null != mMediaPlayer) {
-                mMediaPlayer.release();
-                mMediaPlayer = null;
+        if (null != mMediaPlayer) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
 
-                setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.FINISHED);
-            }
+            setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.FINISHED);
+        }
     }
 
     @Override
