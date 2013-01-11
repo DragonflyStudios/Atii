@@ -124,18 +124,6 @@
             android:contentDescription="@string/pause"
             android:src="@drawable/button_pause" />
 
-        <ImageButton
-            android:id="@+id/repeat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="20dp"
-            android:layout_toLeftOf="@id/replay_seek_bar"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/repeat"
-            android:src="@drawable/button_repeat" />
-
         <!-- Play End -->
 
 

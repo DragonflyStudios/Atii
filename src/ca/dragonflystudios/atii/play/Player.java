@@ -126,13 +126,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             }
         });
 
-        mRepeatButton = (ImageButton) mControlsView.findViewById(R.id.repeat);
-        mRepeatButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                mPlayManager.startAudioReplay();
-            }
-        });
-
         mRecordButton = (ImageButton) mControlsView.findViewById(R.id.record);
         mRecordButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -530,10 +523,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             switchPlaybackButton(mPauseButton);
             break;
         case PAUSED:
-            switchPlaybackButton(mPlayButton);
-            break;
         case FINISHED:
-            switchPlaybackButton(mRepeatButton);
+            switchPlaybackButton(mPlayButton);
             break;
         default:
             if (BuildConfig.DEBUG)
@@ -546,7 +537,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     private void switchPlaybackButton(ImageButton button) {
         mPlayButton.setVisibility(View.INVISIBLE);
         mPauseButton.setVisibility(View.INVISIBLE);
-        mRepeatButton.setVisibility(View.INVISIBLE);
 
         if (null != button)
             button.setVisibility(View.VISIBLE);
@@ -563,7 +553,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     private void setAudioPlaybackControlsVisibility(int visibility) {
         mPlayButton.setVisibility(visibility);
         mPauseButton.setVisibility(visibility);
-        mRepeatButton.setVisibility(visibility);
         mReplaySeekBar.setVisibility(visibility);
         mTrackInfoView.setVisibility(visibility);
     }
@@ -593,7 +582,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
     private ViewGroup mControlsView;
     private SeesawButton mModeButton;
-    private ImageButton mPlayButton, mPauseButton, mRepeatButton;
+    private ImageButton mPlayButton, mPauseButton;
     private ImageButton mRecordButton, mStopButton;
     private ImageButton mCaptureButton, mPickPictureButton;
     private ImageButton mAddBeforeButton, mAddAfterButton, mDeleteButton;
