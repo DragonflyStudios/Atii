@@ -9,6 +9,7 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -107,7 +108,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mModeButton.setVisibility(View.GONE);
 
         mTrackInfoView = (TextView) mControlsView.findViewById(R.id.track_info);
-        mNoAudioMsgView = (TextView) mControlsView.findViewById(R.id.no_audio_message);
+        mAudioStatusView = (TextView) mControlsView.findViewById(R.id.audio_status);
         mReplaySeekBar = (SeekBar) mControlsView.findViewById(R.id.replay_seek_bar);
         mReplaySeekBar.setOnSeekBarChangeListener(this);
 
@@ -137,6 +138,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             public void onClick(View v) {
                 mControlsToggleAllowed = false;
                 mPlayManager.startAudioRecording();
+                mSecondsRecorded = 0;
+                mCountDownTimer.start();
             }
         });
 
@@ -188,6 +191,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mPlayManager.stopAudioRecording();
+                mCountDownTimer.cancel();
+                mSecondsRecorded = 0;
                 mControlsToggleAllowed = true;
             }
         });
@@ -342,11 +347,12 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         if (duration > 0) {
             mReplaySeekBar.setVisibility(View.VISIBLE);
             mTrackInfoView.setVisibility(View.VISIBLE);
-            mNoAudioMsgView.setVisibility(View.INVISIBLE);
+            mAudioStatusView.setVisibility(View.INVISIBLE);
         } else if (duration <= 0) {
             mReplaySeekBar.setVisibility(View.INVISIBLE);
             mTrackInfoView.setVisibility(View.INVISIBLE);
-            mNoAudioMsgView.setVisibility(View.VISIBLE);
+            mAudioStatusView.setVisibility(View.VISIBLE);
+            mAudioStatusView.setText(R.string.no_audio);
         }
 
         if (mDuration != duration) {
@@ -444,19 +450,22 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         case READER:
             mModeButton.setSaw(true);
             setAuthoringControlsVisibility(View.INVISIBLE);
-            mStopButton.setVisibility(View.INVISIBLE);
             switch (mPlayManager.getPlayState()) {
             case IDLE:
             case PLAYING_BACK_AUDIO:
                 mStopButton.setVisibility(View.INVISIBLE);
+                mAudioStatusView.setVisibility(View.INVISIBLE);
                 mRecordButton.setVisibility(View.VISIBLE);
+                setAudioPlaybackControlsVisibility(View.VISIBLE);
                 updateAudioPlaybackButtons();
                 updateProgressForPage(mPlayManager.getCurrentPageNum());
                 break;
             case RECORDING_AUDIO:
                 mPager.setPageChangeEnabled(false);
                 setAuthoringControlsVisibility(View.INVISIBLE);
+                setAudioPlaybackControlsVisibility(View.INVISIBLE);
                 mRecordButton.setVisibility(View.INVISIBLE);
+                mAudioStatusView.setVisibility(View.VISIBLE);
                 mStopButton.setVisibility(View.VISIBLE);
                 break;
             default:
@@ -473,14 +482,18 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             case PLAYING_BACK_AUDIO:
                 setAuthoringControlsVisibility(View.VISIBLE);
                 mStopButton.setVisibility(View.INVISIBLE);
+                mAudioStatusView.setVisibility(View.INVISIBLE);
                 mRecordButton.setVisibility(View.VISIBLE);
+                setAudioPlaybackControlsVisibility(View.VISIBLE);
                 updateAudioPlaybackButtons();
                 updateProgressForPage(mPlayManager.getCurrentPageNum());
                 break;
             case RECORDING_AUDIO:
                 mPager.setPageChangeEnabled(false);
                 setAuthoringControlsVisibility(View.INVISIBLE);
+                setAudioPlaybackControlsVisibility(View.INVISIBLE);
                 mRecordButton.setVisibility(View.INVISIBLE);
+                mAudioStatusView.setVisibility(View.VISIBLE);
                 mStopButton.setVisibility(View.VISIBLE);
                 break;
             case CAPTURING_PHOTO:
@@ -534,6 +547,14 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mDeleteButton.setVisibility(visibility);
     }
 
+    private void setAudioPlaybackControlsVisibility(int visibility) {
+        mPlayButton.setVisibility(visibility);
+        mPauseButton.setVisibility(visibility);
+        mRepeatButton.setVisibility(visibility);
+        mReplaySeekBar.setVisibility(visibility);
+        mTrackInfoView.setVisibility(visibility);
+    }
+
     private void showAllControls() {
         mControlsView.setVisibility(View.VISIBLE);
     }
@@ -563,10 +584,29 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     private ImageButton mRecordButton, mStopButton;
     private ImageButton mCaptureButton, mPickPictureButton;
     private ImageButton mAddBeforeButton, mAddAfterButton, mDeleteButton;
-    private TextView mPageNumView, mTrackInfoView, mNoAudioMsgView;
+    private TextView mPageNumView, mTrackInfoView, mAudioStatusView;
     private SeekBar mReplaySeekBar;
 
     private boolean mControlsToggleAllowed;
 
     private int mDuration = -1;
+
+    private int mSecondsRecorded = 0;
+    private CountDownTimer mCountDownTimer = new CountDownTimer(86400000, 1000) {
+        public void onTick(long millisUntilFinished) {
+            mSecondsRecorded++;
+            int minutes = mSecondsRecorded / 60;
+            int seconds = mSecondsRecorded % 60;
+
+            if (seconds < 10) {
+                mAudioStatusView.setText("" + minutes + ":0" + seconds);
+            } else {
+                mAudioStatusView.setText("" + minutes + ":" + seconds);
+            }
+        }
+
+        public void onFinish() {
+        }
+     };
+
 }

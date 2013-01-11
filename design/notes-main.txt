@@ -139,7 +139,7 @@ Story Player UI:
  *
  * - Redesign authoring
  *
- * [ ] Book Management
+ * [x] Book Management
  *     [x] Long tap show options: edit, delete
  *     [x] Selection of multiple items
  *     [x] Dynamic contextual menu
@@ -200,45 +200,21 @@ Story Player UI:
  *         [ ] When playing done, show Replay
  *             [ ] Once navigate away from page, show Play
  *             [ ] Once tap or drag progress, show Play
- *         [ ] During recording
+ *         [x] During recording
  *             [x] Display area is hidden
  *             [x] [Play], progress bar, & [Record] are hidden
  *             [x] [Stop] replaces [Record]
- *             [ ] Show seconds recorded so far in audio status text view
+ *             [x] Show seconds recorded so far in audio status text view
  *         [x] When recording done, update display area
  *             [x] Show progress (SeekBar)
  *             [x] Hide no audio message
  *     [ ] The audio for wrong page bug
  *
- * ~~~ The Above by end of Friday, Jan 18 ~~~
+ * ~~~ The Above by end of Friday, Jan 11 ~~~
  *
- * ......
+ * [ ] Refactor
  *
- * [ ] Support for multiple audio tracks
- *     [ ] Use xml tag attributes
- *         [ ] named tracks
- *         [ ] indelible tracks
- *     [ ] Player Tracks UI: top of page
- *         [ ] Layout: [Play] ( ...... spinner ...... ) [Record]
- *         [ ] Spinner for selecting among tracks
- *             [ ] Under Reader mode, there is no [Record] button shown for "indelible" tracks
- *             [ ] Under Author mode, show a [Configure] under the spinner
- *                 [ ] Delete track
- *                 [ ] Rename track
- *                 [ ] Make track indelible
- *
- * ......
- *
- * [ ] Page text: allow multiple languages ...
- *     [ ] Superimpose text display
- *
- * ~~~ The Above by end of Thursday, Jan 17 ~~~
- *
- * [ ] Video generation and sharing
- *     [ ] Generate time-lapse videos
- *     [ ] Upload to YouTube
- *
- * ~~~ The Above by end of Thursday, Jan 24 ~~~
+ * ~~~ The Above by end of Monday, Jan 14 ~~~
  *
  * [ ] Usability features
  *     [ ] Fading: during playback, controls disappear after a certain delay (e.g. 5 seconds); otherwise stays
@@ -265,6 +241,15 @@ Story Player UI:
  *         [ ] Future: [Edit] in between [Choose] and [Capture]
  *         - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
  *
+ * ~~~ The Above by end of Thursday, Jan 17 ~~~
+ *
+ * [ ] Video generation and sharing
+ *     [ ] Generate time-lapse videos
+ *     [ ] Upload to YouTube
+ *     [ ] Upload to Youku
+ *
+ * ~~~ The Above by end of Thursday, Jan 24 ~~~
+ *
  * ......
  *
  * [ ] Gingerbread support
@@ -272,6 +257,26 @@ Story Player UI:
  * [ ] Test on other devices
  *
  * ~~~ The Above by end of Thursday, Jan 31 -- Private Preview ~~~
+ *
+ * ......
+ *
+ * [ ] Support for multiple audio tracks
+ *     [ ] Use xml tag attributes
+ *         [ ] named tracks
+ *         [ ] indelible tracks
+ *     [ ] Player Tracks UI: top of page
+ *         [ ] Layout: [Play] ( ...... spinner ...... ) [Record]
+ *         [ ] Spinner for selecting among tracks
+ *             [ ] Under Reader mode, there is no [Record] button shown for "indelible" tracks
+ *             [ ] Under Author mode, show a [Configure] under the spinner
+ *                 [ ] Delete track
+ *                 [ ] Rename track
+ *                 [ ] Make track indelible
+ *
+ * ......
+ *
+ * [ ] Page text: allow multiple languages ...
+ *     [ ] Superimpose text display
  *
  * ......
  *
