@@ -191,9 +191,9 @@ Story Player UI:
  *                 [x] Record button is shown
  *         [ ] During play
  *             [x] Display area shows progress
- *                 [ ] Make progress (SeekBar) translucent
+ *                 [x] Make progress (SeekBar) translucent
  *                 [ ] Advances to the very end!
- *             [ ] [Play] becomes [Pause]
+ *             [x] [Play] becomes [Pause]
  *         [x] During pause
  *             [x] Progress bar tappable & draggable
  *             [x] Play from the position as indicated by the progress

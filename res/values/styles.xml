@@ -1,5 +1,8 @@
 <resources>
 
     <style name="AppTheme" parent="android:Theme.Light" />
+    <style name="AtiiSeekBar" parent="android:Widget.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal</item>
+    </style>
 
 </resources>

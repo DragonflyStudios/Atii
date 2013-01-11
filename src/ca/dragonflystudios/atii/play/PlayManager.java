@@ -505,10 +505,10 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
                 if (null != mPlayChangeListener)
                     mPlayChangeListener.updateProgress(currentPosition, duration);
-            }
 
-            // Running this thread after 100 milliseconds
-            mProgressHandler.postDelayed(this, 100);
+                // Running this thread after 100 milliseconds
+                mProgressHandler.postDelayed(this, 100);
+            }
         }
     };
 
