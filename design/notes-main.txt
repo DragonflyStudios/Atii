@@ -180,7 +180,7 @@ Story Player UI:
  *         [x] Hide other buttons if page image is not yet accepted
  *         [x] Show "Discard" and "Keep" buttons in the middle of page
  *         [x] Disable page turning until choice of "Discard" or "Keep"
- *     [ ] Audio UI, top of page
+ *     [x] Audio UI, top of page
  *                            ( ...... display area ...... )
  *         [x] Layout: [Play]            progress            [Record]
  *             [x] When reading
@@ -189,10 +189,9 @@ Story Player UI:
  *                     [x] Play button is hidden
  *                     [x] Display area is hidden
  *                 [x] Record button is shown
- *         [ ] During play
+ *         [x] During play
  *             [x] Display area shows progress
  *                 [x] Make progress (SeekBar) translucent
- *                 [ ] Advances to the very end!
  *             [x] [Play] becomes [Pause]
  *         [x] During pause
  *             [x] Progress bar tappable & draggable
@@ -210,8 +209,7 @@ Story Player UI:
  * ~~~ The Above by end of Friday, Jan 11 ~~~
  *
  * [ ] Refactor
- *     [ ] Solve the following during refactor
- *         [ ] The audio for wrong page bug
+ *     [ ] During refactoring, solve the audio for wrong page bug
  *
  * ~~~ The Above by end of Monday, Jan 14 ~~~
  *
@@ -254,6 +252,9 @@ Story Player UI:
  * [ ] Gingerbread support
  * [ ] Kindle Fire test
  * [ ] Test on other devices
+ *
+ * [ ] Make seek bar advance to the very end during replay!
+ *     -- There seems to be an issue with Android here: http://code.google.com/p/android/issues/detail?id=11590
  *
  * ~~~ The Above by end of Thursday, Jan 31 -- Private Preview ~~~
  *
