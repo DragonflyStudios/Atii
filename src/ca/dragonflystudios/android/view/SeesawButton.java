@@ -5,6 +5,8 @@ import android.util.AttributeSet;
 import android.widget.ImageButton;
 import ca.dragonflystudios.atii.R;
 
+// TODO: this is really the CompoundButton: http://developer.android.com/reference/android/widget/CompoundButton.html
+
 public class SeesawButton extends ImageButton {
 
     public SeesawButton(Context context) {

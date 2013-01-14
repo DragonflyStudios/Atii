@@ -6,15 +6,14 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import ca.dragonflystudios.atii.R;
 
 public class WarningDialogFragment extends DialogFragment
 {
     public interface WarningDialogListener
     {
-        public void onPositive();
+        public void onPositive(WarningDialogFragment wdf);
 
-        public void onNegative();
+        public void onNegative(WarningDialogFragment wdf);
     }
 
     private static final String TITLE_KEY   = "title";
@@ -50,11 +49,11 @@ public class WarningDialogFragment extends DialogFragment
         builder.setTitle(titleId).setMessage(messageId)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onPositive();
+                        mListener.onPositive(WarningDialogFragment.this);
                     }
                 }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onNegative();
+                        mListener.onNegative(WarningDialogFragment.this);
                     }
                 });
         return builder.create();

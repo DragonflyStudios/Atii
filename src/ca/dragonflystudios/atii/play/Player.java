@@ -38,6 +38,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     public static final String STORY_EXTRA_KEY = "STORY_FOLDER_NAME";
     public static final String PLAY_MODE_EXTRA_KEY = "PLAY_MODE";
 
+    private static final String PAGE_DELETION_DIALOG_TAG = "PageDeletionDialogFragment";
+
     protected final static int CAPTURE_PHOTO = 0;
     protected final static int PICK_PHOTO = 1;
 
@@ -173,7 +175,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             public void onClick(View v) {
                 DialogFragment dialog = WarningDialogFragment.newInstance(R.string.page_deletion_dialog_title,
                         R.string.deletion_no_undo_warning);
-                dialog.show(getFragmentManager(), "PageDeletionDialogFragment");
+                dialog.show(getFragmentManager(), PAGE_DELETION_DIALOG_TAG);
             }
         });
 
@@ -391,14 +393,15 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     }
 
     @Override
-    // implementation for DeleteDialogListener
-    public void onPositive() {
-        mPlayManager.deletePage();
+    // implementation for WarningDialogListener
+    public void onPositive(WarningDialogFragment wdf) {
+        if (wdf.getTag().equals(PAGE_DELETION_DIALOG_TAG))
+            mPlayManager.deletePage();
     }
 
     @Override
-    // implementation for DeleteDialogListener
-    public void onNegative() {
+    // implementation for WarningDialogListener
+    public void onNegative(WarningDialogFragment wdf) {
     }
 
     @Override

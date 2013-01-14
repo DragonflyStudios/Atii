@@ -210,8 +210,9 @@ Story Player UI:
  *
  * [ ] Refactor
  *     [ ] During refactoring, solve the audio for wrong page bug
+ *     [x] LibraryActivity and WarningDialogFragment (with fragment identification for callbacks)
  *
- * ~~~ The Above by end of Monday, Jan 14 ~~~
+ * ~~~ The Above by end of Tuesday, Jan 15 ~~~
  *
  * [ ] Usability features
  *     [ ] Fading: during playback, controls disappear after a certain delay (e.g. 5 seconds); otherwise stays
@@ -238,7 +239,7 @@ Story Player UI:
  *         [ ] Future: [Edit] in between [Choose] and [Capture]
  *         - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
  *
- * ~~~ The Above by end of Thursday, Jan 17 ~~~
+ * ~~~ The Above by end of Friday, Jan 18 ~~~
  *
  * [ ] Video generation and sharing
  *     [ ] Generate time-lapse videos

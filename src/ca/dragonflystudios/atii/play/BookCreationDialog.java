@@ -8,18 +8,15 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import ca.dragonflystudios.android.dialog.FolderChooser;
-import ca.dragonflystudios.android.dialog.FolderChooser.FolderChooserListener;
 import ca.dragonflystudios.atii.R;
 
 public class BookCreationDialog extends DialogFragment {

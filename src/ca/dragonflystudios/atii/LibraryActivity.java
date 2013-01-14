@@ -10,7 +10,6 @@ import java.util.Set;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -52,6 +51,8 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
     private static final String FIRST_LAUNCH = "first_launch";
     private static final String BOOK_OPEN_MODE = "book_open_mode";
 
+    private static final String BOOK_DELETION_DIALOG_TAG = "BookDeletionDialogFragment";
+
     public static File getLibraryFolder() {
         return new File(Environment.getExternalStorageDirectory(), "Atii/Stories");
     }
@@ -64,9 +65,6 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-
-        if (null == sAppContext)
-            sAppContext = getApplicationContext();
 
         File storiesDir = getLibraryFolder();
         if (!storiesDir.exists())
@@ -140,11 +138,11 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch (item.getItemId()) {
                 case R.id.menu_edit:
-                    Log.d(getClass().getName(), "edit!");
                     if (1 < mSelected.size()) {
                         Log.w(getClass().getName(), "selected more than 1 book for editing!");
                         if (BuildConfig.DEBUG)
                             throw new RuntimeException("attempting to open more than 1 book for editing!");
+                        return true;
                     }
                     int position = -1;
                     for (int p : mSelected)
@@ -159,7 +157,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
                 case R.id.menu_delete:
                     DialogFragment dialog = WarningDialogFragment.newInstance(R.string.book_deletion_dialog_title,
                             R.string.deletion_no_undo_warning);
-                    dialog.show(getFragmentManager(), "BookDeletionDialogFragment");
+                    dialog.show(getFragmentManager(), BOOK_DELETION_DIALOG_TAG);
                     mToBeOped = new HashSet<Integer>();
                     mToBeOped.addAll(mSelected);
 
@@ -205,7 +203,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (null == convertView) {
-                convertView = LayoutInflater.from(sAppContext).inflate(R.layout.book_item, null);
+                convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.book_item, null);
             }
 
             BookInfo book = mBookInfos.get(position);
@@ -251,33 +249,23 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
             mBookInfos.add(bookInfo);
         }
 
-        Collections.sort(mBookInfos, bookInfoComparator);
+        Collections.sort(mBookInfos, mBookInfoComparator);
     }
 
     @Override
-    // implementation for DeleteDialogListener
-    public void onPositive() {
-        deleteBooks(mToBeOped);
-        mToBeOped.clear();
-        mToBeOped = null;
+    // implementation for WarningDialogListener
+    public void onPositive(WarningDialogFragment wdf) {
+        if (wdf.getTag().equals(BOOK_DELETION_DIALOG_TAG)) {
+            deleteBooks(mToBeOped);
+            mToBeOped.clear();
+            mToBeOped = null;
+        }
     }
 
     @Override
-    // implementation for DeleteDialogListener
-    public void onNegative() {
+    // implementation for WarningDialogListener
+    public void onNegative(WarningDialogFragment wdf) {
 
-    }
-
-    @Override
-    // implementation for BookCreationListener
-    public void onCreateBook(String title, File sourceFolder) {
-        createBook(title, sourceFolder);
-    }
-
-    @Override
-    // implementation for BookCreationListener
-    public void onCancelBookCreation() {
-        Log.d(getClass().getName(), "book creation cancelled");
     }
 
     private void deleteBooks(Set<Integer> bookPositions) {
@@ -295,18 +283,30 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
         mBookGridAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    // implementation for BookCreationListener
+    public void onCreateBook(String title, File sourceFolder) {
+        createBook(title, sourceFolder);
+    }
+
+    @Override
+    // implementation for BookCreationListener
+    public void onCancelBookCreation() {
+        Log.d(getClass().getName(), "book creation cancelled");
+    }
+
     private void createBook(String title, File sourceFolder) {
         Book book = Book.create(getLibraryFolder(), title, sourceFolder);
         book.save();
 
         BookInfo bookInfo = new BookInfo(book.getFolder(), title);
         mBookInfos.add(bookInfo);
-        Collections.sort(mBookInfos, bookInfoComparator);
+        Collections.sort(mBookInfos, mBookInfoComparator);
         mBookGridAdapter.notifyDataSetChanged();
 
         Intent playIntent = new Intent(LibraryActivity.this, Player.class);
         playIntent.putExtra(Player.STORY_EXTRA_KEY, book.getBookPath());
-        playIntent.putExtra(Player.PLAY_MODE_EXTRA_KEY, PlayMode.READER.toString());
+        playIntent.putExtra(Player.PLAY_MODE_EXTRA_KEY, PlayMode.AUTHOR.toString());
         startActivity(playIntent);
     }
 
@@ -370,10 +370,7 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
     private Set<Integer> mSelected, mToBeOped;
     private GridView mBookGridView;
     private BookGridAdapter mBookGridAdapter;
-
-    private static Context sAppContext;
-
-    private Comparator<BookInfo> bookInfoComparator = new Comparator<BookInfo>() {
+    private Comparator<BookInfo> mBookInfoComparator = new Comparator<BookInfo>() {
         @Override
         public int compare(BookInfo b1, BookInfo b2) {
             return b1.getTitle().compareToIgnoreCase(b2.getTitle());
