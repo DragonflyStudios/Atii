@@ -9,6 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -24,14 +25,15 @@ import ca.dragonflystudios.atii.model.book.Page;
 import ca.dragonflystudios.atii.model.book.Page.AudioPlaybackState;
 import ca.dragonflystudios.utilities.Streams;
 
-public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener,
+public class PlayManager implements Player.PlayCommandHandler, Player.ImageRequester, MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener,
         PhotoSnapper.OnCompletionListener {
 
-    // TODO: auto (page) advance ...
-
+    // TODO: refactor: rethink *hard* this interface; basically, more fine grained but still reasonably abstract interface
     public interface PlayChangeListener {
+        // TODO: refactor: consider add oldMode
         public void onModeChanged(PlayMode newMode);
 
+        // TODO: refactor: consider add oldState
         public void onPlayStateChanged(PlayState newState);
 
         // does not differentiate cross- vs. within-page state changes
@@ -41,11 +43,9 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
         public void onPageImageChanged(int pageNum);
 
-        // this is a hack that breaks the integrity of "PlayChangeListener".
-        // TAI!
         public void requestPageChange(int newPage);
 
-        public void requestPageChangeNotify(int newPage);
+        public void onPagesEdited(int newPage);
     }
 
     public enum PlayMode {
@@ -53,7 +53,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     }
 
     public enum PlayState {
-        IDLE, PLAYING_BACK_AUDIO, RECORDING_AUDIO, CAPTURING_PHOTO
+        IDLE, PLAYING_BACK_AUDIO, RECORDING_AUDIO, GETTING_IMAGE
     }
 
     public PlayMode getPlayMode() {
@@ -88,6 +88,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
         mPlayChangeListener = pcl;
 
+        // TODO: add at least one page?
         if (mBook.hasPages()) {
             mCurrentPageNum = 0;
             mCurrentPage = mBook.getPage(mCurrentPageNum);
@@ -97,6 +98,20 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         }
     }
 
+    public void onResume() {
+        if (isAutoReplay())
+            startAudioReplay();
+    }
+
+    public void onPause() {
+        stopAudioReplay();
+        stopAudioRecording();
+        stopPhotoCapture();
+
+        saveBook();
+    }
+
+    // TODO: should this be allowed? Shouldn't page image path be hidden?
     public String getImagePathForPage(int pageNum) {
         File imageFile = mBook.getPage(pageNum).getImage();
 
@@ -106,6 +121,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         return imageFile.getAbsolutePath();
     }
 
+    // TODO: encapsulate this one?
     public Page getPage(int pageNum) {
         return mBook.getPage(pageNum);
     }
@@ -115,6 +131,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         return 0;
     }
 
+    // TODO: should this be default to current page?
     public int getTrackDuration(int pageNum) {
         if (!hasAudio())
             return -1;
@@ -153,7 +170,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         return mMediaPlayer.getCurrentPosition();
     }
 
-    public boolean isAutoReplay() {
+    private boolean isAutoReplay() {
         return (mPlayMode == PlayMode.READER) && mAutoReplay;
     }
 
@@ -342,8 +359,9 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         }
     }
 
-    @Override
-    // implementation for PlayCommandHandler
+    // Used to interface with built-in photo-capture feature (see the PhotoSnapper class)
+    // But should really use 
+    // the startActivityForResult scheme.
     public void capturePhoto(ViewGroup hostView) {
         new PhotoSnapper(hostView, mCurrentPage.getImagePath(), this);
     }
@@ -355,6 +373,8 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         Uri imageFileUri = Uri.fromFile(mCurrentPage.getImageFileForWriting());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
         intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+
+        setPlayState(PlayState.GETTING_IMAGE);
         requestingActivity.startActivityForResult(intent, Player.CAPTURE_PHOTO);
     }
 
@@ -364,6 +384,8 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
+
+        setPlayState(PlayState.GETTING_IMAGE);
         requestingActivity.startActivityForResult(Intent.createChooser(intent, "Select File"), Player.PICK_PHOTO);
     }
 
@@ -384,8 +406,6 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
         try {
             Streams.copy(newImageStream, fos);
-            // TODO: should not close newImageStream here!
-            newImageStream.close();
             fos.close();
         } catch (IOException ioe) {
             if (BuildConfig.DEBUG) {
@@ -400,12 +420,60 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
         return true;
     }
 
+    @Override
+    // implmenetation for ImageRequester
+    public void onGettingImageFailure() {
+        setPlayState(PlayState.IDLE);
+    }
+
+    @Override
+    // implementation for ImageRequester
+    public void onImageCaptured() {
+        if (null != mPlayChangeListener)
+            mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
+    }
+
+    @Override
+    // implementation for ImageRequester
+    public void onImagePicked(Intent data, ContentResolver resolver) {
+        Uri selectedImage = data.getData();
+        try {
+            InputStream imageStream = resolver.openInputStream(selectedImage);
+            if (setNewPageImage(imageStream) && null != mPlayChangeListener)
+                mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
+            imageStream.close();
+        } catch (FileNotFoundException fnfe) {
+            if (BuildConfig.DEBUG) {
+                fnfe.printStackTrace();
+                throw new RuntimeException(fnfe);
+            } else {
+                Log.w(getClass().getName(), "selected image file not found: " + selectedImage);
+            }
+        } catch (IOException ioe) {
+            if (BuildConfig.DEBUG) {
+                ioe.printStackTrace();
+                throw new RuntimeException(ioe);
+            } else {
+                Log.w(getClass().getName(), "failed to copy page image file");
+            }
+        }
+
+    }
+
     public void discardNewPageImage() {
         mCurrentPage.discardNewImage();
+        if (null != mPlayChangeListener) {
+            mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
+        }
+        setPlayState(PlayState.IDLE);
     }
 
     public void keepNewPageImage() {
         mCurrentPage.commitNewImage();
+        if (null != mPlayChangeListener) {
+            mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
+        }
+        setPlayState(PlayState.IDLE);
     }
 
     @Override
@@ -421,7 +489,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
         mBook.addPageAt(newPage);
         if (null != mPlayChangeListener)
-            mPlayChangeListener.requestPageChangeNotify(newPage);
+            mPlayChangeListener.onPagesEdited(newPage);
     }
 
     @Override
@@ -431,7 +499,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
 
         mBook.addPageAt(newPage);
         if (null != mPlayChangeListener)
-            mPlayChangeListener.requestPageChangeNotify(newPage);
+            mPlayChangeListener.onPagesEdited(newPage);
     }
 
     @Override
@@ -439,7 +507,7 @@ public class PlayManager implements Player.PlayCommandHandler, MediaPlayer.OnCom
     public void deletePage() {
         int newPage = mBook.deletePageAt(mCurrentPageNum);
         if (null != mPlayChangeListener && 0 <= newPage)
-            mPlayChangeListener.requestPageChangeNotify(newPage);
+            mPlayChangeListener.onPagesEdited(newPage);
     }
 
     @Override

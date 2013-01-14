@@ -1,13 +1,11 @@
 package ca.dragonflystudios.atii.play;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.ContentResolver;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
@@ -57,8 +55,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
         public void stopAudioRecording();
 
-        public void capturePhoto(ViewGroup hostView);
-
         public void capturePhoto(Activity requestingActivity);
 
         public void pickPhoto(Activity requestingActivity);
@@ -72,7 +68,13 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         public void deletePage();
     }
 
-    // TODO: hide Playback buttons when there is no audio
+    public interface ImageRequester {
+        public void onGettingImageFailure();
+
+        public void onImageCaptured();
+
+        public void onImagePicked(Intent data, ContentResolver resolver);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,18 +133,13 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mRecordButton = (ImageButton) mControlsView.findViewById(R.id.record);
         mRecordButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mControlsToggleAllowed = false;
                 mPlayManager.startAudioRecording();
-                mSecondsRecorded = 0;
-                mRecordingTimer.start();
             }
         });
 
         mPickPictureButton = (ImageButton) mControlsView.findViewById(R.id.pick_picture);
         mPickPictureButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPager.setPageChangeEnabled(false);
-                hideAllControls();
                 mPlayManager.pickPhoto(Player.this);
             }
         });
@@ -150,8 +147,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mCaptureButton = (ImageButton) mControlsView.findViewById(R.id.capture);
         mCaptureButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                mPager.setPageChangeEnabled(false);
-                hideAllControls();
                 mPlayManager.capturePhoto(Player.this);
             }
         });
@@ -186,9 +181,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mStopButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mPlayManager.stopAudioRecording();
-                mRecordingTimer.cancel();
-                mSecondsRecorded = 0;
-                mControlsToggleAllowed = true;
             }
         });
 
@@ -200,54 +192,30 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     @Override
     public void onResume() {
         super.onResume();
-
-        if (mPlayManager.isAutoReplay())
-            mPlayManager.startAudioReplay();
+        mPlayManager.onResume();
     }
 
     @Override
     public void onPause() {
+        mPlayManager.onPause();
         super.onPause();
-
-        mPlayManager.stopAudioReplay();
-        mPlayManager.stopAudioRecording();
-        mPlayManager.stopPhotoCapture();
-
-        mPlayManager.saveBook();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if (RESULT_OK != resultCode) {
+            mPlayManager.onGettingImageFailure();
+            return;
+        }
+
         switch (requestCode) {
         case CAPTURE_PHOTO:
-            if (resultCode == RESULT_OK) {
-                onPageImageChanged(mPlayManager.getCurrentPageNum());
-            } else {
-                showAllControls();
-                mPager.setPageChangeEnabled(true);
-            }
+            mPlayManager.onImageCaptured();
             break;
         case PICK_PHOTO:
-            if (resultCode == RESULT_OK) {
-                Uri selectedImage = data.getData();
-                try {
-                    InputStream imageStream = getContentResolver().openInputStream(selectedImage);
-                    if (mPlayManager.setNewPageImage(imageStream))
-                        onPageImageChanged(mPlayManager.getCurrentPageNum());
-                } catch (FileNotFoundException fnfe) {
-                    if (BuildConfig.DEBUG) {
-                        fnfe.printStackTrace();
-                        throw new RuntimeException(fnfe);
-                    } else {
-                        Log.w(getClass().getName(), "selected image file not found: " + selectedImage);
-                    }
-                }
-            } else {
-                showAllControls();
-                mPager.setPageChangeEnabled(true);
-            }
+            mPlayManager.onImagePicked(data, getContentResolver());
             break;
         }
     }
@@ -338,13 +306,18 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     @Override
     // implementation for PlayChangeListener
     public void onPageImageChanged(int pageNum) {
+        updatePageImage(pageNum);
+    }
+
+    private void updatePageImage(int pageNum) {
         mPager.setAdapter(mAdapter);
         mPager.setCurrentItem(pageNum);
 
-        // the following line doesn't work!
+        // Had to use the above because the following line does not work!
         // mAdapter.notifyDataSetChanged();
     }
 
+    // TODO: refactor: make this prettier!
     public void updateProgress(int progress, int duration) {
         Log.w("updateProgress", progress + " of " + duration);
 
@@ -381,13 +354,14 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     // implementation for PlayChangeListener
     public void requestPageChange(int newPage) {
         mPager.setCurrentItem(newPage);
+        updatePageNumView(newPage);
+        updateProgressForPage(newPage);
     }
 
     @Override
     // implementation for PlayChangeListener
-    public void requestPageChangeNotify(int newPage) {
-        mPager.setAdapter(mAdapter);
-        mPager.setCurrentItem(newPage);
+    public void onPagesEdited(int newPage) {
+        updatePageImage(newPage);
         updatePageNumView(newPage);
         updateProgressForPage(newPage);
     }
@@ -407,10 +381,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     @Override
     // implementation for OnPageImageChoice
     public void onDiscard() {
-        int pageNum = mPlayManager.getCurrentPageNum();
         mPlayManager.discardNewPageImage();
-        mPager.setAdapter(mAdapter);
-        mPager.setCurrentItem(pageNum);
         showAllControls();
         mPager.setPageChangeEnabled(true);
     }
@@ -418,10 +389,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     @Override
     // implementation for OnPageImageChoice
     public void onKeep() {
-        int pageNum = mPlayManager.getCurrentPageNum();
         mPlayManager.keepNewPageImage();
-        mPager.setAdapter(mAdapter);
-        mPager.setCurrentItem(pageNum);
         showAllControls();
         mPager.setPageChangeEnabled(true);
     }
@@ -452,6 +420,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         }
     }
 
+    // TODO: refactor: think hard about how these work with state transitions
     private void updateControls() {
         mPager.setPageChangeEnabled(true);
 
@@ -462,6 +431,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             switch (mPlayManager.getPlayState()) {
             case IDLE:
             case PLAYING_BACK_AUDIO:
+                mRecordingTimer.cancel();
+                mSecondsRecorded = 0;
+                mControlsToggleAllowed = true;
                 mStopButton.setVisibility(View.INVISIBLE);
                 mAudioStatusView.setVisibility(View.INVISIBLE);
                 mRecordButton.setVisibility(View.VISIBLE);
@@ -470,6 +442,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
                 updateProgressForPage(mPlayManager.getCurrentPageNum());
                 break;
             case RECORDING_AUDIO:
+                mControlsToggleAllowed = false;
+                mSecondsRecorded = 0;
+                mRecordingTimer.start();
                 mPager.setPageChangeEnabled(false);
                 setAuthoringControlsVisibility(View.INVISIBLE);
                 setAudioPlaybackControlsVisibility(View.INVISIBLE);
@@ -489,6 +464,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             switch (mPlayManager.getPlayState()) {
             case IDLE:
             case PLAYING_BACK_AUDIO:
+                mRecordingTimer.cancel();
+                mSecondsRecorded = 0;
+                mControlsToggleAllowed = true;
                 setAuthoringControlsVisibility(View.VISIBLE);
                 mStopButton.setVisibility(View.INVISIBLE);
                 mAudioStatusView.setVisibility(View.INVISIBLE);
@@ -498,6 +476,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
                 updateProgressForPage(mPlayManager.getCurrentPageNum());
                 break;
             case RECORDING_AUDIO:
+                mControlsToggleAllowed = false;
+                mSecondsRecorded = 0;
+                mRecordingTimer.start();
                 mPager.setPageChangeEnabled(false);
                 setAuthoringControlsVisibility(View.INVISIBLE);
                 setAudioPlaybackControlsVisibility(View.INVISIBLE);
@@ -505,7 +486,9 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
                 mAudioStatusView.setVisibility(View.VISIBLE);
                 mStopButton.setVisibility(View.VISIBLE);
                 break;
-            case CAPTURING_PHOTO:
+            case GETTING_IMAGE:
+                mPager.setPageChangeEnabled(false);
+                hideAllControls();
                 break;
             }
             break;
