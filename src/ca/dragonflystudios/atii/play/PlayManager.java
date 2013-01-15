@@ -17,33 +17,28 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.ViewGroup;
-import ca.dragonflystudios.android.media.camera.PhotoSnapper;
 import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.model.book.Book;
 import ca.dragonflystudios.atii.model.book.Page;
 import ca.dragonflystudios.atii.model.book.Page.AudioPlaybackState;
 import ca.dragonflystudios.utilities.Streams;
 
-public class PlayManager implements Player.PlayCommandHandler, Player.ImageRequester, MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener,
-        PhotoSnapper.OnCompletionListener {
+public class PlayManager implements Player.PlayCommandHandler, Player.PlayerState, Player.ImageRequestResultListener,
+        MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener {
 
-    // TODO: refactor: rethink *hard* this interface; basically, more fine grained but still reasonably abstract interface
     public interface PlayChangeListener {
-        // TODO: refactor: consider add oldMode
-        public void onModeChanged(PlayMode newMode);
+        public void onModeChanged(PlayMode oldMode, PlayMode newMode);
 
-        // TODO: refactor: consider add oldState
-        public void onPlayStateChanged(PlayState newState);
+        public void onPlayStateChanged(PlayState oldState, PlayState newState);
 
         // does not differentiate cross- vs. within-page state changes
-        public void onAudioPlaybackStateChanged(AudioPlaybackState newState);
+        public void onAudioPlaybackStateChanged(AudioPlaybackState oldState, AudioPlaybackState newState);
 
         public void onPageChanged(int newPage);
 
         public void onPageImageChanged(int pageNum);
 
-        public void requestPageChange(int newPage);
+        public void requestMoveToPage(int targetPage);
 
         public void onPagesEdited(int newPage);
     }
@@ -56,28 +51,109 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
         IDLE, PLAYING_BACK_AUDIO, RECORDING_AUDIO, GETTING_IMAGE
     }
 
+    @Override
+    // implementation for Player.PlayerState
     public PlayMode getPlayMode() {
         return mPlayMode;
     }
 
+    @Override
+    // implementation for Player.PlayerState
     public PlayState getPlayState() {
         return mPlayState;
     }
 
-    private void setPlayState(PlayState newState) {
-        if (mPlayState != newState) {
-            mPlayState = newState;
-
-            if (null != mPlayChangeListener)
-                mPlayChangeListener.onPlayStateChanged(newState);
-        }
+    @Override
+    // implementation for Player.PlayerState
+    public int getPageNum() {
+        return mCurrentPageNum;
     }
 
+    @Override
+    // implementation for Player.PlayerState
+    public int getNumPages() {
+        return mBook.getNumPages();
+    }
+
+    @Override
+    // implementation for Player.PlayerState
+    public Page getPage(int pageNum) {
+        return mBook.getPage(pageNum);
+    }
+
+    @Override
+    // implementation for Player.PlayerState
     public AudioPlaybackState getAudioPlaybackState() {
         if (null == mCurrentPage)
             return AudioPlaybackState.NO_AUDIO;
 
         return mCurrentPage.getAudioPlaybackState();
+    }
+
+    @Override
+    // implementation for Player.PlayerState
+    public int getTrackDuration() {
+        if (!hasAudio())
+            return -1;
+
+        if (null == mMediaPlayer) {
+            try {
+                mMediaPlayer = new MediaPlayer();
+                mMediaPlayer.setOnCompletionListener(this);
+                mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
+                mMediaPlayer.prepare();
+            } catch (IOException e) {
+                Log.e(getClass().getName(), "prepare() failed with IOException");
+                e.printStackTrace();
+            }
+        }
+
+        return mMediaPlayer.getDuration();
+    }
+
+    @Override
+    // implementation for Player.PlayerState
+    public int getProgress() {
+        if (!hasAudio())
+            return -1;
+
+        if (null == mMediaPlayer) {
+            try {
+                mMediaPlayer = new MediaPlayer();
+                mMediaPlayer.setOnCompletionListener(this);
+                mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
+                mMediaPlayer.prepare();
+            } catch (IOException e) {
+                Log.e(getClass().getName(), "prepare() failed with IOException");
+                e.printStackTrace();
+            }
+        }
+
+        return mMediaPlayer.getCurrentPosition();
+    }
+
+    @Override
+    // implementation for Player.PlayerState
+    public boolean isAutoReplay() {
+        return (mPlayMode == PlayMode.READER) && mAutoReplay;
+    }
+
+    @Override
+    // implementation for Player.PlayerState
+    public void setAutoReplay(boolean auto) {
+        mAutoReplay = auto;
+    }
+
+    @Override
+    // implementation for Player.PlayerState
+    public boolean isAutoAdvance() {
+        return (mPlayMode == PlayMode.READER) && mAutoAdvance;
+    }
+
+    @Override
+    // implementation for Player.PlayerState
+    public void setAutoAdvance(boolean auto) {
+        mAutoAdvance = auto;
     }
 
     public PlayManager(String bookPath, PlayChangeListener pcl, PlayMode mode) {
@@ -98,6 +174,12 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
         }
     }
 
+    // TODO: ... do we really need this one?
+    public int getInitialPage() {
+        // could be a persisted value
+        return 0;
+    }
+
     public void onResume() {
         if (isAutoReplay())
             startAudioReplay();
@@ -106,123 +188,41 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
     public void onPause() {
         stopAudioReplay();
         stopAudioRecording();
-        stopPhotoCapture();
 
-        saveBook();
+        mBook.save();
     }
 
-    // TODO: should this be allowed? Shouldn't page image path be hidden?
-    public String getImagePathForPage(int pageNum) {
-        File imageFile = mBook.getPage(pageNum).getImage();
+    private void setPlayState(PlayState newState) {
+        if (mPlayState != newState) {
+            PlayState oldState = mPlayState;
+            mPlayState = newState;
 
-        if (null == imageFile)
-            return null;
-
-        return imageFile.getAbsolutePath();
-    }
-
-    // TODO: encapsulate this one?
-    public Page getPage(int pageNum) {
-        return mBook.getPage(pageNum);
-    }
-
-    public int getInitialPage() {
-        // could be a persisted value
-        return 0;
-    }
-
-    // TODO: should this be default to current page?
-    public int getTrackDuration(int pageNum) {
-        if (!hasAudio())
-            return -1;
-
-        if (null == mMediaPlayer) {
-            try {
-                mMediaPlayer = new MediaPlayer();
-                mMediaPlayer.setOnCompletionListener(this);
-                mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
-                mMediaPlayer.prepare();
-            } catch (IOException e) {
-                Log.e(getClass().getName(), "prepare() failed with IOException");
-                e.printStackTrace();
-            }
+            if (null != mPlayChangeListener)
+                mPlayChangeListener.onPlayStateChanged(oldState, newState);
         }
-
-        return mMediaPlayer.getDuration();
-    }
-
-    public int getCurrentProgress() {
-        if (!hasAudio())
-            return -1;
-
-        if (null == mMediaPlayer) {
-            try {
-                mMediaPlayer = new MediaPlayer();
-                mMediaPlayer.setOnCompletionListener(this);
-                mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
-                mMediaPlayer.prepare();
-            } catch (IOException e) {
-                Log.e(getClass().getName(), "prepare() failed with IOException");
-                e.printStackTrace();
-            }
-        }
-
-        return mMediaPlayer.getCurrentPosition();
-    }
-
-    private boolean isAutoReplay() {
-        return (mPlayMode == PlayMode.READER) && mAutoReplay;
-    }
-
-    public void setAutoReplay(boolean auto) {
-        mAutoReplay = auto;
-    }
-
-    public boolean isAutoAdvance() {
-        return (mPlayMode == PlayMode.READER) && mAutoAdvance;
-    }
-
-    public void setAutoAdvance(boolean auto) {
-        mAutoAdvance = auto;
-    }
-
-    public int getNumPages() {
-        return mBook.getNumPages();
-    }
-
-    public boolean hasAudioOnCurrentPage() {
-        return mCurrentPage.hasAudio();
-    }
-
-    public int getCurrentPageNum() {
-        return mCurrentPageNum;
     }
 
     private void setCurrentPage(int newPageNum) {
         if (mCurrentPageNum != newPageNum) {
-            AudioPlaybackState oldState = getAudioPlaybackState(mCurrentPageNum);
-            AudioPlaybackState newState = getAudioPlaybackState(newPageNum);
+            AudioPlaybackState oldState = getAudioPlaybackState();
             mCurrentPageNum = newPageNum;
+            AudioPlaybackState newState = getAudioPlaybackState();
             mCurrentPage = mBook.getPage(newPageNum);
 
             if (null != mPlayChangeListener)
                 mPlayChangeListener.onPageChanged(newPageNum);
 
             if (oldState != newState && null != mPlayChangeListener)
-                mPlayChangeListener.onAudioPlaybackStateChanged(newState);
+                mPlayChangeListener.onAudioPlaybackStateChanged(oldState, newState);
         }
     }
 
-    public AudioPlaybackState getAudioPlaybackState(int pageNum) {
-        return mBook.getPage(pageNum).getAudioPlaybackState();
-    }
-
-    public void setAudioPlaybackState(int pageNum, AudioPlaybackState state) {
-        AudioPlaybackState oldState = getAudioPlaybackState(pageNum);
-        if (oldState != state) {
-            mBook.getPage(pageNum).setAudioPlaybackState(state);
-            if (mCurrentPageNum == pageNum && null != mPlayChangeListener)
-                mPlayChangeListener.onAudioPlaybackStateChanged(state);
+    private void setAudioPlaybackState(AudioPlaybackState newState) {
+        AudioPlaybackState oldState = getAudioPlaybackState();
+        if (oldState != newState) {
+            mBook.getPage(mCurrentPageNum).setAudioPlaybackState(newState);
+            if (null != mPlayChangeListener)
+                mPlayChangeListener.onAudioPlaybackStateChanged(oldState, newState);
         }
     }
 
@@ -266,7 +266,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
             }
 
             mMediaPlayer.start();
-            setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.PLAYING);
+            setAudioPlaybackState(AudioPlaybackState.PLAYING);
         }
     }
 
@@ -276,8 +276,15 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
         if (hasAudio() && (isPlaying()))
             if (null != mMediaPlayer) {
                 mMediaPlayer.pause();
-                setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.PAUSED);
+                setAudioPlaybackState(AudioPlaybackState.PAUSED);
             }
+    }
+
+    @Override
+    // implementation for PlayCommandHandler
+    public void seekTo(int position) {
+        if (null != mMediaPlayer)
+            mMediaPlayer.seekTo(position);
     }
 
     @Override
@@ -287,7 +294,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
             mMediaPlayer.release();
             mMediaPlayer = null;
 
-            setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.FINISHED);
+            setAudioPlaybackState(AudioPlaybackState.FINISHED);
         }
     }
 
@@ -300,21 +307,23 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
             switchPlayMode(PlayMode.AUTHOR);
     }
 
-    public void switchPlayMode(PlayMode newMode) {
+    private void switchPlayMode(PlayMode newMode) {
+        PlayMode oldMode = mPlayMode;
+
         switch (newMode) {
         case AUTHOR:
             if (PlayMode.READER == mPlayMode) {
                 stopAudioReplay();
                 mPlayMode = newMode;
                 if (null != mPlayChangeListener)
-                    mPlayChangeListener.onModeChanged(newMode);
+                    mPlayChangeListener.onModeChanged(oldMode, newMode);
             }
             break;
         case READER:
             if (PlayMode.AUTHOR == mPlayMode) {
                 mPlayMode = newMode;
                 if (null != mPlayChangeListener)
-                    mPlayChangeListener.onModeChanged(newMode);
+                    mPlayChangeListener.onModeChanged(oldMode, newMode);
             }
         default:
             break;
@@ -354,74 +363,84 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
                 mMediaRecorder = null;
 
                 setPlayState(PlayState.IDLE);
-                setAudioPlaybackState(mCurrentPageNum, AudioPlaybackState.NOT_STARTED);
+                setAudioPlaybackState(AudioPlaybackState.NOT_STARTED);
             }
         }
     }
 
-    // Used to interface with built-in photo-capture feature (see the PhotoSnapper class)
-    // But should really use 
-    // the startActivityForResult scheme.
-    public void capturePhoto(ViewGroup hostView) {
-        new PhotoSnapper(hostView, mCurrentPage.getImagePath(), this);
-    }
-
     @Override
     // implementation for PlayCommandHandler
-    public void capturePhoto(Activity requestingActivity) {
+    public void captureImage(Activity requestingActivity) {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Uri imageFileUri = Uri.fromFile(mCurrentPage.getImageFileForWriting());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
         intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
 
         setPlayState(PlayState.GETTING_IMAGE);
-        requestingActivity.startActivityForResult(intent, Player.CAPTURE_PHOTO);
+        requestingActivity.startActivityForResult(intent, Player.CAPTURE_IMAGE);
     }
 
     @Override
     // implementation for PlayCommandHandler
-    public void pickPhoto(Activity requestingActivity) {
+    public void pickImage(Activity requestingActivity) {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
 
         setPlayState(PlayState.GETTING_IMAGE);
-        requestingActivity.startActivityForResult(Intent.createChooser(intent, "Select File"), Player.PICK_PHOTO);
-    }
-
-    public boolean setNewPageImage(InputStream newImageStream) {
-        File imageFile = mCurrentPage.getImageFileForWriting();
-        FileOutputStream fos;
-        try {
-            fos = new FileOutputStream(imageFile);
-        } catch (FileNotFoundException fnfe) {
-            if (BuildConfig.DEBUG) {
-                fnfe.printStackTrace();
-                throw new RuntimeException(fnfe);
-            } else {
-                Log.w(getClass().getName(), "target page image file not found: " + imageFile);
-                return false;
-            }
-        }
-
-        try {
-            Streams.copy(newImageStream, fos);
-            fos.close();
-        } catch (IOException ioe) {
-            if (BuildConfig.DEBUG) {
-                ioe.printStackTrace();
-                throw new RuntimeException(ioe);
-            } else {
-                Log.w(getClass().getName(), "failed to copy to target page image file: " + imageFile);
-                return false;
-            }
-        }
-
-        return true;
+        requestingActivity.startActivityForResult(Intent.createChooser(intent, "Select File"), Player.PICK_IMAGE);
     }
 
     @Override
-    // implmenetation for ImageRequester
+    // implementation for PlayCommandHandler
+    public void discardNewPageImage() {
+        mCurrentPage.discardNewImage();
+        if (null != mPlayChangeListener) {
+            mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
+        }
+        setPlayState(PlayState.IDLE);
+    }
+
+    @Override
+    // implementation for PlayCommandHandler
+    public void keepNewPageImage() {
+        mCurrentPage.commitNewImage();
+        if (null != mPlayChangeListener) {
+            mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
+        }
+        setPlayState(PlayState.IDLE);
+    }
+
+    @Override
+    // implementation for PlayCommandHandler
+    public void addPageBefore() {
+        int newPage = mCurrentPageNum;
+
+        mBook.addPageAt(newPage);
+        if (null != mPlayChangeListener)
+            mPlayChangeListener.onPagesEdited(newPage);
+    }
+
+    @Override
+    // implementation for PlayCommandHandler
+    public void addPageAfter() {
+        int newPage = mCurrentPageNum + 1;
+
+        mBook.addPageAt(newPage);
+        if (null != mPlayChangeListener)
+            mPlayChangeListener.onPagesEdited(newPage);
+    }
+
+    @Override
+    // implementation for PlayCommandHandler
+    public void deletePage() {
+        int newPage = mBook.deletePageAt(mCurrentPageNum);
+        if (null != mPlayChangeListener && 0 <= newPage)
+            mPlayChangeListener.onPagesEdited(newPage);
+    }
+
+    @Override
+    // implementation for ImageRequester
     public void onGettingImageFailure() {
         setPlayState(PlayState.IDLE);
     }
@@ -459,54 +478,35 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
 
     }
 
-    public void discardNewPageImage() {
-        mCurrentPage.discardNewImage();
-        if (null != mPlayChangeListener) {
-            mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
+    private boolean setNewPageImage(InputStream newImageStream) {
+        File imageFile = mCurrentPage.getImageFileForWriting();
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(imageFile);
+        } catch (FileNotFoundException fnfe) {
+            if (BuildConfig.DEBUG) {
+                fnfe.printStackTrace();
+                throw new RuntimeException(fnfe);
+            } else {
+                Log.w(getClass().getName(), "target page image file not found: " + imageFile);
+                return false;
+            }
         }
-        setPlayState(PlayState.IDLE);
-    }
 
-    public void keepNewPageImage() {
-        mCurrentPage.commitNewImage();
-        if (null != mPlayChangeListener) {
-            mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
+        try {
+            Streams.copy(newImageStream, fos);
+            fos.close();
+        } catch (IOException ioe) {
+            if (BuildConfig.DEBUG) {
+                ioe.printStackTrace();
+                throw new RuntimeException(ioe);
+            } else {
+                Log.w(getClass().getName(), "failed to copy to target page image file: " + imageFile);
+                return false;
+            }
         }
-        setPlayState(PlayState.IDLE);
-    }
 
-    @Override
-    // implementation for PlayCommandHandler
-    public void stopPhotoCapture() {
-
-    }
-
-    @Override
-    // implementation for PlayCommandHandler
-    public void addPageBefore() {
-        int newPage = mCurrentPageNum;
-
-        mBook.addPageAt(newPage);
-        if (null != mPlayChangeListener)
-            mPlayChangeListener.onPagesEdited(newPage);
-    }
-
-    @Override
-    // implementation for PlayCommandHandler
-    public void addPageAfter() {
-        int newPage = mCurrentPageNum + 1;
-
-        mBook.addPageAt(newPage);
-        if (null != mPlayChangeListener)
-            mPlayChangeListener.onPagesEdited(newPage);
-    }
-
-    @Override
-    // implementation for PlayCommandHandler
-    public void deletePage() {
-        int newPage = mBook.deletePageAt(mCurrentPageNum);
-        if (null != mPlayChangeListener && 0 <= newPage)
-            mPlayChangeListener.onPagesEdited(newPage);
+        return true;
     }
 
     @Override
@@ -516,7 +516,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
             stopAudioReplay();
 
             if (null != mPlayChangeListener && isAutoAdvance() && mCurrentPageNum < getNumPages() - 1)
-                mPlayChangeListener.requestPageChange(mCurrentPageNum + 1);
+                mPlayChangeListener.requestMoveToPage(mCurrentPageNum + 1);
         }
     }
 
@@ -547,23 +547,6 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
     @Override
     // implementation for OnPageChangeListener
     public void onPageScrollStateChanged(int state) {
-    }
-
-    @Override
-    // implementation for PhotoSnapper.OnCompletionListener
-    public void onPhotoSnapperCompletion(File photoFile, boolean success) {
-        if (success && null != mPlayChangeListener) {
-            mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
-        }
-    }
-
-    public void saveBook() {
-        mBook.save();
-    }
-
-    public void seekTo(int position) {
-        if (null != mMediaPlayer)
-            mMediaPlayer.seekTo(position);
     }
 
     private Book mBook;
