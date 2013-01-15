@@ -211,15 +211,31 @@ Story Player UI:
  * [x] Refactor LibraryActivity and WarningDialogFragment (with fragment identification for callbacks)
  * [ ] Refactor Player and PlayManager
  *     - The principle for this refactor: Player handles UI; PlayManager is the delegate for handling media recorder 
-       - and media player and their state transition, page editing ...
+ *     - and media player and their state transition, page editing ...
  *     [ ] During refactoring, solve the audio for wrong page bug
+ * [ ] A version for Kevin
  *
- * ~~~ The Above by end of Tuesday, Jan 15 ~~~
+ * ~~~ The Above by end of Thursday, Jan 17 ~~~
+ *
+ * [ ] Video generation and sharing
+ *     [ ] Generate time-lapse videos
+ *     [ ] Upload to YouTube
+ *     [ ] Upload to Youku
+ *
+ * ~~~ The Above by end of Thursday, Jan 24 ~~~
+ *
+ * [ ] Page image zoom
+ * [ ] Draggable page slider.
+ *     - For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
+ *     - See also ... the Android UI Patterns demo app ... 
+ * [ ] Gingerbread support
+ * [ ] Kindle Fire test
+ * [ ] Test on other devices
+ *
+ * ~~~ The Above by end of Thursday, Jan 31 -- Private Preview ~~~
  *
  * [ ] Usability features
  *     [ ] Fading: during playback, controls disappear after a certain delay (e.g. 5 seconds); otherwise stays
- *     [ ] Show draggable progress bar.
- *         [ ] For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
  *     [ ] In auto page advance ... appropriately time page turn in relation to audio stop and starting
  *         - currently there is a 1s delay before audio starts on a new page
  *     [ ] Visual feedback when playback is going on even when UIs are hidden
@@ -241,25 +257,8 @@ Story Player UI:
  *         [ ] Future: [Edit] in between [Choose] and [Capture]
  *         - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
  *
- * ~~~ The Above by end of Friday, Jan 18 ~~~
- *
- * [ ] Video generation and sharing
- *     [ ] Generate time-lapse videos
- *     [ ] Upload to YouTube
- *     [ ] Upload to Youku
- *
- * ~~~ The Above by end of Thursday, Jan 24 ~~~
- *
- * ......
- *
- * [ ] Gingerbread support
- * [ ] Kindle Fire test
- * [ ] Test on other devices
- *
  * [ ] Make seek bar advance to the very end during replay!
  *     -- There seems to be an issue with Android here: http://code.google.com/p/android/issues/detail?id=11590
- *
- * ~~~ The Above by end of Thursday, Jan 31 -- Private Preview ~~~
  *
  * ......
  *

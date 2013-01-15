@@ -164,18 +164,17 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
 
         mPlayChangeListener = pcl;
 
-        // TODO: add at least one page? handle empty book!!!
         if (mBook.hasPages()) {
-            mCurrentPageNum = 0;
+            mCurrentPageNum = getInitialPage();
             mCurrentPage = mBook.getPage(mCurrentPageNum);
         } else {
+            // TODO: error handling? or just add an empty page?
             mCurrentPageNum = -1;
             mCurrentPage = null;
         }
     }
 
-    // TODO: ... do we really need this one?
-    public int getInitialPage() {
+    private int getInitialPage() {
         // could be a persisted value
         return 0;
     }

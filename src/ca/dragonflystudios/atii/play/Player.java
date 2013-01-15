@@ -136,8 +136,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mPager.setAdapter(mAdapter);
         mPager.setOnPageChangeListener(mPlayManager);
         mPager.setReaderGestureListener(this);
-        // TODO: refactor: deal with this
-        mPager.setCurrentItem(mPlayManager.getInitialPage());
+        mPager.setCurrentItem(mPlayManager.getPageNum());
 
         mControlsView = (ViewGroup) findViewById(R.id.controls);
 

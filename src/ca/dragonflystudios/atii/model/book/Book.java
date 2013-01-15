@@ -139,6 +139,7 @@ public class Book extends Entity {
         if (pageNum >= mPages.size() || pageNum < 0)
             return -1;
 
+        // when deleting the last page, just remove the image and audio files
         if (pageNum == 0 && mPages.size() == 1) {
             mPages.get(0).removePageFiles();
             return 0;

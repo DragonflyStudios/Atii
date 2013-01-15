@@ -152,9 +152,9 @@ public class Page extends Entity {
             mImage = null;
         }
 
-        if (null != mImage && mImage.exists()) {
-            mImage.delete();
-            mImage = null;
+        if (null != mAudio && mAudio.exists()) {
+            mAudio.delete();
+            mAudio = null;
         }
 
         mInitialized = false;
