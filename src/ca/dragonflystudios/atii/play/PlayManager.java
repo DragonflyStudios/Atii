@@ -164,7 +164,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
 
         mPlayChangeListener = pcl;
 
-        // TODO: add at least one page?
+        // TODO: add at least one page? handle empty book!!!
         if (mBook.hasPages()) {
             mCurrentPageNum = 0;
             mCurrentPage = mBook.getPage(mCurrentPageNum);
@@ -252,6 +252,9 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for PlayCommandHandler
     public void startAudioReplay() {
+        if (null == mCurrentPage)
+            return;
+
         if (hasAudio() && (isReplayNotStarted() || isPaused() || isFinished())) {
             if (null == mMediaPlayer) {
                 try {
@@ -335,6 +338,9 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     public void startAudioRecording() {
         stopAudioReplay();
 
+        if (null == mCurrentPage)
+            return;
+
         if (null == mMediaRecorder) {
             try {
                 mMediaRecorder = new MediaRecorder();
@@ -414,29 +420,40 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for PlayCommandHandler
     public void addPageBefore() {
-        int newPage = mCurrentPageNum;
-
-        mBook.addPageAt(newPage);
+        mBook.addPageAt(mCurrentPageNum);
+        mCurrentPage = mBook.getPage(mCurrentPageNum);
         if (null != mPlayChangeListener)
-            mPlayChangeListener.onPagesEdited(newPage);
+            mPlayChangeListener.onPagesEdited(mCurrentPageNum);
     }
 
     @Override
     // implementation for PlayCommandHandler
     public void addPageAfter() {
-        int newPage = mCurrentPageNum + 1;
-
-        mBook.addPageAt(newPage);
+        mCurrentPageNum++;
+        mBook.addPageAt(mCurrentPageNum);
+        mCurrentPage = mBook.getPage(mCurrentPageNum);
         if (null != mPlayChangeListener)
-            mPlayChangeListener.onPagesEdited(newPage);
+            mPlayChangeListener.onPagesEdited(mCurrentPageNum);
     }
 
     @Override
     // implementation for PlayCommandHandler
     public void deletePage() {
+
         int newPage = mBook.deletePageAt(mCurrentPageNum);
-        if (null != mPlayChangeListener && 0 <= newPage)
-            mPlayChangeListener.onPagesEdited(newPage);
+
+        if (newPage >= 0) {
+            if (mBook.hasPages()) {
+                mCurrentPageNum = newPage;
+                mCurrentPage = mBook.getPage(newPage);
+            } else {
+                mCurrentPageNum = -1;
+                mCurrentPage = null;
+            }
+
+            if (null != mPlayChangeListener)
+                mPlayChangeListener.onPagesEdited(newPage);
+        }
     }
 
     @Override
