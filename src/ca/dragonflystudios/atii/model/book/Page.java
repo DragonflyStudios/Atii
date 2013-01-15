@@ -16,7 +16,7 @@ import ca.dragonflystudios.utilities.Pathname;
 // TODO: Should we also allow a page that has no page image? If only to be symmetrical?
 
 public class Page extends Entity {
-    public enum AudioPlaybackState {
+    public enum PlaybackState {
         INVALID, NO_AUDIO, NOT_STARTED, PLAYING, PAUSED, FINISHED
     }
 
@@ -26,7 +26,7 @@ public class Page extends Entity {
 
         // uses lazy initialization
         mInitialized = false;
-        mState = AudioPlaybackState.INVALID;
+        mState = PlaybackState.INVALID;
 
         mUsingNewImage = false;
     }
@@ -42,19 +42,19 @@ public class Page extends Entity {
 
         // uses lazy initialization
         mInitialized = false;
-        mState = AudioPlaybackState.INVALID;
+        mState = PlaybackState.INVALID;
 
         mUsingNewImage = false;
     }
 
-    public AudioPlaybackState getAudioPlaybackState() {
+    public PlaybackState getPlaybackState() {
         if (!mInitialized)
             initializeAudioFile();
 
         return mState;
     }
 
-    public void setAudioPlaybackState(AudioPlaybackState s) {
+    public void setPlaybackState(PlaybackState s) {
         mState = s;
     }
 
@@ -134,16 +134,16 @@ public class Page extends Entity {
         if (null == mAudio)
             mInitialized = false;
         else if (mAudio.exists())
-            mState = AudioPlaybackState.NOT_STARTED;
+            mState = PlaybackState.NOT_STARTED;
         else
-            mState = AudioPlaybackState.NO_AUDIO;
+            mState = PlaybackState.NO_AUDIO;
     }
 
     public boolean hasAudio() {
         if (!mInitialized)
             initializeAudioFile();
 
-        return (AudioPlaybackState.NO_AUDIO != mState);
+        return (PlaybackState.NO_AUDIO != mState);
     }
 
     public void removePageFiles() {
@@ -158,14 +158,14 @@ public class Page extends Entity {
         }
 
         mInitialized = false;
-        mState = AudioPlaybackState.NO_AUDIO;
+        mState = PlaybackState.NO_AUDIO;
     }
 
     private void initializeAudioFile() {
         if (null != mAudio && mAudio.exists())
-            mState = AudioPlaybackState.NOT_STARTED;
+            mState = PlaybackState.NOT_STARTED;
         else
-            mState = AudioPlaybackState.NO_AUDIO;
+            mState = PlaybackState.NO_AUDIO;
 
         mInitialized = true;
     }
@@ -222,7 +222,7 @@ public class Page extends Entity {
 
         // uses lazy initialization
         mInitialized = false;
-        mState = AudioPlaybackState.INVALID;
+        mState = PlaybackState.INVALID;
     }
 
     @Override
@@ -243,7 +243,7 @@ public class Page extends Entity {
         serializer.endTag("", "page");
     }
 
-    private AudioPlaybackState mState;
+    private PlaybackState mState;
     private File mImageFolder, mAudioFolder, mImage, mAudio;
     private File mNewImage;
     private boolean mInitialized, mUsingNewImage;

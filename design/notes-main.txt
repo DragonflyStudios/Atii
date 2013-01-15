@@ -215,7 +215,7 @@ Story Player UI:
  *     [ ] During refactoring, solve the audio for wrong page bug
  * [ ] A version for Kevin
  *
- * ~~~ The Above by end of Thursday, Jan 17 ~~~
+ * ~~~ The Above by end of Wednesday, Jan 16 ~~~
  *
  * [ ] Video generation and sharing
  *     [ ] Generate time-lapse videos

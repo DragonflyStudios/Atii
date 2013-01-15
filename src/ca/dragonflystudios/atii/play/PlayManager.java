@@ -20,7 +20,7 @@ import android.util.Log;
 import ca.dragonflystudios.atii.BuildConfig;
 import ca.dragonflystudios.atii.model.book.Book;
 import ca.dragonflystudios.atii.model.book.Page;
-import ca.dragonflystudios.atii.model.book.Page.AudioPlaybackState;
+import ca.dragonflystudios.atii.model.book.Page.PlaybackState;
 import ca.dragonflystudios.utilities.Streams;
 
 public class PlayManager implements Player.PlayCommandHandler, Player.PlayerState, Player.ImageRequestResultListener,
@@ -31,8 +31,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
 
         public void onPlayStateChanged(PlayState oldState, PlayState newState);
 
-        // does not differentiate cross- vs. within-page state changes
-        public void onAudioPlaybackStateChanged(AudioPlaybackState oldState, AudioPlaybackState newState);
+        public void onPlaybackStateChanged(PlaybackState oldState, PlaybackState newState);
 
         public void onPageChanged(int newPage);
 
@@ -83,11 +82,11 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
 
     @Override
     // implementation for Player.PlayerState
-    public AudioPlaybackState getAudioPlaybackState() {
+    public PlaybackState getPlaybackState() {
         if (null == mCurrentPage)
-            return AudioPlaybackState.NO_AUDIO;
+            return PlaybackState.NO_AUDIO;
 
-        return mCurrentPage.getAudioPlaybackState();
+        return mCurrentPage.getPlaybackState();
     }
 
     @Override
@@ -96,17 +95,17 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
         if (!hasAudio())
             return -1;
 
-        if (null == mMediaPlayer) {
+        if (null == mMediaPlayer)
             try {
                 mMediaPlayer = new MediaPlayer();
                 mMediaPlayer.setOnCompletionListener(this);
                 mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
                 mMediaPlayer.prepare();
+                Log.w("getTrackDuration", "Media player prepare called");
             } catch (IOException e) {
                 Log.e(getClass().getName(), "prepare() failed with IOException");
                 e.printStackTrace();
             }
-        }
 
         return mMediaPlayer.getDuration();
     }
@@ -117,17 +116,8 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
         if (!hasAudio())
             return -1;
 
-        if (null == mMediaPlayer) {
-            try {
-                mMediaPlayer = new MediaPlayer();
-                mMediaPlayer.setOnCompletionListener(this);
-                mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
-                mMediaPlayer.prepare();
-            } catch (IOException e) {
-                Log.e(getClass().getName(), "prepare() failed with IOException");
-                e.printStackTrace();
-            }
-        }
+        if (null == mMediaPlayer || isPlaybackNotStarted())
+            return 0;
 
         return mMediaPlayer.getCurrentPosition();
     }
@@ -180,13 +170,13 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     }
 
     public void onResume() {
-        if (isAutoReplay())
-            startAudioReplay();
+        // if (isAutoReplay())
+        //    startAudioReplay();
     }
 
     public void onPause() {
-        stopAudioReplay();
-        stopAudioRecording();
+        stopPlayback();
+        stopRecording();
 
         mBook.save();
     }
@@ -201,44 +191,40 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
         }
     }
 
-    private void setCurrentPage(int newPageNum) {
+    private void switchToPage(int newPageNum) {
         if (mCurrentPageNum != newPageNum) {
-            AudioPlaybackState oldState = getAudioPlaybackState();
+            endPlayback();
             mCurrentPageNum = newPageNum;
-            AudioPlaybackState newState = getAudioPlaybackState();
             mCurrentPage = mBook.getPage(newPageNum);
 
             if (null != mPlayChangeListener)
                 mPlayChangeListener.onPageChanged(newPageNum);
-
-            if (oldState != newState && null != mPlayChangeListener)
-                mPlayChangeListener.onAudioPlaybackStateChanged(oldState, newState);
         }
     }
 
-    private void setAudioPlaybackState(AudioPlaybackState newState) {
-        AudioPlaybackState oldState = getAudioPlaybackState();
+    private void setPlaybackState(PlaybackState newState) {
+        PlaybackState oldState = getPlaybackState();
         if (oldState != newState) {
-            mBook.getPage(mCurrentPageNum).setAudioPlaybackState(newState);
+            mCurrentPage.setPlaybackState(newState);
             if (null != mPlayChangeListener)
-                mPlayChangeListener.onAudioPlaybackStateChanged(oldState, newState);
+                mPlayChangeListener.onPlaybackStateChanged(oldState, newState);
         }
     }
 
-    private boolean isReplayNotStarted() {
-        return mCurrentPage.getAudioPlaybackState() == AudioPlaybackState.NOT_STARTED;
+    private boolean isPlaybackNotStarted() {
+        return mCurrentPage.getPlaybackState() == PlaybackState.NOT_STARTED;
     }
 
     public boolean isPlaying() {
-        return mCurrentPage.getAudioPlaybackState() == AudioPlaybackState.PLAYING;
+        return mCurrentPage.getPlaybackState() == PlaybackState.PLAYING;
     }
 
     private boolean isPaused() {
-        return mCurrentPage.getAudioPlaybackState() == AudioPlaybackState.PAUSED;
+        return mCurrentPage.getPlaybackState() == PlaybackState.PAUSED;
     }
 
     private boolean isFinished() {
-        return mCurrentPage.getAudioPlaybackState() == AudioPlaybackState.FINISHED;
+        return mCurrentPage.getPlaybackState() == PlaybackState.FINISHED;
     }
 
     private boolean hasAudio() {
@@ -250,17 +236,18 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
 
     @Override
     // implementation for PlayCommandHandler
-    public void startAudioReplay() {
+    public void startPlayback() {
         if (null == mCurrentPage)
             return;
 
-        if (hasAudio() && (isReplayNotStarted() || isPaused() || isFinished())) {
+        if (hasAudio() && (isPlaybackNotStarted() || isPaused() || isFinished())) {
             if (null == mMediaPlayer) {
                 try {
                     mMediaPlayer = new MediaPlayer();
                     mMediaPlayer.setOnCompletionListener(this);
-                    mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
+                    mMediaPlayer.setDataSource(mCurrentPage.getAudio().getAbsolutePath());
                     mMediaPlayer.prepare();
+                    Log.w("startAudioReplay", "Media player prepare called");
                 } catch (IOException e) {
                     Log.e(getClass().getName(), "prepare() failed with IOException");
                     e.printStackTrace();
@@ -268,17 +255,18 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
             }
 
             mMediaPlayer.start();
-            setAudioPlaybackState(AudioPlaybackState.PLAYING);
+            Log.w("startAudioReplay", "Media player start called");
+            setPlaybackState(PlaybackState.PLAYING);
         }
     }
 
     @Override
     // implementation for PlayCommandHandler
-    public void pauseAudioReplay() {
+    public void pausePlayback() {
         if (hasAudio() && (isPlaying()))
             if (null != mMediaPlayer) {
                 mMediaPlayer.pause();
-                setAudioPlaybackState(AudioPlaybackState.PAUSED);
+                setPlaybackState(PlaybackState.PAUSED);
             }
     }
 
@@ -291,12 +279,16 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
 
     @Override
     // implementation for PlayCommandHandler
-    public void stopAudioReplay() {
+    public void stopPlayback() {
+        endPlayback();
+        setPlaybackState(PlaybackState.NOT_STARTED);
+    }
+
+    private void endPlayback() {
         if (null != mMediaPlayer) {
+            mMediaPlayer.stop();
             mMediaPlayer.release();
             mMediaPlayer = null;
-
-            setAudioPlaybackState(AudioPlaybackState.FINISHED);
         }
     }
 
@@ -315,7 +307,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
         switch (newMode) {
         case AUTHOR:
             if (PlayMode.READER == mPlayMode) {
-                stopAudioReplay();
+                stopPlayback();
                 mPlayMode = newMode;
                 if (null != mPlayChangeListener)
                     mPlayChangeListener.onModeChanged(oldMode, newMode);
@@ -334,8 +326,8 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
 
     @Override
     // implementation for PlayCommandHandler
-    public void startAudioRecording() {
-        stopAudioReplay();
+    public void startRecording() {
+        stopPlayback();
 
         if (null == mCurrentPage)
             return;
@@ -360,7 +352,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
 
     @Override
     // implementation for PlayCommandHandler
-    public void stopAudioRecording() {
+    public void stopRecording() {
         if (mPlayState == PlayState.RECORDING_AUDIO) {
             if (null != mMediaRecorder) {
                 mMediaRecorder.stop();
@@ -368,7 +360,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
                 mMediaRecorder = null;
 
                 setPlayState(PlayState.IDLE);
-                setAudioPlaybackState(AudioPlaybackState.NOT_STARTED);
+                setPlaybackState(PlaybackState.NOT_STARTED);
             }
         }
     }
@@ -529,7 +521,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     // implementation for MediaPlayer.OnCompletionListener
     public void onCompletion(MediaPlayer mp) {
         if (mMediaPlayer == mp) {
-            stopAudioReplay();
+            stopPlayback();
 
             if (null != mPlayChangeListener && isAutoAdvance() && mCurrentPageNum < getNumPages() - 1)
                 mPlayChangeListener.requestMoveToPage(mCurrentPageNum + 1);
@@ -544,16 +536,15 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for OnPageChangeListener
     public void onPageSelected(int position) {
+        Log.w("onPageSelected", "mCurrentPageNum = " + mCurrentPageNum + "    position = " + position);
         if (mCurrentPageNum != position) {
-            stopAudioReplay();
-
-            setCurrentPage(position);
+            switchToPage(position);
 
             if (isAutoReplay()) {
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        startAudioReplay();
+                        startPlayback();
                     }
                 }, 1000);
             }
