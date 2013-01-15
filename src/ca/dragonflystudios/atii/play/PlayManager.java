@@ -170,8 +170,8 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     }
 
     public void onResume() {
-        // if (isAutoReplay())
-        //    startAudioReplay();
+        if (isAutoReplay())
+            startPlayback();
     }
 
     public void onPause() {
@@ -206,8 +206,12 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
         PlaybackState oldState = getPlaybackState();
         if (oldState != newState) {
             mCurrentPage.setPlaybackState(newState);
-            if (null != mPlayChangeListener)
+            if (null != mPlayChangeListener) {
                 mPlayChangeListener.onPlaybackStateChanged(oldState, newState);
+                
+                if (isPlaybackNotStarted() || !hasAudio())
+                    setPlayState(PlayState.IDLE);
+            }
         }
     }
 

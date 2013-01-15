@@ -321,10 +321,30 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
     @Override
     // implementation for PlayChangeListener
-    public void onPlayStateChanged(PlayState oldState, PlayState newState) {
+    public void onPlayStateChanged(final PlayState oldState, final PlayState newState) {
         runOnUiThread(new Runnable() {
             public void run() {
-                refreshControls();
+                switch (oldState) {
+                case PLAYING_BACK_AUDIO:
+                    mPlayingTimer.cancel();
+                    break;
+                case RECORDING_AUDIO:
+                    mRecordingTimer.cancel();
+                    break;
+                default:
+                    break;
+                }
+
+                switch (newState) {
+                case PLAYING_BACK_AUDIO:
+                    mPlayingTimer.start();
+                    break;
+                case RECORDING_AUDIO:
+                    mRecordingTimer.start();
+                    break;
+                default:
+                    break;
+                }
             }
         });
     }
@@ -403,8 +423,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     }
 
     private void refreshUis() {
-        refreshControls();
         refreshStatusDisplays();
+        refreshControls();
     }
 
     private void refreshPageImage(int pageNum) {
@@ -434,8 +454,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     }
 
     private void refreshProgress() {
-        int progress = mPlayManager.getProgress();
         int duration = mPlayManager.getTrackDuration();
+        int progress = mPlayManager.getProgress();
 
         Log.w("refreshProgress", progress + " of " + duration);
 
@@ -472,12 +492,10 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         case READER:
             mModeButton.setSaw(true);
             setAuthoringControlsVisibility(View.INVISIBLE);
-            showAllControls();
             mPager.setPageChangeEnabled(true);
             switch (mPlayManager.getPlayState()) {
             case IDLE:
             case PLAYING_BACK_AUDIO:
-                mRecordingTimer.cancel();
                 mSecondsRecorded = 0;
                 mControlsToggleAllowed = true;
                 mStopButton.setVisibility(View.INVISIBLE);
@@ -490,7 +508,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             case RECORDING_AUDIO:
                 mControlsToggleAllowed = false;
                 mSecondsRecorded = 0;
-                mRecordingTimer.start();
                 mPager.setPageChangeEnabled(false);
                 setAuthoringControlsVisibility(View.INVISIBLE);
                 setPlaybackControlsVisibility(View.INVISIBLE);
