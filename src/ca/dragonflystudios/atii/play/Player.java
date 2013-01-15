@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
@@ -73,7 +74,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
         public void onImageCaptured();
 
-        public void onImagePicked(Intent data, ContentResolver resolver);
+        public void onImagePicked(Uri data, ContentResolver resolver);
     }
 
     @Override
@@ -215,7 +216,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             mPlayManager.onImageCaptured();
             break;
         case PICK_PHOTO:
-            mPlayManager.onImagePicked(data, getContentResolver());
+            mPlayManager.onImagePicked(data.getData(), getContentResolver());
             break;
         }
     }
@@ -317,7 +318,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         // mAdapter.notifyDataSetChanged();
     }
 
-    // TODO: refactor: make this prettier!
     public void updateProgress(int progress, int duration) {
         Log.w("updateProgress", progress + " of " + duration);
 

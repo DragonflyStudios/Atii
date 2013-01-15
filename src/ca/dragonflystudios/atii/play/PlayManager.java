@@ -435,10 +435,9 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
 
     @Override
     // implementation for ImageRequester
-    public void onImagePicked(Intent data, ContentResolver resolver) {
-        Uri selectedImage = data.getData();
+    public void onImagePicked(Uri pickedImage, ContentResolver resolver) {
         try {
-            InputStream imageStream = resolver.openInputStream(selectedImage);
+            InputStream imageStream = resolver.openInputStream(pickedImage);
             if (setNewPageImage(imageStream) && null != mPlayChangeListener)
                 mPlayChangeListener.onPageImageChanged(mCurrentPageNum);
             imageStream.close();
@@ -447,7 +446,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.ImageReque
                 fnfe.printStackTrace();
                 throw new RuntimeException(fnfe);
             } else {
-                Log.w(getClass().getName(), "selected image file not found: " + selectedImage);
+                Log.w(getClass().getName(), "selected image file not found: " + pickedImage);
             }
         } catch (IOException ioe) {
             if (BuildConfig.DEBUG) {
