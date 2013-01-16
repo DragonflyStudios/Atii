@@ -209,10 +209,10 @@ Story Player UI:
  * ~~~ The Above by end of Friday, Jan 11 ~~~
  *
  * [x] Refactor LibraryActivity and WarningDialogFragment (with fragment identification for callbacks)
- * [ ] Refactor Player and PlayManager
+ * [x] Refactor Player and PlayManager
  *     - The principle for this refactor: Player handles UI; PlayManager is the delegate for handling media recorder 
  *     - and media player and their state transition, page editing ...
- *     [ ] During refactoring, solve the audio for wrong page bug
+ *     [x] During refactoring, solve the audio for wrong page bug
  * [ ] A version for Kevin
  *
  * ~~~ The Above by end of Wednesday, Jan 16 ~~~

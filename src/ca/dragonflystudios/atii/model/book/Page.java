@@ -147,6 +147,10 @@ public class Page extends Entity {
         return (PlaybackState.NO_AUDIO != mState && PlaybackState.INVALID != mState);
     }
 
+    public void audioUpdated() {
+        initializeAudioFile();
+    }
+
     public void removePageFiles() {
         if (null != mImage && mImage.exists()) {
             mImage.delete();

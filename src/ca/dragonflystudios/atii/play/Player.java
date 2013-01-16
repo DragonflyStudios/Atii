@@ -280,8 +280,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             });
     }
 
-    // TODO: revist the following!
-
     @Override
     // implementation for PlayChangeListener
     public void onPlayModeChanged(PlayMode oldMode, final PlayMode newMode) {
@@ -309,6 +307,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         runOnUiThread(new Runnable() {
             public void run() {
                 switch (oldState) {
+                case IDLE:
                 case PLAYING_BACK:
                     exitingPlayingback();
                     break;
@@ -375,6 +374,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     @Override
     // implementation for PlayChangeListener
     public void onPagesEdited(int newPage) {
+        refreshPlaybackButtons(mPlayManager.getPlaybackState());
         refreshStatusDisplays();
         refreshPageImage(newPage);
     }
@@ -427,6 +427,52 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             mPlayManager.startPlayback();
             mPlayingTimer.start();
         }
+    }
+
+    private void enteringPlayingback() {
+        mControlsToggleAllowed = true;
+        mPager.setPageChangeEnabled(true);
+        mRecordButton.setVisibility(View.VISIBLE);
+        setPlaybackControlsVisibility(View.VISIBLE);
+        refreshPlaybackButtons(mPlayManager.getPlaybackState());
+        refreshProgress();
+        if (PlayMode.AUTHOR == mPlayManager.getPlayMode())
+            setAuthoringControlsVisibility(View.VISIBLE);
+        else
+            setAuthoringControlsVisibility(View.INVISIBLE);
+    }
+
+    private void exitingPlayingback() {
+        setPlaybackControlsVisibility(View.INVISIBLE);
+    }
+
+    private void enteringRecording() {
+        mControlsToggleAllowed = false;
+        mPager.setPageChangeEnabled(false);
+        mSecondsRecorded = 0;
+        mRecordingTimer.start();
+        mPager.setPageChangeEnabled(false);
+        mRecordButton.setVisibility(View.INVISIBLE);
+        mNoAudioStatusView.setVisibility(View.INVISIBLE);
+        mSecondsRecordedView.setVisibility(View.VISIBLE);
+        mStopButton.setVisibility(View.VISIBLE);
+        setAuthoringControlsVisibility(View.INVISIBLE);
+    }
+
+    private void exitingRecording() {
+        mSecondsRecordedView.setVisibility(View.INVISIBLE);
+        mStopButton.setVisibility(View.INVISIBLE);
+        mRecordingTimer.cancel();
+    }
+
+    private void enteringGettingImage() {
+        mControlsToggleAllowed = false;
+        mPager.setPageChangeEnabled(false);
+        hideAllControls();
+    }
+
+    private void exitingGettingImage() {
+        showAllControls();
     }
 
     private void refreshPageImage(int pageNum) {
@@ -483,51 +529,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         }
     }
 
-    private void enteringPlayingback() {
-        mControlsToggleAllowed = true;
-        mPager.setPageChangeEnabled(true);
-        mStopButton.setVisibility(View.INVISIBLE);
-        mRecordButton.setVisibility(View.VISIBLE);
-        setPlaybackControlsVisibility(View.VISIBLE);
-        refreshPlaybackButtons(mPlayManager.getPlaybackState());
-        refreshProgress();
-        if (PlayMode.AUTHOR == mPlayManager.getPlayMode())
-            setAuthoringControlsVisibility(View.VISIBLE);
-        else
-            setAuthoringControlsVisibility(View.INVISIBLE);
-    }
-
-    private void exitingPlayingback() {
-    }
-
-    private void enteringRecording() {
-        mControlsToggleAllowed = false;
-        mPager.setPageChangeEnabled(false);
-        mSecondsRecorded = 0;
-        mRecordingTimer.start();
-        mPager.setPageChangeEnabled(false);
-        setPlaybackControlsVisibility(View.INVISIBLE);
-        mRecordButton.setVisibility(View.INVISIBLE);
-        mSecondsRecordedView.setVisibility(View.VISIBLE);
-        mStopButton.setVisibility(View.VISIBLE);
-        setAuthoringControlsVisibility(View.INVISIBLE);
-    }
-
-    private void exitingRecording() {
-        mSecondsRecordedView.setVisibility(View.INVISIBLE);
-        mRecordingTimer.cancel();
-        refreshProgress();
-    }
-
-    private void enteringGettingImage() {
-        mControlsToggleAllowed = false;
-        mPager.setPageChangeEnabled(false);
-        hideAllControls();
-    }
-
-    private void exitingGettingImage() {
-    }
-
     private void refreshPlaybackButtons(PlaybackState newState) {
         switch (newState) {
         case NO_AUDIO:
@@ -576,6 +577,10 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
     private void hideAllControls() {
         mControlsView.setVisibility(View.INVISIBLE);
+    }
+
+    private void showAllControls() {
+        mControlsView.setVisibility(View.VISIBLE);
     }
 
     private void toggleAllControls() {

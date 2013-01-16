@@ -172,7 +172,8 @@
             android:layout_toRightOf="@id/replay_seek_bar"
             android:background="@android:color/transparent"
             android:contentDescription="@string/stop"
-            android:src="@drawable/button_stop" />
+            android:src="@drawable/button_stop"
+            android:visibility="invisible" />
 
         <!-- Record End -->
 

@@ -216,8 +216,9 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     }
 
     private void switchToPage(int newPageNum) {
+        stopPlayback();
+
         if (mCurrentPageNum != newPageNum) {
-            stopPlayback();
             mCurrentPageNum = newPageNum;
             mCurrentPage = mBook.getPage(newPageNum);
 
@@ -385,6 +386,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
                 mMediaRecorder.release();
                 mMediaRecorder = null;
 
+                mCurrentPage.audioUpdated();
                 setPlayState(PlayState.IDLE);
             }
         }
@@ -393,6 +395,8 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for PlayCommandHandler
     public void captureImage(Activity requestingActivity) {
+        stopPlayback();
+
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Uri imageFileUri = Uri.fromFile(mCurrentPage.getImageFileForWriting());
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
@@ -405,6 +409,8 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for PlayCommandHandler
     public void pickImage(Activity requestingActivity) {
+        stopPlayback();
+
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -436,6 +442,8 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for PlayCommandHandler
     public void addPageBefore() {
+        stopPlayback();
+
         mBook.addPageAt(mCurrentPageNum);
         mCurrentPage = mBook.getPage(mCurrentPageNum);
         if (null != mPlayChangeListener)
@@ -445,6 +453,8 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for PlayCommandHandler
     public void addPageAfter() {
+        stopPlayback();
+
         mCurrentPageNum++;
         mBook.addPageAt(mCurrentPageNum);
         mCurrentPage = mBook.getPage(mCurrentPageNum);
@@ -455,6 +465,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for PlayCommandHandler
     public void deletePage() {
+        stopPlayback();
 
         int newPage = mBook.deletePageAt(mCurrentPageNum);
 
