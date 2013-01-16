@@ -340,6 +340,8 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
             menu.findItem(R.id.menu_switch_to_reader).setEnabled(true).setVisible(true);
             menu.findItem(R.id.menu_switch_to_author).setEnabled(false).setVisible(false);
             break;
+        default:
+            break;
         }
         return true;
     }

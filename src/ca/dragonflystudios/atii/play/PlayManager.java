@@ -53,10 +53,19 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for Player.PlayerState
     public void initializeState() {
-        mPlayMode = PlayMode.INVALID;
-        mPlayState = PlayState.INVALID;
-        setPlayMode(PlayMode.READER);
-        setPlayState(PlayState.IDLE);
+        if (null != mPlayChangeListener) {
+            int mCurrentPageNum = getInitialPageNum();
+            mCurrentPage = mBook.getPage(mCurrentPageNum);
+            mPlayChangeListener.onPlayModeChanged(PlayMode.INVALID, mPlayMode);
+            
+            mPlayChangeListener.requestMoveToPage(mCurrentPageNum);
+            // the following call is a hack to address the issue with ViewPager's not calling onPageSelected()
+            // upon first setCurrentItem(): http://code.google.com/p/android/issues/detail?id=27526
+            mPlayChangeListener.onPageChanged(mCurrentPageNum);
+
+            mPlayChangeListener.onPlayStateChanged(PlayState.INVALID, mPlayState);
+            mPlayChangeListener.onPlaybackStateChanged(PlaybackState.INVALID, getPlaybackState());
+        }
     }
 
     @Override
@@ -108,7 +117,13 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
             try {
                 mMediaPlayer = new MediaPlayer();
                 mMediaPlayer.setOnCompletionListener(this);
-                mMediaPlayer.setDataSource(mCurrentPage.getAudio().getPath());
+                if (mCurrentPage != null)
+                    Log.w("getTrackDuration", "mCurrentPage is not null");
+                if (mCurrentPage.getAudio() != null)
+                    Log.w("getTrackDuration", "mCurrentPage.getAudio() is not null");
+                if (mCurrentPage.getAudio().getAbsolutePath() != null)
+                    Log.w("getTrackDuration", "mCurrentPage.getAudio().getAbsolutePath() is not null");
+                mMediaPlayer.setDataSource(mCurrentPage.getAudio().getAbsolutePath());
                 mMediaPlayer.prepare();
                 Log.w("getTrackDuration", "Media player prepare called");
             } catch (IOException e) {
@@ -164,7 +179,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
         mPlayChangeListener = pcl;
 
         if (mBook.hasPages()) {
-            mCurrentPageNum = getInitialPage();
+            mCurrentPageNum = getInitialPageNum();
             mCurrentPage = mBook.getPage(mCurrentPageNum);
         } else {
             // TODO: error handling? or just add an empty page?
@@ -173,7 +188,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
         }
     }
 
-    private int getInitialPage() {
+    private int getInitialPageNum() {
         // could be a persisted value
         return 0;
     }
@@ -202,12 +217,14 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
 
     private void switchToPage(int newPageNum) {
         if (mCurrentPageNum != newPageNum) {
-            endPlayback();
+            stopPlayback();
             mCurrentPageNum = newPageNum;
             mCurrentPage = mBook.getPage(newPageNum);
 
-            if (null != mPlayChangeListener)
+            if (null != mPlayChangeListener) {
                 mPlayChangeListener.onPageChanged(newPageNum);
+                mPlayChangeListener.onPlaybackStateChanged(PlaybackState.INVALID, getPlaybackState());
+            }
         }
     }
 
@@ -217,7 +234,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
             mCurrentPage.setPlaybackState(newState);
             if (null != mPlayChangeListener) {
                 mPlayChangeListener.onPlaybackStateChanged(oldState, newState);
-                
+
                 if (isPlaybackNotStarted() || !hasAudio())
                     setPlayState(PlayState.IDLE);
             }
@@ -293,15 +310,11 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for PlayCommandHandler
     public void stopPlayback() {
-        endPlayback();
-        setPlaybackState(PlaybackState.NOT_STARTED);
-    }
-
-    private void endPlayback() {
         if (null != mMediaPlayer) {
             mMediaPlayer.stop();
             mMediaPlayer.release();
             mMediaPlayer = null;
+            setPlaybackState(PlaybackState.NOT_STARTED);
         }
     }
 
@@ -373,7 +386,6 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
                 mMediaRecorder = null;
 
                 setPlayState(PlayState.IDLE);
-                setPlaybackState(PlaybackState.NOT_STARTED);
             }
         }
     }

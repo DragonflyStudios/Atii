@@ -33,19 +33,17 @@ import ca.dragonflystudios.atii.play.PlayManager.PlayState;
 import ca.dragonflystudios.atii.view.ReaderGestureView.ReaderGestureListener;
 
 public class Player extends FragmentActivity implements ReaderGestureListener, PlayChangeListener, WarningDialogListener,
-        OnPageImageChoice, OnSeekBarChangeListener
-{
+        OnPageImageChoice, OnSeekBarChangeListener {
 
-    public static final String  STORY_EXTRA_KEY          = "STORY_FOLDER_NAME";
-    public static final String  PLAY_MODE_EXTRA_KEY      = "PLAY_MODE";
+    public static final String STORY_EXTRA_KEY = "STORY_FOLDER_NAME";
+    public static final String PLAY_MODE_EXTRA_KEY = "PLAY_MODE";
 
     private static final String PAGE_DELETION_DIALOG_TAG = "PageDeletionDialogFragment";
 
-    protected final static int  CAPTURE_IMAGE            = 0;
-    protected final static int  PICK_IMAGE               = 1;
+    protected final static int CAPTURE_IMAGE = 0;
+    protected final static int PICK_IMAGE = 1;
 
-    public interface PlayCommandHandler
-    {
+    public interface PlayCommandHandler {
 
         public void startPlayback();
 
@@ -76,8 +74,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         public void deletePage();
     }
 
-    public interface PlayerState
-    {
+    public interface PlayerState {
         public void initializeState();
 
         public PlayMode getPlayMode();
@@ -111,8 +108,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
      * @author Luo, Jun
      * 
      */
-    public interface ImageRequestResultListener
-    {
+    public interface ImageRequestResultListener {
 
         public void onGettingImageFailure();
 
@@ -141,7 +137,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mPager.setAdapter(mAdapter);
         mPager.setOnPageChangeListener(mPlayManager);
         mPager.setReaderGestureListener(this);
-        mPager.setCurrentItem(mPlayManager.getPageNum());
 
         mControlsView = (ViewGroup) findViewById(R.id.controls);
 
@@ -157,9 +152,10 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
         mModeButton.setVisibility(View.GONE);
 
         mTrackInfoView = (TextView) mControlsView.findViewById(R.id.track_info);
-        mAudioStatusView = (TextView) mControlsView.findViewById(R.id.audio_status);
-        mReplaySeekBar = (SeekBar) mControlsView.findViewById(R.id.replay_seek_bar);
-        mReplaySeekBar.setOnSeekBarChangeListener(this);
+        mNoAudioStatusView = (TextView) mControlsView.findViewById(R.id.no_audio_status);
+        mSecondsRecordedView = (TextView) mControlsView.findViewById(R.id.seconds_recorded);
+        mPlaybackSeekBar = (SeekBar) mControlsView.findViewById(R.id.replay_seek_bar);
+        mPlaybackSeekBar.setOnSeekBarChangeListener(this);
 
         mPlayButton = (ImageButton) mControlsView.findViewById(R.id.play);
         mPlayButton.setOnClickListener(new OnClickListener() {
@@ -284,6 +280,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             });
     }
 
+    // TODO: revist the following!
+
     @Override
     // implementation for PlayChangeListener
     public void onPlayModeChanged(PlayMode oldMode, final PlayMode newMode) {
@@ -312,13 +310,13 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
             public void run() {
                 switch (oldState) {
                 case PLAYING_BACK:
-                    exitPlayingback();
+                    exitingPlayingback();
                     break;
                 case RECORDING:
-                    exitRecording();
+                    exitingRecording();
                     break;
                 case GETTING_IMAGE:
-                    exitGettingImage();
+                    exitingGettingImage();
                     break;
                 default:
                     break;
@@ -327,13 +325,13 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
                 switch (newState) {
                 case IDLE:
                 case PLAYING_BACK:
-                    enterPlayingback();
+                    enteringPlayingback();
                     break;
                 case GETTING_IMAGE:
-                    enterGettingImage();
+                    enteringGettingImage();
                     break;
                 case RECORDING:
-                    enterRecording();
+                    enteringRecording();
                     break;
                 default:
                     break;
@@ -347,26 +345,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     public void onPlaybackStateChanged(PlaybackState oldState, final PlaybackState newState) {
         runOnUiThread(new Runnable() {
             public void run() {
-                switch (newState) {
-                case NO_AUDIO:
-                    switchPlaybackButton(null);
-                    break;
-                case PLAYING:
-                    mPlayingTimer.start();
-                    switchPlaybackButton(mPauseButton);
-                    break;
-                case NOT_STARTED:
-                case PAUSED:
-                case FINISHED:
-                    mPlayingTimer.cancel();
-                    switchPlaybackButton(mPlayButton);
-                    break;
-                default:
-                    if (BuildConfig.DEBUG)
-                        throw new IllegalStateException("invalid audio playback state");
-                    else
-                        return;
-                }
+                refreshPlaybackButtons(newState);
             }
         });
     }
@@ -391,17 +370,13 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     // implementation for PlayChangeListener
     public void requestMoveToPage(int newPage) {
         mPager.setCurrentItem(newPage);
-        refreshPageNumView();
-        refreshProgress();
     }
 
     @Override
     // implementation for PlayChangeListener
     public void onPagesEdited(int newPage) {
+        refreshStatusDisplays();
         refreshPageImage(newPage);
-        // TODO: better be refreshControls()? maybe not
-        refreshPageNumView();
-        refreshProgress();
     }
 
     @Override
@@ -447,7 +422,7 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     @Override
     // implementation for OnSeekBarChangeListener
     public void onStopTrackingTouch(SeekBar seekBar) {
-        mPlayManager.seekTo(mReplaySeekBar.getProgress());
+        mPlayManager.seekTo(mPlaybackSeekBar.getProgress());
         if (mHasBeenPlaying) {
             mPlayManager.startPlayback();
             mPlayingTimer.start();
@@ -486,75 +461,94 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
 
         Log.w("refreshProgress", progress + " of " + duration);
 
-        if (duration > 0) {
-            mReplaySeekBar.setVisibility(View.VISIBLE);
-            mTrackInfoView.setVisibility(View.VISIBLE);
-            mAudioStatusView.setVisibility(View.INVISIBLE);
-        } else if (duration <= 0) {
-            mReplaySeekBar.setVisibility(View.INVISIBLE);
-            mTrackInfoView.setVisibility(View.INVISIBLE);
-            mAudioStatusView.setVisibility(View.VISIBLE);
-            mAudioStatusView.setText(R.string.no_audio);
-        }
-
         if (mDuration != duration) {
             if (duration > 0)
-                mReplaySeekBar.setMax(duration);
+                mPlaybackSeekBar.setMax(duration);
             mDuration = duration;
         }
 
-        if (mDuration > 0 & progress >= 0) {
+        if (mDuration > 0 && progress >= 0) {
+            mPlaybackSeekBar.setVisibility(View.VISIBLE);
+            mTrackInfoView.setVisibility(View.VISIBLE);
+            mNoAudioStatusView.setVisibility(View.INVISIBLE);
+
             SimpleDateFormat df = new SimpleDateFormat("mm:ss");
             String trackInfoText = df.format(progress) + " / " + df.format(duration);
             mTrackInfoView.setText(trackInfoText);
-            mReplaySeekBar.setProgress(progress);
+            mPlaybackSeekBar.setProgress(progress);
+        } else {
+            mPlaybackSeekBar.setVisibility(View.INVISIBLE);
+            mTrackInfoView.setVisibility(View.INVISIBLE);
+            mNoAudioStatusView.setVisibility(View.VISIBLE);
         }
     }
 
-    private void enterPlayingback() {
+    private void enteringPlayingback() {
         mControlsToggleAllowed = true;
         mPager.setPageChangeEnabled(true);
         mStopButton.setVisibility(View.INVISIBLE);
         mRecordButton.setVisibility(View.VISIBLE);
-        mAudioStatusView.setVisibility(View.INVISIBLE);
         setPlaybackControlsVisibility(View.VISIBLE);
+        refreshPlaybackButtons(mPlayManager.getPlaybackState());
+        refreshProgress();
         if (PlayMode.AUTHOR == mPlayManager.getPlayMode())
-            setAuthoringControlsVisibility(View.INVISIBLE);
-        else
             setAuthoringControlsVisibility(View.VISIBLE);
+        else
+            setAuthoringControlsVisibility(View.INVISIBLE);
     }
 
-    private void exitPlayingback() {
+    private void exitingPlayingback() {
     }
 
-    private void enterRecording() {
+    private void enteringRecording() {
         mControlsToggleAllowed = false;
         mPager.setPageChangeEnabled(false);
-        mRecordingTimer.start();
         mSecondsRecorded = 0;
         mRecordingTimer.start();
         mPager.setPageChangeEnabled(false);
         setPlaybackControlsVisibility(View.INVISIBLE);
         mRecordButton.setVisibility(View.INVISIBLE);
-        mAudioStatusView.setVisibility(View.VISIBLE);
+        mSecondsRecordedView.setVisibility(View.VISIBLE);
         mStopButton.setVisibility(View.VISIBLE);
-        if (PlayMode.AUTHOR == mPlayManager.getPlayMode())
-            setAuthoringControlsVisibility(View.INVISIBLE);
-        else
-            setAuthoringControlsVisibility(View.VISIBLE);
+        setAuthoringControlsVisibility(View.INVISIBLE);
     }
 
-    private void exitRecording() {
+    private void exitingRecording() {
+        mSecondsRecordedView.setVisibility(View.INVISIBLE);
         mRecordingTimer.cancel();
+        refreshProgress();
     }
 
-    private void enterGettingImage() {
+    private void enteringGettingImage() {
         mControlsToggleAllowed = false;
         mPager.setPageChangeEnabled(false);
         hideAllControls();
     }
 
-    private void exitGettingImage() {
+    private void exitingGettingImage() {
+    }
+
+    private void refreshPlaybackButtons(PlaybackState newState) {
+        switch (newState) {
+        case NO_AUDIO:
+            switchPlaybackButton(null);
+            break;
+        case PLAYING:
+            mPlayingTimer.start();
+            switchPlaybackButton(mPauseButton);
+            break;
+        case NOT_STARTED:
+        case PAUSED:
+        case FINISHED:
+            mPlayingTimer.cancel();
+            switchPlaybackButton(mPlayButton);
+            break;
+        default:
+            if (BuildConfig.DEBUG)
+                throw new IllegalStateException("invalid audio playback state");
+            else
+                return;
+        }
     }
 
     private void switchPlaybackButton(ImageButton button) {
@@ -576,12 +570,8 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     private void setPlaybackControlsVisibility(int visibility) {
         mPlayButton.setVisibility(visibility);
         mPauseButton.setVisibility(visibility);
-        mReplaySeekBar.setVisibility(visibility);
+        mPlaybackSeekBar.setVisibility(visibility);
         mTrackInfoView.setVisibility(visibility);
-    }
-
-    private void showAllControls() {
-        mControlsView.setVisibility(View.VISIBLE);
     }
 
     private void hideAllControls() {
@@ -589,59 +579,55 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     }
 
     private void toggleAllControls() {
-        toggleViewVisibility(mControlsView);
-    }
-
-    private void toggleViewVisibility(View v) {
-        if (View.VISIBLE == v.getVisibility())
-            v.setVisibility(View.INVISIBLE);
+        if (View.VISIBLE == mControlsView.getVisibility())
+            mControlsView.setVisibility(View.INVISIBLE);
         else
-            v.setVisibility(View.VISIBLE);
+            mControlsView.setVisibility(View.VISIBLE);
     }
 
-    private PlayManager      mPlayManager;
+    private PlayManager mPlayManager;
     private AtiiPagerAdapter mAdapter;
-    private AtiiPager        mPager;
+    private AtiiPager mPager;
 
-    private ViewGroup        mControlsView;
-    private SeesawButton     mModeButton;
-    private ImageButton      mPlayButton, mPauseButton;
-    private ImageButton      mRecordButton, mStopButton;
-    private ImageButton      mCaptureButton, mPickPictureButton;
-    private ImageButton      mAddBeforeButton, mAddAfterButton, mDeleteButton;
-    private TextView         mPageNumView, mTrackInfoView, mAudioStatusView;
-    private SeekBar          mReplaySeekBar;
+    private ViewGroup mControlsView;
+    private SeesawButton mModeButton;
+    private ImageButton mPlayButton, mPauseButton;
+    private ImageButton mRecordButton, mStopButton;
+    private ImageButton mCaptureButton, mPickPictureButton;
+    private ImageButton mAddBeforeButton, mAddAfterButton, mDeleteButton;
+    private TextView mPageNumView, mTrackInfoView, mNoAudioStatusView, mSecondsRecordedView;
+    private SeekBar mPlaybackSeekBar;
 
-    private boolean          mHasBeenPlaying;
+    private boolean mHasBeenPlaying;
 
-    private boolean          mControlsToggleAllowed;
+    private boolean mControlsToggleAllowed;
 
-    private int              mDuration        = -1;
+    private int mDuration = -1;
 
-    private int              mSecondsRecorded = 0;
-    private CountDownTimer   mRecordingTimer  = new CountDownTimer(86400000, 1000) {
-                                                  public void onTick(long millisUntilFinished) {
-                                                      mSecondsRecorded++;
-                                                      int minutes = mSecondsRecorded / 60;
-                                                      int seconds = mSecondsRecorded % 60;
+    private int mSecondsRecorded = 0;
+    private CountDownTimer mRecordingTimer = new CountDownTimer(86400000, 1000) {
+        public void onTick(long millisUntilFinished) {
+            mSecondsRecorded++;
+            int minutes = mSecondsRecorded / 60;
+            int seconds = mSecondsRecorded % 60;
 
-                                                      if (seconds < 10) {
-                                                          mAudioStatusView.setText("" + minutes + ":0" + seconds);
-                                                      } else {
-                                                          mAudioStatusView.setText("" + minutes + ":" + seconds);
-                                                      }
-                                                  }
+            if (seconds < 10) {
+                mSecondsRecordedView.setText("" + minutes + ":0" + seconds);
+            } else {
+                mSecondsRecordedView.setText("" + minutes + ":" + seconds);
+            }
+        }
 
-                                                  public void onFinish() {
-                                                  }
-                                              };
+        public void onFinish() {
+        }
+    };
 
-    private CountDownTimer   mPlayingTimer    = new CountDownTimer(86400000, 100) {
-                                                  public void onTick(long millisUntilFinished) {
-                                                      refreshProgress();
-                                                  }
+    private CountDownTimer mPlayingTimer = new CountDownTimer(86400000, 100) {
+        public void onTick(long millisUntilFinished) {
+            refreshProgress();
+        }
 
-                                                  public void onFinish() {
-                                                  }
-                                              };
+        public void onFinish() {
+        }
+    };
 }

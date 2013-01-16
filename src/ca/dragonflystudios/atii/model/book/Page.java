@@ -14,6 +14,7 @@ import ca.dragonflystudios.atii.model.Parser;
 import ca.dragonflystudios.utilities.Pathname;
 
 // TODO: Should we also allow a page that has no page image? If only to be symmetrical?
+// TODO: get rid of the lazy initialization thing
 
 public class Page extends Entity {
     public enum PlaybackState {
@@ -143,7 +144,7 @@ public class Page extends Entity {
         if (!mInitialized)
             initializeAudioFile();
 
-        return (PlaybackState.NO_AUDIO != mState);
+        return (PlaybackState.NO_AUDIO != mState && PlaybackState.INVALID != mState);
     }
 
     public void removePageFiles() {
