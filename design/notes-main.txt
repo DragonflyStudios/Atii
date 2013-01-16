@@ -213,7 +213,7 @@ Story Player UI:
  *     - The principle for this refactor: Player handles UI; PlayManager is the delegate for handling media recorder 
  *     - and media player and their state transition, page editing ...
  *     [x] During refactoring, solve the audio for wrong page bug
- * [ ] A version for Kevin
+ * [x] A version for Kevin
  *
  * ~~~ The Above by end of Wednesday, Jan 16 ~~~
  *
@@ -256,7 +256,7 @@ Story Player UI:
  *     [ ] Page image editing: allow panning, zooming & cropping.
  *         [ ] Future: [Edit] in between [Choose] and [Capture]
  *         - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
- *
+ * [ ] Show message and spinner when first time starting up and copying assets
  * [ ] Make seek bar advance to the very end during replay!
  *     -- There seems to be an issue with Android here: http://code.google.com/p/android/issues/detail?id=11590
  *
