@@ -27,7 +27,7 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
         MediaPlayer.OnCompletionListener, ViewPager.OnPageChangeListener {
 
     public interface PlayChangeListener {
-        public void onModeChanged(PlayMode oldMode, PlayMode newMode);
+        public void onPlayModeChanged(PlayMode oldMode, PlayMode newMode);
 
         public void onPlayStateChanged(PlayState oldState, PlayState newState);
 
@@ -43,11 +43,20 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     }
 
     public enum PlayMode {
-        READER, AUTHOR
+        INVALID, READER, AUTHOR
     }
 
     public enum PlayState {
-        IDLE, PLAYING_BACK_AUDIO, RECORDING_AUDIO, GETTING_IMAGE
+        INVALID, IDLE, PLAYING_BACK, RECORDING, GETTING_IMAGE
+    }
+
+    @Override
+    // implementation for Player.PlayerState
+    public void initializeState() {
+        mPlayMode = PlayMode.INVALID;
+        mPlayState = PlayState.INVALID;
+        setPlayMode(PlayMode.READER);
+        setPlayState(PlayState.IDLE);
     }
 
     @Override
@@ -300,12 +309,12 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     // implementation for PlayCommandHandler
     public void togglePlayMode() {
         if (mPlayMode != PlayMode.READER)
-            switchPlayMode(PlayMode.READER);
+            setPlayMode(PlayMode.READER);
         else
-            switchPlayMode(PlayMode.AUTHOR);
+            setPlayMode(PlayMode.AUTHOR);
     }
 
-    private void switchPlayMode(PlayMode newMode) {
+    private void setPlayMode(PlayMode newMode) {
         PlayMode oldMode = mPlayMode;
 
         switch (newMode) {
@@ -314,14 +323,14 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
                 stopPlayback();
                 mPlayMode = newMode;
                 if (null != mPlayChangeListener)
-                    mPlayChangeListener.onModeChanged(oldMode, newMode);
+                    mPlayChangeListener.onPlayModeChanged(oldMode, newMode);
             }
             break;
         case READER:
             if (PlayMode.AUTHOR == mPlayMode) {
                 mPlayMode = newMode;
                 if (null != mPlayChangeListener)
-                    mPlayChangeListener.onModeChanged(oldMode, newMode);
+                    mPlayChangeListener.onPlayModeChanged(oldMode, newMode);
             }
         default:
             break;
@@ -350,14 +359,14 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
             }
         }
 
-        setPlayState(PlayState.RECORDING_AUDIO);
+        setPlayState(PlayState.RECORDING);
         mMediaRecorder.start();
     }
 
     @Override
     // implementation for PlayCommandHandler
     public void stopRecording() {
-        if (mPlayState == PlayState.RECORDING_AUDIO) {
+        if (mPlayState == PlayState.RECORDING) {
             if (null != mMediaRecorder) {
                 mMediaRecorder.stop();
                 mMediaRecorder.release();
