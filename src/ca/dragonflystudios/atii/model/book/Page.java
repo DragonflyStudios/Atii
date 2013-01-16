@@ -13,9 +13,6 @@ import ca.dragonflystudios.atii.model.Entity;
 import ca.dragonflystudios.atii.model.Parser;
 import ca.dragonflystudios.utilities.Pathname;
 
-// TODO: Should we also allow a page that has no page image? If only to be symmetrical?
-// TODO: get rid of the lazy initialization thing
-
 public class Page extends Entity {
     public enum PlaybackState {
         INVALID, NO_AUDIO, NOT_STARTED, PLAYING, PAUSED, FINISHED
@@ -25,10 +22,7 @@ public class Page extends Entity {
         mImageFolder = imageFolder;
         mAudioFolder = audioFolder;
 
-        // uses lazy initialization
-        mInitialized = false;
-        mState = PlaybackState.INVALID;
-
+        mState = PlaybackState.NO_AUDIO;
         mUsingNewImage = false;
     }
 
@@ -41,17 +35,33 @@ public class Page extends Entity {
         if (null != audioFileName)
             mAudio = new File(mAudioFolder, audioFileName);
 
-        // uses lazy initialization
-        mInitialized = false;
-        mState = PlaybackState.INVALID;
-
+        mState = PlaybackState.NO_AUDIO;
         mUsingNewImage = false;
+
+        initializePlaybackState();
+    }
+
+    public boolean isUsingNewImage() {
+        return mUsingNewImage;
+    }
+
+    public String getImagePath() {
+        File imageFile = mUsingNewImage ? mNewImage : mImage;
+
+        if (null == imageFile)
+            return null;
+
+        return imageFile.getAbsolutePath();
+    }
+
+    public String getAudioPath() {
+        if (null == mAudio)
+            return null;
+
+        return mAudio.getAbsolutePath();
     }
 
     public PlaybackState getPlaybackState() {
-        if (!mInitialized)
-            initializeAudioFile();
-
         return mState;
     }
 
@@ -116,9 +126,6 @@ public class Page extends Entity {
     }
 
     public File getAudio() {
-        if (!mInitialized)
-            initializeAudioFile();
-
         return mAudio;
     }
 
@@ -131,24 +138,15 @@ public class Page extends Entity {
 
     public void setAudio(File newAudio) {
         mAudio = newAudio;
-
-        if (null == mAudio)
-            mInitialized = false;
-        else if (mAudio.exists())
-            mState = PlaybackState.NOT_STARTED;
-        else
-            mState = PlaybackState.NO_AUDIO;
+        initializePlaybackState();
     }
 
     public boolean hasAudio() {
-        if (!mInitialized)
-            initializeAudioFile();
-
-        return (PlaybackState.NO_AUDIO != mState && PlaybackState.INVALID != mState);
+        return (PlaybackState.NO_AUDIO != mState);
     }
 
     public void audioUpdated() {
-        initializeAudioFile();
+        initializePlaybackState();
     }
 
     public void removePageFiles() {
@@ -162,37 +160,14 @@ public class Page extends Entity {
             mAudio = null;
         }
 
-        mInitialized = false;
         mState = PlaybackState.NO_AUDIO;
     }
 
-    private void initializeAudioFile() {
+    private void initializePlaybackState() {
         if (null != mAudio && mAudio.exists())
             mState = PlaybackState.NOT_STARTED;
         else
             mState = PlaybackState.NO_AUDIO;
-
-        mInitialized = true;
-    }
-
-    public boolean isUsingNewImage() {
-        return mUsingNewImage;
-    }
-
-    public String getImagePath() {
-        File imageFile = mUsingNewImage ? mNewImage : mImage;
-
-        if (null == imageFile)
-            return null;
-
-        return imageFile.getAbsolutePath();
-    }
-
-    public String getAudioPath() {
-        if (null == mAudio)
-            return null;
-
-        return mAudio.getAbsolutePath();
     }
 
     @Override
@@ -225,9 +200,7 @@ public class Page extends Entity {
         mImage = new File(mImageFolder, imageFileName);
         mAudio = new File(mAudioFolder, audioFileName);
 
-        // uses lazy initialization
-        mInitialized = false;
-        mState = PlaybackState.INVALID;
+        initializePlaybackState();
     }
 
     @Override
@@ -251,5 +224,5 @@ public class Page extends Entity {
     private PlaybackState mState;
     private File mImageFolder, mAudioFolder, mImage, mAudio;
     private File mNewImage;
-    private boolean mInitialized, mUsingNewImage;
+    private boolean mUsingNewImage;
 }

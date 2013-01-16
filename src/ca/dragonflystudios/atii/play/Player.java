@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -504,8 +503,6 @@ public class Player extends FragmentActivity implements ReaderGestureListener, P
     private void refreshProgress() {
         int duration = mPlayManager.getTrackDuration();
         int progress = mPlayManager.getProgress();
-
-        Log.w("refreshProgress", progress + " of " + duration);
 
         if (mDuration != duration) {
             if (duration > 0)

@@ -117,15 +117,8 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
             try {
                 mMediaPlayer = new MediaPlayer();
                 mMediaPlayer.setOnCompletionListener(this);
-                if (mCurrentPage != null)
-                    Log.w("getTrackDuration", "mCurrentPage is not null");
-                if (mCurrentPage.getAudio() != null)
-                    Log.w("getTrackDuration", "mCurrentPage.getAudio() is not null");
-                if (mCurrentPage.getAudio().getAbsolutePath() != null)
-                    Log.w("getTrackDuration", "mCurrentPage.getAudio().getAbsolutePath() is not null");
                 mMediaPlayer.setDataSource(mCurrentPage.getAudio().getAbsolutePath());
                 mMediaPlayer.prepare();
-                Log.w("getTrackDuration", "Media player prepare called");
             } catch (IOException e) {
                 Log.e(getClass().getName(), "prepare() failed with IOException");
                 e.printStackTrace();
@@ -278,15 +271,12 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
                     mMediaPlayer.setOnCompletionListener(this);
                     mMediaPlayer.setDataSource(mCurrentPage.getAudio().getAbsolutePath());
                     mMediaPlayer.prepare();
-                    Log.w("startAudioReplay", "Media player prepare called");
                 } catch (IOException e) {
-                    Log.e(getClass().getName(), "prepare() failed with IOException");
                     e.printStackTrace();
                 }
             }
 
             mMediaPlayer.start();
-            Log.w("startAudioReplay", "Media player start called");
             setPlaybackState(PlaybackState.PLAYING);
         }
     }
@@ -572,7 +562,6 @@ public class PlayManager implements Player.PlayCommandHandler, Player.PlayerStat
     @Override
     // implementation for OnPageChangeListener
     public void onPageSelected(int position) {
-        Log.w("onPageSelected", "mCurrentPageNum = " + mCurrentPageNum + "    position = " + position);
         if (mCurrentPageNum != position) {
             switchToPage(position);
 
