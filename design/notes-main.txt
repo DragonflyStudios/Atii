@@ -219,6 +219,11 @@ Story Player UI:
  *
  * [ ] Video generation and sharing
  *     [ ] Generate time-lapse videos
+ *         - http://stackoverflow.com/questions/3688993/encode-a-series-of-images-into-a-video
+ *         - http://odroid.foros-phpbb.com/t338-ffmpeg-compiled-with-android-ndk
+ *         - http://stackoverflow.com/questions/14133989/how-can-i-make-3gp-video-with-mp3-audio-file-and-images
+ *         - http://stackoverflow.com/questions/3132774/add-an-image-to-mp3-and-convert-it-to-a-video-file-using-ffmpeg
+ *         - http://stackoverflow.com/questions/4725773/ffmpeg-on-android
  *     [ ] Upload to YouTube
  *     [ ] Upload to Youku
  *
@@ -227,8 +232,18 @@ Story Player UI:
  * [ ] Page image zoom
  * [ ] Draggable page slider.
  *     - For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
- *     - See also ... the Android UI Patterns demo app ... 
- * [ ] Gingerbread support
+ *     - See also ... the Android UI Patterns demo app ...
+ * [ ] Bring back action bar for Reader?
+ *     [ ] Lock for protecting an audio track?
+ *     [ ] Switch for auto page advance?
+ *     [ ] Mode switch in Overflow menu?
+ *     [ ] Hide action bar when recording video or getting image
+ * [ ] Create preview for books created without images, but later added images
+ *     - Consider adding/changing image for first page triggering creation of preview!
+ * [ ] Show message and spinner when first time starting up and copying assets
+ *
+ * ~~ Platform and device tests ~~
+ *
  * [ ] Kindle Fire test
  * [ ] Test on other devices
  *
@@ -256,7 +271,6 @@ Story Player UI:
  *     [ ] Page image editing: allow panning, zooming & cropping.
  *         [ ] Future: [Edit] in between [Choose] and [Capture]
  *         - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
- * [ ] Show message and spinner when first time starting up and copying assets
  * [ ] Make seek bar advance to the very end during replay!
  *     -- There seems to be an issue with Android here: http://code.google.com/p/android/issues/detail?id=11590
  *
