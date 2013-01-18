@@ -219,13 +219,25 @@ Story Player UI:
  *
  * [ ] Video generation and sharing
  *     [ ] Generate time-lapse videos
+ *         - Nice FFmpeg intro: http://blog.superuser.com/2012/02/24/ffmpeg-the-ultimate-video-and-audio-manipulation-tool/
+ *         - Another, old, FFmeg intro: http://www.tuxradar.com/content/ffmpeg-made-easy
  *         - http://stackoverflow.com/questions/3688993/encode-a-series-of-images-into-a-video
  *         - http://odroid.foros-phpbb.com/t338-ffmpeg-compiled-with-android-ndk
  *         - http://stackoverflow.com/questions/14133989/how-can-i-make-3gp-video-with-mp3-audio-file-and-images
  *         - http://stackoverflow.com/questions/3132774/add-an-image-to-mp3-and-convert-it-to-a-video-file-using-ffmpeg
  *         - http://stackoverflow.com/questions/4725773/ffmpeg-on-android
+ *         - http://code.google.com/p/javacv/issues/detail?id=160
+ *         - https://play.google.com/store/apps/details?id=roman10.media.ffmpeg&hl=en
+ *         - http://www.roman10.net/how-to-build-ffmpeg-for-android/
+ *         - 'The output should be "MPEG4 (Divx, Xvid) format at 640x480 resolution with MP3 audio" as youtube recommends.'
  *     [ ] Upload to YouTube
+ *         - YouTube parameters: http://superuser.com/questions/98980/creating-video-with-audio-and-still-image-for-youtube
+ *         - Good doc: http://ffmpeg.org/trac/ffmpeg/wiki/EncodeforYouTube
+ *         - Encoding for the web: http://duq.ca/duqamuq/?tag=ffmpeg
+ *         - http://ubuntuforums.org/showthread.php?t=1502537
  *     [ ] Upload to Youku
+ *     [ ] License stuff
+ *         - http://www.mpegla.com/main/programs/AVC/Documents/AVC_TermsSummary.pdf
  *
  * ~~~ The Above by end of Thursday, Jan 24 ~~~
  *
