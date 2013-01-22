@@ -242,24 +242,46 @@ Story Player UI:
  * ~~~ The Above by end of Thursday, Jan 24 ~~~
  *
  * [ ] Page image zoom
- * [ ] Draggable page slider.
+ * [ ] Draggable page slider
  *     - For pages: http://www.youtube.com/watch?v=us8w2g9YXC4&feature=youtube_gdata
  *     - See also ... the Android UI Patterns demo app ...
+ * [ ] Create preview for books created without images, but later added images
+ *     - Consider adding/changing image for first page triggering creation of preview!
+ * [ ] Show message and spinner when first time starting up and copying assets
+ * [ ] Make the buttons look better
+ *     [ ] A keep-playing button for auto page advancing? Or a setting in Settings.
+ *
+ * ......
+ *
+ * [ ] Support for multiple named audio tracks
+ *     [ ] Use xml tag attributes
+ *         [ ] named tracks
+ *         [ ] indelible tracks
+ *     [ ] Player Tracks UI: top of page
+ *         [ ] Layout: [Play] ( ...... spinner ...... ) [Record]
+ *         [ ] Spinner for selecting among tracks
+ *             [ ] Under Reader mode, there is no [Record] button shown for "indelible" tracks
+ *             [ ] Under Author mode, show a [Configure] under the spinner
+ *                 [ ] Delete track
+ *                 [ ] Rename track
+ *                 [ ] Make track indelible
  * [ ] Bring back action bar for Reader?
  *     [ ] Lock for protecting an audio track?
  *     [ ] Switch for auto page advance?
  *     [ ] Mode switch in Overflow menu?
  *     [ ] Hide action bar when recording video or getting image
- * [ ] Create preview for books created without images, but later added images
- *     - Consider adding/changing image for first page triggering creation of preview!
- * [ ] Show message and spinner when first time starting up and copying assets
+ *
+ * [ ] Include 3 demos in the release version
+ *     [ ] A cartoon story -- Underwear Tiger? -- English & Chinese & Spanish
+ *     [ ] How to use the Atii Reader -- English, Chinese, Spanish & Arabic -- Demonstrate with a stick-figure story
+ *     [ ] How to make a Chinese binding -- Chinese and English and Spanish
  *
  * ~~ Platform and device tests ~~
  *
  * [ ] Kindle Fire test
  * [ ] Test on other devices
  *
- * ~~~ The Above by end of Thursday, Jan 31 -- Private Preview ~~~
+ * ~~~ The Above will be the first release version, by March 17 ~~~
  *
  * [ ] Usability features
  *     [ ] Fading: during playback, controls disappear after a certain delay (e.g. 5 seconds); otherwise stays
@@ -285,21 +307,6 @@ Story Player UI:
  *         - See: http://mobile.tutsplus.com/tutorials/android/capture-and-crop-an-image-with-the-device-camera/
  * [ ] Make seek bar advance to the very end during replay!
  *     -- There seems to be an issue with Android here: http://code.google.com/p/android/issues/detail?id=11590
- *
- * ......
- *
- * [ ] Support for multiple audio tracks
- *     [ ] Use xml tag attributes
- *         [ ] named tracks
- *         [ ] indelible tracks
- *     [ ] Player Tracks UI: top of page
- *         [ ] Layout: [Play] ( ...... spinner ...... ) [Record]
- *         [ ] Spinner for selecting among tracks
- *             [ ] Under Reader mode, there is no [Record] button shown for "indelible" tracks
- *             [ ] Under Author mode, show a [Configure] under the spinner
- *                 [ ] Delete track
- *                 [ ] Rename track
- *                 [ ] Make track indelible
  *
  * ......
  *
