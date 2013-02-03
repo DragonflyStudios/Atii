@@ -35,7 +35,7 @@ public class WarningDialogFragment extends DialogFragment
         try {
             mListener = (WarningDialogListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement DeleteDialogListener");
+            throw new ClassCastException(activity.toString() + " must implement WarningDialogListener");
         }
     }
 

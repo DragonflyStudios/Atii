@@ -33,6 +33,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import ca.dragonflystudios.android.dialog.FolderChooser.FolderChooserListener;
+import ca.dragonflystudios.android.dialog.MessageDialogFragment;
 import ca.dragonflystudios.android.dialog.WarningDialogFragment;
 import ca.dragonflystudios.android.dialog.WarningDialogFragment.WarningDialogListener;
 import ca.dragonflystudios.android.storage.Storage;
@@ -358,8 +359,12 @@ public class LibraryActivity extends Activity implements WarningDialogListener, 
             invalidateOptionsMenu();
             return true;
         case R.id.menu_create:
-            DialogFragment dialog = BookCreationDialog.newInstance();
-            dialog.show(getFragmentManager(), "BookCreationDialogFragment");
+            DialogFragment creation_dialog = BookCreationDialog.newInstance();
+            creation_dialog.show(getFragmentManager(), "BookCreationDialogFragment");
+            return true;
+        case R.id.menu_about:
+            DialogFragment about_dialog = MessageDialogFragment.newInstance(R.string.about_dialog_title, R.string.about_dialog_message);
+            about_dialog.show(getFragmentManager(), "AboutDialogFragment");
             return true;
         default:
             return super.onOptionsItemSelected(item);
