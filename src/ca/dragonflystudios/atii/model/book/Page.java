@@ -78,7 +78,7 @@ public class Page extends Entity {
 
     public File getImageFileForWriting() {
         if (null == mNewImage)
-            mNewImage = Pathname.createUniqueFile(mImageFolder, ".jpg");
+            mNewImage = Pathname.createUniqueFile(mImageFolder, "jpg");
         mUsingNewImage = true;
 
         return mNewImage;
